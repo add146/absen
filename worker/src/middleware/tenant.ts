@@ -100,8 +100,8 @@ export const tenantContext = async (c: Context<{ Bindings: Bindings }>, next: Ne
 
         await next()
     } catch (e: any) {
-        console.error('Token verification failed:', e.message)
-        return c.json({ error: 'Invalid or expired token' }, 401)
+        console.error('JWT verification failed:', e.message, e)
+        return c.json({ error: 'Invalid or expired token', details: e.message }, 401)
     }
 }
 
