@@ -20,7 +20,6 @@ const AttendanceHistory: React.FC = () => {
     const [currentDate, setCurrentDate] = useState(new Date());
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [attendanceData, setAttendanceData] = useState<any[]>([]);
-    const [loading, setLoading] = useState(false);
     const [stats, setStats] = useState({
         present: 0,
         absent: 0,
@@ -33,7 +32,6 @@ const AttendanceHistory: React.FC = () => {
     }, [currentDate]);
 
     const fetchMonthlyData = async () => {
-        setLoading(true);
         try {
             const year = currentDate.getFullYear();
             const month = currentDate.getMonth();
@@ -46,8 +44,6 @@ const AttendanceHistory: React.FC = () => {
             calculateStats(data);
         } catch (error) {
             console.error('Failed to fetch history', error);
-        } finally {
-            setLoading(false);
         }
     };
 

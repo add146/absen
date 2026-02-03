@@ -3,14 +3,8 @@ import api from '../services/api';
 import {
     MdAccountBalanceWallet,
     MdRedeem,
-    MdTrendingUp,
-    MdShoppingBag,
     MdCardGiftcard,
-    MdExpandMore,
-    MdCheckCircle,
-    MdStar,
-    MdMap,
-    MdChevronRight
+    MdStar
 } from 'react-icons/md';
 import DashboardLayout from '../components/DashboardLayout';
 

@@ -19,6 +19,14 @@ const Dashboard: React.FC = () => {
     const [attendanceId, setAttendanceId] = useState<string | null>(null);
     const [leavesStats, setLeavesStats] = useState({ total: 12, used: 0 });
     const [weeklyHours, setWeeklyHours] = useState<number[]>([0, 0, 0, 0, 0]);
+    const [currentTime, setCurrentTime] = useState(new Date());
+    const [activities, setActivities] = useState<any[]>([]);
+    const [stats, setStats] = useState({
+        checkInTime: '--:--',
+        checkOutTime: '--:--',
+        workingHours: '0h 0m',
+        location: 'Not checked in'
+    });
 
     useEffect(() => {
         const timer = setInterval(() => setCurrentTime(new Date()), 1000);
@@ -53,7 +61,6 @@ const Dashboard: React.FC = () => {
 
             // Simple aggregation for last 5 days
             // This is a placeholder logic, in real world we map to M-T-W-T-F
-            const hoursPerDay = [0, 0, 0, 0, 0];
             // Logic to fill hoursPerDay based on data... 
             // For now, let's just use some dummy verified data if real data is empty to properly demo the UI
             if (data.length > 0) {
