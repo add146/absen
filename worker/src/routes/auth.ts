@@ -102,4 +102,65 @@ auth.post('/login', async (c) => {
     })
 })
 
+/**
+ * POST /auth/join
+ * Register a new user into an EXISTING tenant (Employee Registration)
+ */
+auth.post('/join', async (c) => {
+    try {
+        const { email, password, name, tenant_slug, employee_id } = await c.req.json()
+
+        if (!email || !password || !name || !tenant_slug) {
+            return c.json({ error: 'Missing required fields' }, 400)
+        }
+
+        // 1. Find Tenant
+        const { getTenantBySlug, canAddUser } = await import('../services/tenant-service')
+        const tenant = await getTenantBySlug(tenant_slug, c.env)
+
+        if (!tenant) {
+            return c.json({ error: 'Company code invalid. Please verify with your admin.' }, 404)
+        }
+
+        // 2. Check Capacity (Plan Limits)
+        const canAdd = await canAddUser(tenant.id, c.env)
+        if (!canAdd) {
+            return c.json({ error: 'Organization has reached maximum user limit.' }, 403)
+        }
+
+        // 3. Check if email exists
+        const existingUser = await c.env.DB.prepare('SELECT id FROM users WHERE email = ?').bind(email).first()
+        if (existingUser) {
+            return c.json({ error: 'Email already registered' }, 409)
+        }
+
+        // 4. Create User
+        const userId = crypto.randomUUID()
+        const hash = await import('bcryptjs').then(b => b.hash(password, 10))
+
+        await c.env.DB.prepare(`
+            INSERT INTO users (id, tenant_id, email, password_hash, name, role, status, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))
+        `).bind(
+            userId,
+            tenant.id,
+            email,
+            hash,
+            name,
+            'employee', // Default role for joiners
+            'active'
+        ).run()
+
+        return c.json({
+            message: 'Joined successfully',
+            userId,
+            tenant: { name: tenant.name }
+        })
+
+    } catch (e: any) {
+        console.error('Join failed:', e)
+        return c.json({ error: 'Registration failed', details: e.message }, 500)
+    }
+})
+
 export default auth
