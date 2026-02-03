@@ -75,4 +75,30 @@ attendance.get('/today', async (c) => {
     return c.json({ data: result.results })
 })
 
+attendance.get('/history', async (c) => {
+    const user = c.get('user')
+    const { start_date, end_date } = c.req.query()
+
+    let query = 'SELECT * FROM attendances WHERE user_id = ?'
+    const params = [user.sub]
+
+    if (start_date) {
+        query += ' AND check_in_time >= ?'
+        params.push(start_date)
+    }
+    if (end_date) {
+        query += ' AND check_in_time <= ?'
+        params.push(end_date + ' 23:59:59')
+    }
+
+    query += ' ORDER BY created_at DESC'
+
+    try {
+        const { results } = await c.env.DB.prepare(query).bind(...params).all()
+        return c.json({ success: true, data: results })
+    } catch (e: any) {
+        return c.json({ success: false, error: 'Failed to fetch history' }, 500)
+    }
+})
+
 export default attendance
