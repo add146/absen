@@ -100,7 +100,7 @@ const GlobalSettings: React.FC = () => {
                                                 value={editedValues[setting.setting_key] ?? setting.setting_value}
                                                 onChange={(e) => handleEdit(setting.setting_key, e.target.value)}
                                                 className="flex-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
-                                                placeholder={`Enter ${setting.setting_key}`}
+                                                placeholder={`Enter ${setting.description}`}
                                             />
                                             {editedValues[setting.setting_key] !== undefined && (
                                                 <button
