@@ -42,6 +42,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 };
 
 function App() {
+  // Main Router Configuration
   return (
     <Router>
       <Routes>
