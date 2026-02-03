@@ -23,7 +23,7 @@ const AttendanceHistory: React.FC = () => {
     const [loading, setLoading] = useState(false);
     const [stats, setStats] = useState({
         present: 0,
-        absent: 0, // We can't easily track absent without a schedule, maybe just leave as 0 or calc based on weekdays passed
+        absent: 0,
         late: 0,
         avgHours: '0h 0m'
     });
@@ -56,8 +56,8 @@ const AttendanceHistory: React.FC = () => {
         let late = 0;
         let totalHoursMs = 0;
 
-        // Create a map to ensure unique days are counted (if multiple check-ins per day)
         const uniqueDays = new Set();
+        let presentCountForAvg = 0;
 
         data.forEach(record => {
             const dateStr = new Date(record.check_in_time).toDateString();
@@ -66,7 +66,6 @@ const AttendanceHistory: React.FC = () => {
                 present++;
             }
 
-            // Late logic (assuming before 9:00 AM is on time)
             const checkIn = new Date(record.check_in_time);
             if (checkIn.getHours() > 9 || (checkIn.getHours() === 9 && checkIn.getMinutes() > 0)) {
                 late++;
@@ -74,13 +73,11 @@ const AttendanceHistory: React.FC = () => {
 
             if (record.check_out_time) {
                 totalHoursMs += new Date(record.check_out_time).getTime() - checkIn.getTime();
+                presentCountForAvg++;
             }
         });
 
-        // Current simplified logic for absent: Days passed in month - present (excluding weekends) - very rough approx
-        // For now, let's just show mock absent or 0.
-        // Avg Hours
-        const avgMs = present > 0 ? totalHoursMs / present : 0;
+        const avgMs = presentCountForAvg > 0 ? totalHoursMs / presentCountForAvg : 0;
         const avgH = Math.floor(avgMs / 3600000);
         const avgM = Math.floor((avgMs % 3600000) / 60000);
 
@@ -92,7 +89,6 @@ const AttendanceHistory: React.FC = () => {
         });
     };
 
-    // Helper to get days in month
     const getDaysInMonth = (date: Date) => {
         const year = date.getFullYear();
         const month = date.getMonth();
@@ -113,160 +109,177 @@ const AttendanceHistory: React.FC = () => {
 
     const getDayData = (day: number) => {
         const targetDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
-        // Find record for this day
         return attendanceData.find(d => new Date(d.check_in_time).toDateString() === targetDate.toDateString());
     };
 
     const selectedDayData = attendanceData.filter(d => new Date(d.check_in_time).toDateString() === selectedDate.toDateString());
 
+    return (
+        <DashboardLayout>
+            <div className="max-w-7xl mx-auto space-y-6">
 
-    {/* Stats Grid */ }
-    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <StatCard icon={<MdCheckCircle />} title="Present" value="22 Days" color="green" />
-        <StatCard icon={<MdCancel />} title="Absent" value="1 Day" color="red" />
-        <StatCard icon={<MdTimer />} title="Late Arrival" value="3 Days" color="orange" />
-        <StatCard icon={<MdHourglassBottom />} title="Avg Hours" value="8h 12m" color="blue" />
-    </div>
-
-    {/* Main Content Grid */ }
-    <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-
-        {/* Calendar Section */}
-        <div className="xl:col-span-2 space-y-6">
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
-                <div className="p-6 border-b border-gray-100 dark:border-gray-700 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <h2 className="text-lg font-bold text-gray-800 dark:text-white flex items-center gap-2">
-                        <MdCalendarToday className="text-primary" />
-                        September 2023
-                    </h2>
-                    <div className="flex items-center gap-2">
-                        <button className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-400">
-                            <MdChevronLeft className="text-xl" />
-                        </button>
-                        <button className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-400">
-                            <MdChevronRight className="text-xl" />
-                        </button>
-                        <select className="text-sm py-1.5 pl-3 pr-8 rounded-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 focus:ring-primary focus:border-primary">
-                            <option>Month View</option>
-                            <option>Week View</option>
-                        </select>
-                        <button className="bg-primary text-white text-sm font-medium px-4 py-2 rounded-lg shadow-sm hover:bg-opacity-90 transition">
-                            Export Report
-                        </button>
-                    </div>
+                {/* Stats Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <StatCard icon={<MdCheckCircle />} title="Present" value={`${stats.present} Days`} color="green" />
+                    <StatCard icon={<MdCancel />} title="Absent" value={`${stats.absent} Days`} color="red" />
+                    <StatCard icon={<MdTimer />} title="Late Arrival" value={`${stats.late} Days`} color="orange" />
+                    <StatCard icon={<MdHourglassBottom />} title="Avg Hours" value={stats.avgHours} color="blue" />
                 </div>
 
-                <div className="p-6">
-                    <div className="grid grid-cols-7 mb-4 text-center">
-                        {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
-                            <div key={day} className="text-xs font-semibold text-gray-400 uppercase">{day}</div>
-                        ))}
-                    </div>
+                {/* Main Content Grid */}
+                <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
 
-                    <div className="grid grid-cols-7 gap-2 lg:gap-4">
-                        {/* Previous Month Days */}
-                        {[27, 28, 29, 30, 31].map((day) => (
-                            <div key={`prev-${day}`} className="h-24 lg:h-32 rounded-xl bg-gray-50/50 dark:bg-gray-800/30 p-2 flex flex-col justify-between opacity-50">
-                                <span className="text-sm font-medium text-gray-400">{day}</span>
-                            </div>
-                        ))}
-
-                        {/* September 1 (Regular) */}
-                        <CalendarDay day={1} time="09:00 - 17:00" type="present" />
-
-                        {/* Weekend (2, 3) */}
-                        <CalendarDay day={2} type="weekend" />
-                        <CalendarDay day={3} type="weekend" />
-
-                        {/* Regular (4) */}
-                        <CalendarDay day={4} time="08:55 - 17:05" type="present" />
-
-                        {/* Late (5) */}
-                        <CalendarDay day={5} time="Late: 09:15" duration="8h 00m" type="late" />
-
-                        {/* Highlighted (6 - Today/Focus) */}
-                        <div className="h-24 lg:h-32 rounded-xl border-2 border-primary bg-indigo-50 dark:bg-indigo-900/10 p-2 flex flex-col relative shadow-lg transform scale-[1.02] cursor-pointer">
-                            <span className="w-6 h-6 flex items-center justify-center rounded-full bg-primary text-white text-xs font-bold shadow-sm">6</span>
-                            <div className="mt-auto space-y-1">
-                                <div className="text-[10px] bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 px-2 py-1 rounded truncate">
-                                    09:00 - 18:00
-                                </div>
-                                <div className="flex items-center gap-1">
-                                    <span className="w-1.5 h-1.5 bg-purple-500 rounded-full"></span>
-                                    <span className="text-[10px] text-primary dark:text-indigo-300 font-medium truncate">Office</span>
+                    {/* Calendar Section */}
+                    <div className="xl:col-span-2 space-y-6">
+                        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+                            <div className="p-6 border-b border-gray-100 dark:border-gray-700 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                <h2 className="text-lg font-bold text-gray-800 dark:text-white flex items-center gap-2">
+                                    <MdCalendarToday className="text-primary" />
+                                    {currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                                </h2>
+                                <div className="flex items-center gap-2">
+                                    <button onClick={() => changeMonth(-1)} className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-400">
+                                        <MdChevronLeft className="text-xl" />
+                                    </button>
+                                    <button onClick={() => changeMonth(1)} className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-400">
+                                        <MdChevronRight className="text-xl" />
+                                    </button>
+                                    <button className="bg-primary text-white text-sm font-medium px-4 py-2 rounded-lg shadow-sm hover:bg-opacity-90 transition flex items-center gap-2">
+                                        <MdFileDownload /> Export
+                                    </button>
                                 </div>
                             </div>
-                        </div>
 
-                        {/* Regular (7) */}
-                        <CalendarDay day={7} time="09:00 - 17:00" type="present" />
+                            <div className="p-6">
+                                <div className="grid grid-cols-7 mb-4 text-center">
+                                    {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
+                                        <div key={day} className="text-xs font-semibold text-gray-400 uppercase">{day}</div>
+                                    ))}
+                                </div>
 
-                        {/* WFH (8) */}
-                        <CalendarDay day={8} time="09:00 - 17:00" type="wfh" />
+                                <div className="grid grid-cols-7 gap-2 lg:gap-4">
+                                    {/* Blanks for prev month */}
+                                    {blanks.map((_, i) => (
+                                        <div key={`blank-${i}`} className="h-24 lg:h-32 rounded-xl bg-gray-50/50 dark:bg-gray-800/30"></div>
+                                    ))}
 
-                        {/* Weekend (9, 10) */}
-                        <CalendarDay day={9} type="weekend" />
-                        <CalendarDay day={10} type="weekend" />
+                                    {/* Days */}
+                                    {daysArray.map((day) => {
+                                        const date = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+                                        const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+                                        const record = getDayData(day);
 
-                        {/* Fillers for next days */}
-                        {[11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30].map(day => (
-                            <div key={day} className="h-24 lg:h-32 rounded-xl border border-gray-100 dark:border-gray-700 p-2 flex flex-col">
-                                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{day}</span>
+                                        let type: 'present' | 'late' | 'weekend' | 'wfh' | 'regular' | 'absent' = 'regular';
+                                        let timeStr = '';
+                                        let durationStr = '';
+
+                                        if (isWeekend) {
+                                            type = 'weekend';
+                                        } else if (record) {
+                                            const checkIn = new Date(record.check_in_time);
+                                            const isLate = checkIn.getHours() > 9 || (checkIn.getHours() === 9 && checkIn.getMinutes() > 0);
+                                            type = isLate ? 'late' : 'present';
+                                            timeStr = isLate
+                                                ? `Late: ${checkIn.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+                                                : `${checkIn.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${record.check_out_time ? new Date(record.check_out_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '...'}`;
+
+                                        } else if (date < new Date() && !isWeekend) {
+                                            // type = 'absent'; 
+                                        }
+
+                                        const isSelected = selectedDate.getDate() === day && (selectedDate.getMonth() === currentDate.getMonth()) && (selectedDate.getFullYear() === currentDate.getFullYear());
+
+                                        return (
+                                            <div onClick={() => setSelectedDate(date)} key={day}>
+                                                <CalendarDay
+                                                    day={day}
+                                                    time={timeStr}
+                                                    duration={durationStr}
+                                                    type={type}
+                                                    isSelected={isSelected}
+                                                />
+                                            </div>
+
+                                        );
+                                    })}
+                                </div>
                             </div>
-                        ))}
-
-                    </div>
-                </div>
-
-                {/* Legend */}
-                <div className="flex flex-wrap gap-4 px-6 pb-6">
-                    <LegendItem color="bg-green-500" label="Present" />
-                    <LegendItem color="bg-orange-400" label="Late" />
-                    <LegendItem color="bg-red-400" label="Absent" />
-                    <LegendItem color="bg-blue-400" label="WFH" />
-                    <LegendItem color="bg-purple-500" label="Holiday" />
-                </div>
-            </div>
-        </div>
-
-        {/* Daily Log Section */}
-        <div className="xl:col-span-1">
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 h-full flex flex-col">
-                <div className="p-6 border-b border-gray-100 dark:border-gray-700">
-                    <h3 className="font-bold text-lg text-gray-800 dark:text-white mb-1">Wednesday, Sep 6</h3>
-                    <p className="text-sm text-gray-500">Daily Activity Log</p>
-                    <div className="mt-6 flex items-center justify-between bg-indigo-50 dark:bg-indigo-900/10 p-4 rounded-xl border border-primary/20">
-                        <div className="text-center">
-                            <p className="text-xs text-gray-500 dark:text-gray-400 uppercase font-semibold">Duration</p>
-                            <p className="text-lg font-bold text-primary">9h 00m</p>
-                        </div>
-                        <div className="h-8 w-[1px] bg-gray-300 dark:bg-gray-600"></div>
-                        <div className="text-center">
-                            <p className="text-xs text-gray-500 dark:text-gray-400 uppercase font-semibold">Overtime</p>
-                            <p className="text-lg font-bold text-green-600 dark:text-green-400">+1h 00m</p>
                         </div>
                     </div>
-                </div>
 
-                <div className="flex-1 overflow-y-auto p-6 space-y-6">
-                    <TimelineItem title="Clock In" time="09:00 AM" desc="Regular Shift Start" location="Central Office, HQ" color="blue" />
-                    <TimelineItem title="Break Out" time="01:00 PM" desc="Lunch Break" color="orange" />
-                    <TimelineItem title="Break In" time="02:00 PM" desc="Back to work" verified color="green" />
-                    <TimelineItem title="Clock Out" time="06:00 PM" desc="Shift End" location="Central Office, HQ" color="purple" last />
-                </div>
+                    {/* Daily Log Section */}
+                    <div className="xl:col-span-1">
+                        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 h-full flex flex-col">
+                            <div className="p-6 border-b border-gray-100 dark:border-gray-700">
+                                <h3 className="font-bold text-lg text-gray-800 dark:text-white mb-1">
+                                    {selectedDate.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}
+                                </h3>
+                                <p className="text-sm text-gray-500">Daily Activity Log</p>
 
-                <div className="p-6 border-t border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/20 rounded-b-2xl">
-                    <button className="w-full py-3 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 font-medium hover:bg-white dark:hover:bg-gray-700 hover:shadow-sm transition-all text-sm flex items-center justify-center gap-2">
-                        <MdEdit className="text-base" />
-                        Request Correction
-                    </button>
+                                {selectedDayData.length > 0 ? (
+                                    <div className="mt-6 flex items-center justify-between bg-indigo-50 dark:bg-indigo-900/10 p-4 rounded-xl border border-primary/20">
+                                        <div className="text-center">
+                                            <p className="text-xs text-gray-500 dark:text-gray-400 uppercase font-semibold">Duration</p>
+                                            <p className="text-lg font-bold text-primary">
+                                                {selectedDayData[0].check_out_time ? (
+                                                    (() => {
+                                                        const diff = new Date(selectedDayData[0].check_out_time).getTime() - new Date(selectedDayData[0].check_in_time).getTime();
+                                                        const h = Math.floor(diff / 3600000);
+                                                        const m = Math.floor((diff % 3600000) / 60000);
+                                                        return `${h}h ${m}m`;
+                                                    })()
+                                                ) : 'Ongoing'}
+                                            </p>
+                                        </div>
+                                        <div className="h-8 w-[1px] bg-gray-300 dark:bg-gray-600"></div>
+                                        <div className="text-center">
+                                            <p className="text-xs text-gray-500 dark:text-gray-400 uppercase font-semibold">Status</p>
+                                            <p className="text-sm font-bold text-green-600 dark:text-green-400">On Time</p>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="mt-6 p-4 text-center text-gray-500 text-sm">No activity recorded</div>
+                                )}
+                            </div>
+
+                            <div className="flex-1 overflow-y-auto p-6 space-y-6">
+                                {selectedDayData.map((record, i) => (
+                                    <div key={i}>
+                                        <TimelineItem
+                                            title="Clock In"
+                                            time={new Date(record.check_in_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                            desc="Shift Start"
+                                            location="Office"
+                                            color="blue"
+                                            verified
+                                        />
+                                        {record.check_out_time && (
+                                            <TimelineItem
+                                                title="Clock Out"
+                                                time={new Date(record.check_out_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                desc="Shift End"
+                                                location="Office"
+                                                color="purple"
+                                                last
+                                            />
+                                        )}
+                                    </div>
+                                ))}
+                                {selectedDayData.length === 0 && <p className="text-center text-gray-400 text-sm italic">Select a day with data to view details</p>}
+                            </div>
+
+                            <div className="p-6 border-t border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/20 rounded-b-2xl">
+                                <button onClick={() => alert('Request correction feature coming soon')} className="w-full py-3 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 font-medium hover:bg-white dark:hover:bg-gray-700 hover:shadow-sm transition-all text-sm flex items-center justify-center gap-2">
+                                    <MdEdit className="text-base" />
+                                    Request Correction
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
-        </div>
-
-    </div>
-            </div >
-        </DashboardLayout >
+        </DashboardLayout>
     );
 };
 
@@ -338,12 +351,6 @@ const CalendarDay = ({ day, time, duration, type = 'regular', isSelected }: { da
         </div>
     );
 };
-
-const LegendItem = ({ color, label }: { color: string, label: string }) => (
-    <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-        <span className={`w-3 h-3 rounded-full ${color}`}></span> {label}
-    </div>
-);
 
 const TimelineItem = ({ title, time, desc, location, color, verified, last }: { title: string, time: string, desc: string, location?: string, color: string, verified?: boolean, last?: boolean }) => {
     const colors = {
