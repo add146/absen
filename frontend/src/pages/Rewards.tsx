@@ -1,13 +1,24 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import api from '../services/api';
-import { MdStar, MdShoppingBag, MdHistory, MdConfirmationNumber } from 'react-icons/md';
+import {
+    MdAccountBalanceWallet,
+    MdRedeem,
+    MdTrendingUp,
+    MdShoppingBag,
+    MdCardGiftcard,
+    MdExpandMore,
+    MdCheckCircle,
+    MdStar,
+    MdMap,
+    MdChevronRight
+} from 'react-icons/md';
+import DashboardLayout from '../components/DashboardLayout';
 
-const Rewards = () => {
+const Rewards: React.FC = () => {
     const [products, setProducts] = useState<any[]>([]);
     const [orders, setOrders] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [balance, setBalance] = useState(0);
-    const [activeTab, setActiveTab] = useState<'catalog' | 'history'>('catalog');
 
     useEffect(() => {
         fetchData();
@@ -15,7 +26,6 @@ const Rewards = () => {
 
     const fetchData = async () => {
         try {
-            // Parallel fetch: products, user balance, order history
             const [prodRes, userRes, orderRes] = await Promise.all([
                 api.get('/shop/products'),
                 api.get('/auth/me'),
@@ -26,131 +36,190 @@ const Rewards = () => {
             setBalance(userRes.data.user.points_balance);
             setOrders(orderRes.data.data);
         } catch (error) {
-            console.error('Failed to fetch shop data', error);
+            console.error('Failed to fetch data', error);
         } finally {
             setLoading(false);
         }
     };
 
-    const handleRedeem = async (productId: string, price: number) => {
-        if (balance < price) {
+    const handleRedeem = async (product: any) => {
+        if (balance < product.price_points) {
             alert('Poin Anda tidak mencukupi!');
             return;
         }
 
-        if (!confirm('Apakah Anda yakin, ingin menukarkan poin untuk item ini?')) return;
+        if (!confirm(`Tukar ${product.price_points} poin untuk "${product.name}"?`)) return;
 
         try {
-            await api.post('/shop/redeem', { product_id: productId, quantity: 1 });
+            await api.post('/shop/redeem', { product_id: product.id, quantity: 1 });
             alert('Penukaran berhasil!');
-            fetchData(); // Refresh data
+            fetchData();
         } catch (error: any) {
             alert(error.response?.data?.error || 'Redemption failed');
         }
     };
 
     return (
-        <div className="space-y-6">
-            <header className="flex justify-between items-center bg-gradient-to-r from-purple-600 to-blue-600 p-6 rounded-2xl text-white shadow-lg">
-                <div>
-                    <h1 className="text-3xl font-bold">Rewards Shop</h1>
-                    <p className="opacity-90 mt-1">Tukarkan poin kehadiranmu dengan hadiah menarik!</p>
-                </div>
-                <div className="bg-white/20 backdrop-blur-md px-6 py-3 rounded-xl border border-white/30 text-center">
-                    <p className="text-sm font-medium opacity-80 uppercase tracking-wider">Saldo Poin</p>
-                    <div className="flex items-center justify-center gap-2 mt-1">
-                        <MdStar className="text-yellow-300 text-2xl" />
-                        <span className="text-3xl font-extrabold">{balance.toLocaleString()}</span>
+        <DashboardLayout>
+            <div className="flex flex-col gap-8">
+                {/* Header */}
+                <header className="flex justify-between items-center">
+                    <div>
+                        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Points & Rewards</h1>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Manage your earned points and redeem rewards.</p>
                     </div>
-                </div>
-            </header>
+                </header>
 
-            {/* Tabs */}
-            <div className="flex space-x-1 bg-gray-100 p-1 rounded-xl w-fit">
-                <button
-                    onClick={() => setActiveTab('catalog')}
-                    className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ${activeTab === 'catalog' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
-                >
-                    <MdShoppingBag /> Katalog
-                </button>
-                <button
-                    onClick={() => setActiveTab('history')}
-                    className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ${activeTab === 'history' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
-                >
-                    <MdHistory /> Riwayat
-                </button>
-            </div>
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-            {loading ? (
-                <div className="text-center py-12 text-gray-500 animate-pulse">Loading rewards...</div>
-            ) : activeTab === 'catalog' ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {products.map((product) => (
-                        <div key={product.id} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow group">
-                            <div className="aspect-video bg-gray-100 relative overflow-hidden">
-                                <img src={product.image_url} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                                <div className="absolute top-3 right-3 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-xs font-bold text-gray-700 shadow-sm">
-                                    Stok: {product.stock}
+                    {/* Left Column */}
+                    <div className="lg:col-span-1 space-y-6">
+
+                        {/* Balance Card */}
+                        <div className="bg-gradient-to-br from-indigo-600 to-indigo-400 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden">
+                            <div className="absolute top-0 right-0 -mr-8 -mt-8 w-32 h-32 rounded-full bg-white opacity-10 blur-xl"></div>
+                            <div className="absolute bottom-0 left-0 -ml-8 -mb-8 w-24 h-24 rounded-full bg-white opacity-10 blur-xl"></div>
+                            <div className="relative z-10">
+                                <div className="flex items-center justify-between mb-2">
+                                    <span className="text-indigo-100 font-medium">Current Balance</span>
+                                    <MdAccountBalanceWallet className="text-indigo-100 opacity-80 text-xl" />
                                 </div>
-                            </div>
-                            <div className="p-5">
-                                <h3 className="font-bold text-lg text-gray-800">{product.name}</h3>
-                                <p className="text-sm text-gray-500 mt-2 line-clamp-2">{product.description}</p>
-
-                                <div className="mt-4 flex items-center justify-between">
-                                    <div className="flex items-center text-yellow-600 font-bold text-xl">
-                                        <MdStar className="mr-1" />
-                                        {product.price_points}
-                                    </div>
-                                    <button
-                                        onClick={() => handleRedeem(product.id, product.price_points)}
-                                        disabled={product.stock === 0 || balance < product.price_points}
-                                        className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors ${product.stock === 0 ? 'bg-gray-100 text-gray-400 cursor-not-allowed' :
-                                                balance < product.price_points ? 'bg-gray-100 text-gray-400 cursor-not-allowed' :
-                                                    'bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-200'
-                                            }`}
-                                    >
-                                        {product.stock === 0 ? 'Habis' : 'Tukar'}
+                                <h2 className="text-4xl font-bold mb-1">
+                                    {loading ? '...' : balance.toLocaleString()}
+                                    <span className="text-xl font-normal opacity-80 ml-1">pts</span>
+                                </h2>
+                                <p className="text-indigo-100 text-sm mb-6">Keep earning points from attendance!</p>
+                                <div className="flex gap-3">
+                                    <button className="flex-1 bg-white text-primary font-semibold py-2 px-4 rounded-lg shadow-sm hover:bg-indigo-50 transition-colors flex items-center justify-center gap-2">
+                                        <MdRedeem className="text-sm" />
+                                        Redeem
+                                    </button>
+                                    <button className="flex-1 bg-indigo-600 bg-opacity-40 text-white font-semibold py-2 px-4 rounded-lg hover:bg-opacity-50 transition-colors border border-indigo-400 border-opacity-30">
+                                        History
                                     </button>
                                 </div>
                             </div>
                         </div>
-                    ))}
-                </div>
-            ) : (
-                <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                    {orders.length === 0 ? (
-                        <div className="p-12 text-center text-gray-500">Belum ada riwayat penukaran.</div>
-                    ) : (
-                        <div className="divide-y">
-                            {orders.map((order) => (
-                                <div key={order.id} className="p-4 flex items-center justify-between hover:bg-gray-50">
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
-                                            <img src={order.image_url} alt={order.product_name} className="w-full h-full object-cover" />
+
+                        {/* Browse Rewards (Products) */}
+                        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-5">
+                            <h3 className="font-bold text-gray-900 dark:text-white mb-4">Available Rewards</h3>
+                            <div className="space-y-3">
+                                {loading ? (
+                                    <div className="text-center text-gray-500 py-4">Loading products...</div>
+                                ) : products.length === 0 ? (
+                                    <div className="text-center text-gray-500 py-4">No rewards available.</div>
+                                ) : (
+                                    products.map(product => (
+                                        <div key={product.id} className="flex items-center justify-between p-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-lg cursor-pointer group transition-colors border border-transparent hover:border-gray-100">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-12 h-12 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
+                                                    <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" />
+                                                </div>
+                                                <div>
+                                                    <p className="font-medium text-sm text-gray-900 dark:text-white group-hover:text-primary transition-colors line-clamp-1">{product.name}</p>
+                                                    <div className="flex items-center text-yellow-600 text-xs font-bold mt-0.5">
+                                                        <MdStar className="mr-0.5" />
+                                                        {product.price_points} pts
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <button
+                                                onClick={() => handleRedeem(product)}
+                                                className="text-xs bg-blue-50 text-blue-600 px-3 py-1.5 rounded-md font-medium hover:bg-blue-100 transition-colors"
+                                                disabled={product.stock === 0}
+                                            >
+                                                {product.stock === 0 ? 'Habis' : 'Tukar'}
+                                            </button>
                                         </div>
-                                        <div>
-                                            <h4 className="font-bold text-gray-800">{order.product_name}</h4>
-                                            <p className="text-xs text-gray-500">
-                                                {new Date(order.created_at).toLocaleDateString()} • {new Date(order.created_at).toLocaleTimeString()}
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <div className="text-right">
-                                        <div className="flex items-center justify-end text-red-600 font-bold mb-1">
-                                            -{order.total_points} Pts
-                                        </div>
-                                        <span className="bg-green-100 text-green-700 px-2 py-0.5 rounded text-xs font-semibold capitalize">
-                                            {order.status}
-                                        </span>
-                                    </div>
-                                </div>
-                            ))}
+                                    ))
+                                )}
+                            </div>
                         </div>
-                    )}
+                    </div>
+
+                    {/* Right Column: Activity History */}
+                    <div className="lg:col-span-2">
+                        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 h-full flex flex-col">
+                            <div className="p-6 border-b border-gray-100 dark:border-gray-700 flex flex-wrap gap-4 justify-between items-center">
+                                <h3 className="font-bold text-lg text-gray-900 dark:text-white">Redemption History</h3>
+                            </div>
+
+                            <div className="flex-1 overflow-x-auto">
+                                <table className="w-full text-left">
+                                    <thead>
+                                        <tr className="bg-gray-50 dark:bg-gray-800/50 border-b border-gray-100 dark:border-gray-700">
+                                            <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Item</th>
+                                            <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Date</th>
+                                            <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">Points</th>
+                                            <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-center">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
+                                        {loading ? (
+                                            <tr><td colSpan={5} className="p-6 text-center text-gray-500">Loading history...</td></tr>
+                                        ) : orders.length === 0 ? (
+                                            <tr><td colSpan={5} className="p-6 text-center text-gray-500">No redemption history yet.</td></tr>
+                                        ) : (
+                                            orders.map(order => (
+                                                <HistoryRow
+                                                    key={order.id}
+                                                    icon={<MdCardGiftcard />}
+                                                    title={order.product_name}
+                                                    subtitle="Redemption"
+                                                    date={new Date(order.created_at).toLocaleString()}
+                                                    points={`-${order.total_points}`}
+                                                    pointsColor="red"
+                                                    status={order.status}
+                                                    iconBg="purple"
+                                                />
+                                            ))
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
-            )}
-        </div>
+            </div>
+        </DashboardLayout>
+    );
+};
+
+const HistoryRow = ({ icon, title, subtitle, date, points, pointsColor, status, iconBg }: any) => {
+    const iconBgs: any = {
+        green: 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400',
+        purple: 'bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400',
+        gray: 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400',
+        blue: 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400',
+    };
+
+    return (
+        <tr className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+            <td className="px-6 py-4 whitespace-nowrap">
+                <div className="flex items-center gap-3">
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${iconBgs[iconBg] || iconBgs.gray}`}>
+                        <span className="text-sm">{icon}</span>
+                    </div>
+                    <div>
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">{title}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">{subtitle}</p>
+                    </div>
+                </div>
+            </td>
+            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                {date}
+            </td>
+            <td className="px-6 py-4 whitespace-nowrap text-right">
+                <span className={`${pointsColor === 'green' ? 'text-green-600 dark:text-green-400' : 'text-red-500 dark:text-red-400'} font-bold`}>{points}</span>
+            </td>
+            <td className="px-6 py-4 whitespace-nowrap text-center">
+                <span className={`px-2 py-1 rounded text-xs font-semibold capitalize ${status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>
+                    {status}
+                </span>
+            </td>
+        </tr>
     );
 };
 
