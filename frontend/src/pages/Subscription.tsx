@@ -87,14 +87,14 @@ const SubscriptionPage: React.FC = () => {
                 // Open Midtrans Snap
                 // @ts-ignore
                 window.snap.pay(data.token, {
-                    onSuccess: function (result: any) {
+                    onSuccess: function (_result: any) {
                         alert('Pembayaran berhasil!')
                         fetchCurrentSubscription()
                     },
-                    onPending: function (result: any) {
+                    onPending: function (_result: any) {
                         alert('Menunggu pembayaran...')
                     },
-                    onError: function (result: any) {
+                    onError: function (_result: any) {
                         alert('Pembayaran gagal')
                     },
                     onClose: function () {
@@ -187,9 +187,9 @@ const SubscriptionPage: React.FC = () => {
 
                         <div className="text-center mb-6">
                             <div className={`inline-flex items-center justify-center w-16 h-16 rounded-full mb-4 ${plan.slug === 'premium' ? 'bg-purple-200 text-purple-600' :
-                                    plan.slug === 'basic' ? 'bg-blue-200 text-blue-600' :
-                                        plan.slug === 'enterprise' ? 'bg-indigo-200 text-indigo-600' :
-                                            'bg-gray-200 text-gray-600'
+                                plan.slug === 'basic' ? 'bg-blue-200 text-blue-600' :
+                                    plan.slug === 'enterprise' ? 'bg-indigo-200 text-indigo-600' :
+                                        'bg-gray-200 text-gray-600'
                                 }`}>
                                 {getPlanIcon(plan.slug)}
                             </div>
@@ -232,12 +232,12 @@ const SubscriptionPage: React.FC = () => {
                                 (currentSubscription?.plan_slug === plan.slug)
                             }
                             className={`w-full py-3 px-4 rounded-lg font-semibold transition-colors ${currentSubscription?.plan_slug === plan.slug
-                                    ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
-                                    : plan.slug === 'premium'
-                                        ? 'bg-purple-600 hover:bg-purple-700 text-white'
-                                        : plan.slug === 'enterprise'
-                                            ? 'bg-indigo-600 hover:bg-indigo-700 text-white'
-                                            : 'bg-blue-600 hover:bg-blue-700 text-white'
+                                ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
+                                : plan.slug === 'premium'
+                                    ? 'bg-purple-600 hover:bg-purple-700 text-white'
+                                    : plan.slug === 'enterprise'
+                                        ? 'bg-indigo-600 hover:bg-indigo-700 text-white'
+                                        : 'bg-blue-600 hover:bg-blue-700 text-white'
                                 } disabled:opacity-50`}
                         >
                             {upgrading === plan.slug ? (
