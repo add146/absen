@@ -29,6 +29,8 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
         document.documentElement.classList.toggle('dark');
     };
 
+    const user = JSON.parse(localStorage.getItem('user_data') || '{}');
+
     const navItems = [
         { name: 'Dashboard', icon: <MdDashboard />, path: '/dashboard' },
         { name: 'Attendance', icon: <MdSchedule />, path: '/attendance' },
@@ -37,6 +39,10 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
         { name: 'Rewards', icon: <MdLeaderboard />, path: '/rewards', badge: '120 pts' },
         { name: 'Settings', icon: <MdSettings />, path: '/settings' },
     ];
+
+    if (user.role === 'admin') {
+        navItems.push({ name: 'Admin Panel', icon: <MdToken />, path: '/admin/dashboard', badge: 'New' });
+    }
 
     return (
         <div className={`flex h-screen overflow-hidden bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-200 font-display ${darkMode ? 'dark' : ''}`}>
@@ -58,8 +64,8 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
                                 key={item.name}
                                 to={item.path}
                                 className={`flex items-center px-4 py-3 rounded-lg transition-colors group ${isActive
-                                        ? 'bg-indigo-50 dark:bg-indigo-900/30 text-primary'
-                                        : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white'
+                                    ? 'bg-indigo-50 dark:bg-indigo-900/30 text-primary'
+                                    : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white'
                                     }`}
                             >
                                 <span className={`mr-3 text-xl ${isActive ? 'text-primary' : 'group-hover:text-primary'}`}>{item.icon}</span>
@@ -80,8 +86,8 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
                             {/* Replace with actual image */}
                         </div>
                         <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-gray-900 dark:text-white truncate">Alex Morgan</p>
-                            <p className="text-xs text-gray-500 dark:text-gray-400 truncate">Product Designer</p>
+                            <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{user.name || 'User'}</p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 truncate capitalize">{user.role || 'Employee'}</p>
                         </div>
                         <button className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
                             <MdLogout className="text-xl" />
@@ -104,8 +110,8 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
                     </div>
 
                     <div className="hidden md:block">
-                        <h2 className="text-xl font-semibold text-gray-800 dark:text-white">Good Morning, Alex! ☀️</h2>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">Wednesday, Dec 12 • 09:12 AM</p>
+                        <h2 className="text-xl font-semibold text-gray-800 dark:text-white">Good Morning, {user.name?.split(' ')[0] || 'User'}! ☀️</h2>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">{new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}</p>
                     </div>
 
                     <div className="flex items-center gap-4">
