@@ -1,6 +1,79 @@
 import { useEffect, useState } from 'react';
 import api from '../../services/api';
 import { MdAdd, MdLocationOn } from 'react-icons/md';
+import { APIProvider, Map, AdvancedMarker, InfoWindow } from '@vis.gl/react-google-maps';
+
+const GOOGLE_MAPS_API_KEY = 'AIzaSyDYIc7jBfPMmkS6FPUcimXjWI9pCd2_4pA';
+
+// Office locations map component with Google Maps
+const OfficeMap = ({
+    locations,
+    onMapClick,
+    showClickHandler = false
+}: {
+    locations: any[],
+    onMapClick?: (lat: number, lng: number) => void,
+    showClickHandler?: boolean
+}) => {
+    const [selectedLocation, setSelectedLocation] = useState<any>(null);
+
+    // Calculate center from locations, default to Jakarta if no locations
+    const center = locations.length > 0
+        ? { lat: locations[0].latitude, lng: locations[0].longitude }
+        : { lat: -6.2088, lng: 106.8456 };
+
+    const handleMapClick = (e: any) => {
+        if (showClickHandler && onMapClick && e.latLng) {
+            onMapClick(e.latLng.lat(), e.latLng.lng());
+        }
+    };
+
+    return (
+        <APIProvider apiKey={GOOGLE_MAPS_API_KEY}>
+            <div className="h-[400px] w-full rounded-xl overflow-hidden border border-gray-200">
+                <Map
+                    defaultCenter={center}
+                    defaultZoom={13}
+                    mapId="office-locations-map"
+                    onClick={handleMapClick}
+                    gestureHandling="greedy"
+                >
+                    {/* Display all locations with markers and circles */}
+                    {locations.map(loc => (
+                        <div key={loc.id}>
+                            {/* Marker */}
+                            <AdvancedMarker
+                                position={{ lat: loc.latitude, lng: loc.longitude }}
+                                onClick={() => setSelectedLocation(loc)}
+                            />
+
+                            {/* Info Window */}
+                            {selectedLocation?.id === loc.id && (
+                                <InfoWindow
+                                    position={{ lat: loc.latitude, lng: loc.longitude }}
+                                    onCloseClick={() => setSelectedLocation(null)}
+                                >
+                                    <div className="p-2">
+                                        <strong className="text-gray-800">{loc.name}</strong><br />
+                                        <span className="text-xs text-gray-500">
+                                            {loc.latitude.toFixed(6)}, {loc.longitude.toFixed(6)}
+                                        </span><br />
+                                        <span className="text-xs font-semibold text-blue-600">
+                                            Radius: {loc.radius_meters}m
+                                        </span>
+                                    </div>
+                                </InfoWindow>
+                            )}
+
+                            {/* Geofence Circle - using Google Maps Circle overlay would be better but requires more setup */}
+                            {/* For now, we show the radius in the info window */}
+                        </div>
+                    ))}
+                </Map>
+            </div>
+        </APIProvider>
+    );
+};
 
 const LocationSettings = () => {
     const [locations, setLocations] = useState<any[]>([]);
@@ -28,6 +101,14 @@ const LocationSettings = () => {
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleMapClick = (lat: number, lng: number) => {
+        setFormData({
+            ...formData,
+            latitude: lat.toFixed(6),
+            longitude: lng.toFixed(6)
+        });
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -62,6 +143,28 @@ const LocationSettings = () => {
                 </button>
             </div>
 
+            {/* Map View */}
+            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                <h3 className="text-lg font-semibold mb-4 text-gray-800">Office Locations Map</h3>
+                {loading ? (
+                    <div className="h-[400px] flex items-center justify-center bg-gray-50 rounded-lg">
+                        <p className="text-gray-500">Loading map...</p>
+                    </div>
+                ) : (
+                    <OfficeMap
+                        locations={locations}
+                        onMapClick={showForm ? handleMapClick : undefined}
+                        showClickHandler={showForm}
+                    />
+                )}
+                {showForm && (
+                    <p className="text-sm text-blue-600 mt-2">
+                        💡 Tip: Click on the map to automatically fill coordinates
+                    </p>
+                )}
+            </div>
+
+            {/* Add Location Form */}
             {showForm && (
                 <div className="bg-white p-6 rounded-xl shadow-sm border border-blue-100">
                     <h3 className="text-lg font-semibold mb-4">Add New Office Location</h3>
@@ -71,7 +174,7 @@ const LocationSettings = () => {
                             <input
                                 type="text"
                                 required
-                                className="mt-1 w-full p-2 border rounded-lg"
+                                className="mt-1 w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                 value={formData.name}
                                 onChange={e => setFormData({ ...formData, name: e.target.value })}
                                 placeholder="e.g. Headquarters"
@@ -82,7 +185,7 @@ const LocationSettings = () => {
                                 <label className="block text-sm font-medium text-gray-700">Latitude</label>
                                 <input
                                     type="number" step="any" required
-                                    className="mt-1 w-full p-2 border rounded-lg"
+                                    className="mt-1 w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     value={formData.latitude}
                                     onChange={e => setFormData({ ...formData, latitude: e.target.value })}
                                     placeholder="-6.123456"
@@ -92,7 +195,7 @@ const LocationSettings = () => {
                                 <label className="block text-sm font-medium text-gray-700">Longitude</label>
                                 <input
                                     type="number" step="any" required
-                                    className="mt-1 w-full p-2 border rounded-lg"
+                                    className="mt-1 w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     value={formData.longitude}
                                     onChange={e => setFormData({ ...formData, longitude: e.target.value })}
                                     placeholder="106.123456"
@@ -103,22 +206,26 @@ const LocationSettings = () => {
                             <label className="block text-sm font-medium text-gray-700">Radius (Meters)</label>
                             <input
                                 type="number" required
-                                className="mt-1 w-full p-2 border rounded-lg"
+                                className="mt-1 w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                 value={formData.radius_meters}
                                 onChange={e => setFormData({ ...formData, radius_meters: e.target.value })}
                             />
+                            <p className="text-xs text-gray-500 mt-1">Geofence radius for attendance validation</p>
                         </div>
                         <div className="flex justify-end space-x-3">
                             <button
                                 type="button"
-                                onClick={() => setShowForm(false)}
-                                className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg"
+                                onClick={() => {
+                                    setShowForm(false);
+                                    setFormData({ name: '', latitude: '', longitude: '', radius_meters: '100' });
+                                }}
+                                className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition"
                             >
                                 Cancel
                             </button>
                             <button
                                 type="submit"
-                                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
                             >
                                 Save Location
                             </button>
@@ -127,6 +234,7 @@ const LocationSettings = () => {
                 </div>
             )}
 
+            {/* Location Cards Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {loading ? <p>Loading locations...</p> : locations.map(loc => (
                     <div key={loc.id} className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-start space-x-4">
