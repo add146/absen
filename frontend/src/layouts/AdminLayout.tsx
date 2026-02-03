@@ -1,5 +1,5 @@
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
-import { MdDashboard, MdPeople, MdLocationOn, MdAssessment, MdLogout, MdArrowBack, MdCheckCircle, MdShoppingCart, MdInventory, MdShowChart, MdStars, MdSecurity, MdSettings, MdMonitorHeart } from 'react-icons/md';
+import { MdDashboard, MdPeople, MdLocationOn, MdAssessment, MdLogout, MdArrowBack, MdCheckCircle, MdShoppingCart, MdInventory, MdShowChart, MdStars, MdSecurity, MdSettings } from 'react-icons/md';
 
 const AdminLayout = () => {
     const navigate = useNavigate();
