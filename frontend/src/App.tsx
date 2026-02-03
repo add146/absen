@@ -30,6 +30,7 @@ import UserManagement from './pages/superadmin/UserManagement';
 import GlobalSettings from './pages/superadmin/GlobalSettings';
 import TenantManagement from './pages/superadmin/TenantManagement';
 import PlanManagement from './pages/superadmin/PlanManagement';
+import PlatformAnalytics from './pages/superadmin/PlatformAnalytics';
 
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -81,6 +82,7 @@ function App() {
           <Route path="tenants" element={<TenantManagement />} />
           <Route path="users" element={<UserManagement />} />
           <Route path="plans" element={<PlanManagement />} />
+          <Route path="analytics" element={<PlatformAnalytics />} />
           <Route path="settings" element={<GlobalSettings />} />
           <Route path="profile" element={<SuperAdminProfile />} />
           <Route index element={<Navigate to="/superadmin/dashboard" replace />} />
