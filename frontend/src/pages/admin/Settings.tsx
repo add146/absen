@@ -1,5 +1,4 @@
 import React from 'react';
-import WAHASettingsCard from '../../components/admin/WAHASettingsCard';
 
 const Settings: React.FC = () => {
     return (
@@ -12,12 +11,9 @@ const Settings: React.FC = () => {
             </div>
 
             <div className="space-y-6">
-                {/* WAHA WhatsApp Integration */}
-                <WAHASettingsCard />
-
-                {/* Future: Add more setting cards here */}
-                {/* <EmailSettingsCard /> */}
-                {/* <StorageSettingsCard /> */}
+                <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-6 text-center text-gray-500">
+                    <p>Global settings (WhatsApp, Payment, Maps) are now managed by Super Admin.</p>
+                </div>
             </div>
         </div>
     );

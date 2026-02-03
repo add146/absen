@@ -1,4 +1,4 @@
-import React, { type ReactNode } from 'react';
+import React from 'react';
 import { Link, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import {
     MdDashboard,
@@ -9,6 +9,7 @@ import {
     MdCardGiftcard,
     MdPieChart,
     MdPerson,
+    MdMonitorHeart,
     MdStorage
 } from 'react-icons/md';
 
@@ -24,117 +25,68 @@ const SuperAdminLayout: React.FC = () => {
 
     const userData = JSON.parse(localStorage.getItem('user_data') || '{}');
 
-    const isActive = (path: string) => location.pathname.includes(path);
+    const menuItems = [
+        { path: '/superadmin/dashboard', icon: <MdDashboard size={20} />, label: 'Dashboard' },
+        { path: '/superadmin/tenants', icon: <MdBusiness size={20} />, label: 'Tenants' },
+        { path: '/superadmin/users', icon: <MdPeople size={20} />, label: 'User Management' },
+        { path: '/superadmin/plans', icon: <MdCardGiftcard size={20} />, label: 'Subscription Plans' },
+        { path: '/superadmin/analytics', icon: <MdPieChart size={20} />, label: 'Platform Analytics' },
+        { path: '/superadmin/settings', icon: <MdSettings size={20} />, label: 'Global Settings' },
+        { path: '/superadmin/health', icon: <MdMonitorHeart size={20} />, label: 'System Health' },
+        { path: '/superadmin/profile', icon: <MdPerson size={20} />, label: 'My Profile' },
+    ];
 
     return (
-        <div className="min-h-screen bg-gray-50">
-            {/* Top Navbar */}
-            <nav className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg fixed top-0 left-0 right-0 z-50">
-                <div className="px-6 py-4">
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                            <MdStorage className="text-3xl" />
-                            <div>
-                                <h1 className="text-xl font-bold">Super Admin Panel</h1>
-                                <p className="text-xs text-purple-100">SaaS Platform Management</p>
-                            </div>
-                        </div>
-                        <div className="flex items-center gap-4">
-                            <div className="text-right">
-                                <p className="text-sm font-semibold">{userData.name}</p>
-                                <p className="text-xs text-purple-200">{userData.email}</p>
-                            </div>
-                            <button
-                                onClick={handleLogout}
-                                className="px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg transition flex items-center gap-2"
-                            >
-                                <MdLogout />
-                                <span className="text-sm">Logout</span>
-                            </button>
+        <div className="flex h-screen bg-gray-100">
+            {/* Sidebar */}
+            <aside className="w-64 bg-white shadow-md flex flex-col">
+                <div className="p-6 border-b">
+                    <div className="flex items-center gap-2 text-indigo-700">
+                        <MdStorage size={28} />
+                        <div>
+                            <h1 className="text-xl font-bold">Super Admin</h1>
+                            <p className="text-xs text-gray-400">Platform Manager</p>
                         </div>
                     </div>
                 </div>
-            </nav>
 
-            {/* Main Container */}
-            <div className="flex pt-16">
-                {/* Sidebar */}
-                <aside className="w-64 bg-white shadow-md fixed left-0 bottom-0 top-16 overflow-y-auto">
-                    <nav className="p-4 space-y-1">
-                        <NavLink
-                            to="/superadmin/dashboard"
-                            icon={<MdDashboard />}
-                            label="Dashboard"
-                            active={isActive('/superadmin/dashboard')}
-                        />
-                        <NavLink
-                            to="/superadmin/tenants"
-                            icon={<MdBusiness />}
-                            label="Tenants"
-                            active={isActive('/superadmin/tenants')}
-                        />
-                        <NavLink
-                            to="/superadmin/users"
-                            icon={<MdPeople />}
-                            label="User Management"
-                            active={isActive('/superadmin/users')}
-                        />
-                        <NavLink
-                            to="/superadmin/plans"
-                            icon={<MdCardGiftcard />}
-                            label="Subscription Plans"
-                            active={isActive('/superadmin/plans')}
-                        />
-                        <NavLink
-                            to="/superadmin/settings"
-                            icon={<MdSettings />}
-                            label="Global Settings"
-                            active={isActive('/superadmin/settings')}
-                        />
-                        <NavLink
-                            to="/superadmin/analytics"
-                            icon={<MdPieChart />}
-                            label="Platform Analytics"
-                            active={isActive('/superadmin/analytics')}
-                        />
-                        <div className="border-t my-2"></div>
-                        <NavLink
-                            to="/superadmin/profile"
-                            icon={<MdPerson />}
-                            label="My Profile"
-                            active={isActive('/superadmin/profile')}
-                        />
-                    </nav>
-                </aside>
+                <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
+                    {menuItems.map((item) => (
+                        <Link
+                            key={item.path}
+                            to={item.path}
+                            className={`flex items-center space-x-3 p-3 rounded-lg transition-colors ${location.pathname.includes(item.path)
+                                    ? 'bg-indigo-50 text-indigo-700'
+                                    : 'text-gray-600 hover:bg-gray-50'
+                                }`}
+                        >
+                            {item.icon}
+                            <span className="font-medium">{item.label}</span>
+                        </Link>
+                    ))}
+                </nav>
 
-                {/* Main Content */}
-                <main className="flex-1 ml-64 p-8">
-                    <Outlet />
-                </main>
-            </div>
+                <div className="p-4 border-t space-y-2">
+                    <div className="px-3 py-2">
+                        <p className="text-sm font-semibold text-gray-700">{userData.name || 'Super Admin'}</p>
+                        <p className="text-xs text-gray-500 truncate">{userData.email}</p>
+                    </div>
+
+                    <button
+                        onClick={handleLogout}
+                        className="flex items-center space-x-3 p-3 w-full text-left text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                    >
+                        <MdLogout size={20} />
+                        <span className="font-medium">Logout</span>
+                    </button>
+                </div>
+            </aside>
+
+            {/* Main Content */}
+            <main className="flex-1 overflow-y-auto p-8">
+                <Outlet />
+            </main>
         </div>
-    );
-};
-
-interface NavLinkProps {
-    to: string;
-    icon: ReactNode;
-    label: string;
-    active: boolean;
-}
-
-const NavLink: React.FC<NavLinkProps> = ({ to, icon, label, active }) => {
-    return (
-        <Link
-            to={to}
-            className={`flex items-center gap-3 px-4 py-3 rounded-lg transition ${active
-                ? 'bg-indigo-50 text-indigo-600 font-semibold'
-                : 'text-gray-700 hover:bg-gray-50'
-                }`}
-        >
-            <span className="text-xl">{icon}</span>
-            <span>{label}</span>
-        </Link>
     );
 };
 

@@ -72,7 +72,6 @@ function App() {
             <Route path="point-rules" element={<PointRulesManagement />} />
             <Route path="fraud-detection" element={<FraudDetection />} />
             <Route path="settings" element={<Settings />} />
-            <Route path="health" element={<SystemHealth />} />
             <Route index element={<Navigate to="/admin/dashboard" replace />} />
           </Route>
         </Route>
@@ -86,6 +85,7 @@ function App() {
           <Route path="analytics" element={<PlatformAnalytics />} />
           <Route path="settings" element={<GlobalSettings />} />
           <Route path="profile" element={<SuperAdminProfile />} />
+          <Route path="health" element={<SystemHealth />} />
           <Route index element={<Navigate to="/superadmin/dashboard" replace />} />
         </Route>
 

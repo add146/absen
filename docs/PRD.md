@@ -701,8 +701,24 @@ npm run test:e2e
 
 ---
 
-> **Note**: Dokumen ini adalah versi singkat PRD. Untuk implementasi production, perlu ditambahkan:
-> - API specification (OpenAPI/Swagger)
-> - Detail error handling
-> - Monitoring & logging strategy
 > - Disaster recovery plan
+
+---
+
+## 7. Update Implementasi (03 Februari 2026)
+
+### 7.1 Super Admin System (Completed)
+Sistem **Super Admin** telah diimplementasikan sepenuhnya dengan fitur:
+- management **Tenant** (CRUD + Suspend)
+- management **Global Settings** (API Keys, WAHA Session, Midtrans)
+- management **User** lintas tenant (Cleanup & Bulk Delete)
+- **Platform Analytics** (Real-time charts)
+- **Profile Management** dengan keamanan password BCrypt.
+
+### 7.2 Dashboard Refinement
+- **Admin Dashboard**: Dikembalikan ke tampilan klasik dengan akses untuk `admin` dan `owner`.
+- **Tenant Dashboard Route**: `/tenant/dashboard` otomatis redirect ke `/admin/dashboard`.
+
+### 7.3 Perbaikan Global Settings
+- UI Disederhanakan: Menghapus technical keys (underscore), hanya menampilkan label deskriptif.
+- **WAHA Integration**: Penambahan kolom `waha_session_name` untuk multi-device support.

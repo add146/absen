@@ -23,7 +23,6 @@ const AdminLayout = () => {
         { path: '/admin/point-rules', icon: <MdStars size={20} />, label: 'Point Rules' },
         { path: '/admin/fraud-detection', icon: <MdSecurity size={20} />, label: 'Fraud Detection' },
         { path: '/admin/settings', icon: <MdSettings size={20} />, label: 'Settings' },
-        { path: '/admin/health', icon: <MdMonitorHeart size={20} />, label: 'System Health' },
     ];
 
     return (
