@@ -35,7 +35,7 @@ const SubscriptionPage: React.FC = () => {
 
     const fetchPlans = async () => {
         try {
-            const token = localStorage.getItem('token')
+            const token = localStorage.getItem('access_token')
             const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8787'}/subscriptions/plans`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -52,7 +52,7 @@ const SubscriptionPage: React.FC = () => {
 
     const fetchCurrentSubscription = async () => {
         try {
-            const token = localStorage.getItem('token')
+            const token = localStorage.getItem('access_token')
             const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8787'}/subscriptions/current`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -71,7 +71,7 @@ const SubscriptionPage: React.FC = () => {
         setUpgrading(planSlug)
 
         try {
-            const token = localStorage.getItem('token')
+            const token = localStorage.getItem('access_token')
             const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8787'}/subscriptions/checkout`, {
                 method: 'POST',
                 headers: {

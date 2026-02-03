@@ -18,7 +18,7 @@ const AnalyticsDashboard: React.FC = () => {
 
     const fetchAnalytics = async () => {
         try {
-            const token = localStorage.getItem('token');
+            const token = localStorage.getItem('access_token');
             const headers = { Authorization: `Bearer ${token}` };
 
             const [trendRes, punctRes, pointsRes] = await Promise.all([

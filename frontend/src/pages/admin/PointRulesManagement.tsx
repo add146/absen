@@ -31,7 +31,7 @@ const PointRulesManagement: React.FC = () => {
 
     const fetchRules = async () => {
         try {
-            const token = localStorage.getItem('token');
+            const token = localStorage.getItem('access_token');
             const response = await axios.get(`${API_URL}/point-rules`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
@@ -46,7 +46,7 @@ const PointRulesManagement: React.FC = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            const token = localStorage.getItem('token');
+            const token = localStorage.getItem('access_token');
             const headers = { Authorization: `Bearer ${token}` };
 
             if (editingRule) {
@@ -67,7 +67,7 @@ const PointRulesManagement: React.FC = () => {
 
     const toggleActive = async (rule: PointRule) => {
         try {
-            const token = localStorage.getItem('token');
+            const token = localStorage.getItem('access_token');
             await axios.put(
                 `${API_URL}/point-rules/${rule.id}`,
                 { is_active: rule.is_active ? 0 : 1 },
@@ -83,7 +83,7 @@ const PointRulesManagement: React.FC = () => {
         if (!confirm('Are you sure you want to delete this rule?')) return;
 
         try {
-            const token = localStorage.getItem('token');
+            const token = localStorage.getItem('access_token');
             await axios.delete(`${API_URL}/point-rules/${id}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
