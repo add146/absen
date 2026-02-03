@@ -1,5 +1,5 @@
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
-import { MdDashboard, MdPeople, MdLocationOn, MdAssessment, MdLogout } from 'react-icons/md';
+import { MdDashboard, MdPeople, MdLocationOn, MdAssessment, MdLogout, MdArrowBack } from 'react-icons/md';
 
 const AdminLayout = () => {
     const navigate = useNavigate();
@@ -32,8 +32,8 @@ const AdminLayout = () => {
                             key={item.path}
                             to={item.path}
                             className={`flex items-center space-x-3 p-3 rounded-lg transition-colors ${location.pathname === item.path
-                                    ? 'bg-blue-50 text-blue-600'
-                                    : 'text-gray-600 hover:bg-gray-50'
+                                ? 'bg-blue-50 text-blue-600'
+                                : 'text-gray-600 hover:bg-gray-50'
                                 }`}
                         >
                             {item.icon}
@@ -42,7 +42,15 @@ const AdminLayout = () => {
                     ))}
                 </nav>
 
-                <div className="p-4 border-t">
+                <div className="p-4 border-t space-y-2">
+                    <Link
+                        to="/dashboard"
+                        className="flex items-center space-x-3 p-3 w-full text-left text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                    >
+                        <MdArrowBack size={20} />
+                        <span className="font-medium">Back to App</span>
+                    </Link>
+
                     <button
                         onClick={handleLogout}
                         className="flex items-center space-x-3 p-3 w-full text-left text-red-600 hover:bg-red-50 rounded-lg transition-colors"
