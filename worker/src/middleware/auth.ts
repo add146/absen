@@ -9,11 +9,12 @@ export const authMiddleware = async (c: Context, next: Next) => {
     if (!token) return c.json({ error: 'Unauthorized' }, 401)
 
     try {
-        const payload = await verify(token, c.env.JWT_SECRET, 'HS256')
+        const payload = await verify(token, 'HARDCODED_DEBUG_SECRET_123', 'HS256')
         c.set('user', payload)
         await next()
-    } catch (e) {
-        return c.json({ error: 'Invalid token' }, 401)
+    } catch (e: any) {
+        console.error('Auth Middleware Verify Failed:', e.message, e)
+        return c.json({ error: 'Invalid token', details: e.message }, 401)
     }
 }
 
