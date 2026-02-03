@@ -6,6 +6,7 @@ compatibility_date = "2024-02-03"
 binding = "DB"
 database_name = "absen-db"
 database_id = "3f448513-701b-4c95-abed-64f571564f5e"
+migrations_dir = "../schema/migrations"
 
 [vars]
 ENVIRONMENT = "development"

@@ -1,244 +1,156 @@
-import React from 'react';
-import {
-    MdAccountBalanceWallet,
-    MdRedeem,
-    MdTrendingUp,
-    MdShoppingBag,
-    MdCardGiftcard,
-    MdFlightTakeoff,
-    MdFitnessCenter,
-    MdExpandMore,
-    MdCheckCircle,
-    MdCheck,
-    MdStar,
-    MdShoppingCart,
-    MdMap,
-    MdChevronRight
-} from 'react-icons/md';
-import DashboardLayout from '../components/DashboardLayout';
+import { useEffect, useState } from 'react';
+import api from '../services/api';
+import { MdStar, MdShoppingBag, MdHistory, MdConfirmationNumber } from 'react-icons/md';
 
-const Rewards: React.FC = () => {
-    return (
-        <DashboardLayout>
-            <div className="flex flex-col gap-8">
-                {/* Header */}
-                <header className="flex justify-between items-center">
-                    <div>
-                        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Points & Rewards</h1>
-                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Manage your earned points and redeem rewards.</p>
-                    </div>
-                    {/* Header actions could go here */}
-                </header>
+const Rewards = () => {
+    const [products, setProducts] = useState<any[]>([]);
+    const [orders, setOrders] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [balance, setBalance] = useState(0);
+    const [activeTab, setActiveTab] = useState<'catalog' | 'history'>('catalog');
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    useEffect(() => {
+        fetchData();
+    }, []);
 
-                    {/* Left Column */}
-                    <div className="lg:col-span-1 space-y-6">
+    const fetchData = async () => {
+        try {
+            // Parallel fetch: products, user balance, order history
+            const [prodRes, userRes, orderRes] = await Promise.all([
+                api.get('/shop/products'),
+                api.get('/auth/me'),
+                api.get('/shop/orders')
+            ]);
 
-                        {/* Balance Card */}
-                        <div className="bg-gradient-to-br from-indigo-600 to-indigo-400 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden">
-                            <div className="absolute top-0 right-0 -mr-8 -mt-8 w-32 h-32 rounded-full bg-white opacity-10 blur-xl"></div>
-                            <div className="absolute bottom-0 left-0 -ml-8 -mb-8 w-24 h-24 rounded-full bg-white opacity-10 blur-xl"></div>
-                            <div className="relative z-10">
-                                <div className="flex items-center justify-between mb-2">
-                                    <span className="text-indigo-100 font-medium">Current Balance</span>
-                                    <MdAccountBalanceWallet className="text-indigo-100 opacity-80 text-xl" />
-                                </div>
-                                <h2 className="text-4xl font-bold mb-1">2,450 <span className="text-xl font-normal opacity-80">pts</span></h2>
-                                <p className="text-indigo-100 text-sm mb-6">+120 points earned this week</p>
-                                <div className="flex gap-3">
-                                    <button className="flex-1 bg-white text-primary font-semibold py-2 px-4 rounded-lg shadow-sm hover:bg-indigo-50 transition-colors flex items-center justify-center gap-2">
-                                        <MdRedeem className="text-sm" />
-                                        Redeem
-                                    </button>
-                                    <button className="flex-1 bg-indigo-600 bg-opacity-40 text-white font-semibold py-2 px-4 rounded-lg hover:bg-opacity-50 transition-colors border border-indigo-400 border-opacity-30">
-                                        History
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
+            setProducts(prodRes.data.data);
+            setBalance(userRes.data.user.points_balance);
+            setOrders(orderRes.data.data);
+        } catch (error) {
+            console.error('Failed to fetch shop data', error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
-                        {/* Quick Stats */}
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
-                                <div className="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mb-3">
-                                    <MdTrendingUp className="text-green-600 dark:text-green-400 text-xl" />
-                                </div>
-                                <p className="text-xs text-gray-500 dark:text-gray-400">Total Earned</p>
-                                <p className="text-xl font-bold text-gray-900 dark:text-white">5,890</p>
-                            </div>
-                            <div className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
-                                <div className="w-10 h-10 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center mb-3">
-                                    <MdShoppingBag className="text-orange-600 dark:text-orange-400 text-xl" />
-                                </div>
-                                <p className="text-xs text-gray-500 dark:text-gray-400">Redeemed</p>
-                                <p className="text-xl font-bold text-gray-900 dark:text-white">3,440</p>
-                            </div>
-                        </div>
+    const handleRedeem = async (productId: string, price: number) => {
+        if (balance < price) {
+            alert('Poin Anda tidak mencukupi!');
+            return;
+        }
 
-                        {/* Browse Rewards */}
-                        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-5">
-                            <h3 className="font-bold text-gray-900 dark:text-white mb-4">Browse Rewards</h3>
-                            <div className="space-y-3">
-                                <RewardCategory icon={<MdCardGiftcard />} title="Gift Cards" subtitle="Amazon, Apple, etc." color="blue" />
-                                <RewardCategory icon={<MdFlightTakeoff />} title="Time Off" subtitle="Extra leave hours" color="purple" />
-                                <RewardCategory icon={<MdFitnessCenter />} title="Wellness" subtitle="Gym memberships" color="pink" />
-                            </div>
-                        </div>
-                    </div>
+        if (!confirm('Apakah Anda yakin, ingin menukarkan poin untuk item ini?')) return;
 
-                    {/* Right Column: Activity History */}
-                    <div className="lg:col-span-2">
-                        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 h-full flex flex-col">
-                            <div className="p-6 border-b border-gray-100 dark:border-gray-700 flex flex-wrap gap-4 justify-between items-center">
-                                <h3 className="font-bold text-lg text-gray-900 dark:text-white">Activity History</h3>
-                                <div className="flex items-center gap-2">
-                                    <div className="relative">
-                                        <select className="appearance-none bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 text-sm rounded-lg pl-3 pr-8 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
-                                            <option>All Types</option>
-                                            <option>Earned</option>
-                                            <option>Spent</option>
-                                        </select>
-                                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-500">
-                                            <MdExpandMore className="text-sm" />
-                                        </div>
-                                    </div>
-                                    <div className="relative">
-                                        <select className="appearance-none bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 text-sm rounded-lg pl-3 pr-8 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
-                                            <option>This Month</option>
-                                            <option>Last Month</option>
-                                            <option>This Year</option>
-                                        </select>
-                                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-500">
-                                            <MdExpandMore className="text-sm" />
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="flex-1 overflow-x-auto">
-                                <table className="w-full text-left">
-                                    <thead>
-                                        <tr className="bg-gray-50 dark:bg-gray-800/50 border-b border-gray-100 dark:border-gray-700">
-                                            <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Transaction</th>
-                                            <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Category</th>
-                                            <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Date & Time</th>
-                                            <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">Points</th>
-                                            <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-center">Status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
-                                        <HistoryRow
-                                            icon={<MdCheckCircle />} title="On-time Clock In" subtitle="Streak: 5 days"
-                                            category="Attendance" catColor="blue" date="Oct 24, 09:00 AM" points="+50"
-                                            pointsColor="green" status="completed" iconBg="green" iconColor="green"
-                                        />
-                                        <HistoryRow
-                                            icon={<MdStar />} title="Employee of the Month" subtitle="Nominated by Team Lead"
-                                            category="Award" catColor="purple" date="Oct 20, 10:30 AM" points="+500"
-                                            pointsColor="green" status="completed" iconBg="purple" iconColor="purple"
-                                        />
-                                        <HistoryRow
-                                            icon={<MdShoppingCart />} title="Amazon Gift Card ($50)" subtitle="Reward Redemption"
-                                            category="Redemption" catColor="gray" date="Oct 15, 02:15 PM" points="-1,200"
-                                            pointsColor="red" status="completed" iconBg="gray" iconColor="gray"
-                                        />
-                                        <HistoryRow
-                                            icon={<MdMap />} title="Office Visit" subtitle="Checked in at Central HQ"
-                                            category="Location" catColor="yellow" date="Oct 12, 08:55 AM" points="+20"
-                                            pointsColor="green" status="completed" iconBg="blue" iconColor="blue"
-                                        />
-                                        <HistoryRow
-                                            icon={<MdCheckCircle />} title="On-time Clock In" subtitle="Streak: 4 days"
-                                            category="Attendance" catColor="blue" date="Oct 11, 08:58 AM" points="+50"
-                                            pointsColor="green" status="completed" iconBg="green" iconColor="green"
-                                        />
-                                    </tbody>
-                                </table>
-                            </div>
-
-                            <div className="p-4 border-t border-gray-100 dark:border-gray-700 flex justify-between items-center">
-                                <span className="text-xs text-gray-500">Showing 5 of 45 transactions</span>
-                                <div className="flex gap-2">
-                                    <button className="px-3 py-1 text-sm border border-gray-200 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 disabled:opacity-50" disabled>Previous</button>
-                                    <button className="px-3 py-1 text-sm border border-gray-200 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300">Next</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        </DashboardLayout>
-    );
-};
-
-const RewardCategory = ({ icon, title, subtitle, color }: { icon: React.ReactNode, title: string, subtitle: string, color: 'blue' | 'purple' | 'pink' }) => {
-    const colors = {
-        blue: 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400',
-        purple: 'bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400',
-        pink: 'bg-pink-50 dark:bg-pink-900/20 text-pink-600 dark:text-pink-400',
+        try {
+            await api.post('/shop/redeem', { product_id: productId, quantity: 1 });
+            alert('Penukaran berhasil!');
+            fetchData(); // Refresh data
+        } catch (error: any) {
+            alert(error.response?.data?.error || 'Redemption failed');
+        }
     };
 
     return (
-        <div className="flex items-center justify-between p-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-lg cursor-pointer group transition-colors">
-            <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-lg flex items-center justify-center text-lg ${colors[color]}`}>
-                    {icon}
-                </div>
+        <div className="space-y-6">
+            <header className="flex justify-between items-center bg-gradient-to-r from-purple-600 to-blue-600 p-6 rounded-2xl text-white shadow-lg">
                 <div>
-                    <p className="font-medium text-sm text-gray-900 dark:text-white group-hover:text-primary transition-colors">{title}</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">{subtitle}</p>
+                    <h1 className="text-3xl font-bold">Rewards Shop</h1>
+                    <p className="opacity-90 mt-1">Tukarkan poin kehadiranmu dengan hadiah menarik!</p>
                 </div>
+                <div className="bg-white/20 backdrop-blur-md px-6 py-3 rounded-xl border border-white/30 text-center">
+                    <p className="text-sm font-medium opacity-80 uppercase tracking-wider">Saldo Poin</p>
+                    <div className="flex items-center justify-center gap-2 mt-1">
+                        <MdStar className="text-yellow-300 text-2xl" />
+                        <span className="text-3xl font-extrabold">{balance.toLocaleString()}</span>
+                    </div>
+                </div>
+            </header>
+
+            {/* Tabs */}
+            <div className="flex space-x-1 bg-gray-100 p-1 rounded-xl w-fit">
+                <button
+                    onClick={() => setActiveTab('catalog')}
+                    className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ${activeTab === 'catalog' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
+                >
+                    <MdShoppingBag /> Katalog
+                </button>
+                <button
+                    onClick={() => setActiveTab('history')}
+                    className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ${activeTab === 'history' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
+                >
+                    <MdHistory /> Riwayat
+                </button>
             </div>
-            <MdChevronRight className="text-gray-400 text-sm" />
-        </div>
-    );
-};
 
-const HistoryRow = ({ icon, title, subtitle, category, catColor, date, points, pointsColor, iconBg }: any) => {
-    const catColors: any = {
-        blue: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
-        purple: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300',
-        gray: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300',
-        yellow: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300',
-    };
+            {loading ? (
+                <div className="text-center py-12 text-gray-500 animate-pulse">Loading rewards...</div>
+            ) : activeTab === 'catalog' ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {products.map((product) => (
+                        <div key={product.id} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow group">
+                            <div className="aspect-video bg-gray-100 relative overflow-hidden">
+                                <img src={product.image_url} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                                <div className="absolute top-3 right-3 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-xs font-bold text-gray-700 shadow-sm">
+                                    Stok: {product.stock}
+                                </div>
+                            </div>
+                            <div className="p-5">
+                                <h3 className="font-bold text-lg text-gray-800">{product.name}</h3>
+                                <p className="text-sm text-gray-500 mt-2 line-clamp-2">{product.description}</p>
 
-    const iconBgs: any = {
-        green: 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400',
-        purple: 'bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400',
-        gray: 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400',
-        blue: 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400',
-    };
-
-    return (
-        <tr className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
-            <td className="px-6 py-4 whitespace-nowrap">
-                <div className="flex items-center gap-3">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${iconBgs[iconBg]}`}>
-                        <span className="text-sm">{icon}</span>
-                    </div>
-                    <div>
-                        <p className="text-sm font-medium text-gray-900 dark:text-white">{title}</p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">{subtitle}</p>
-                    </div>
+                                <div className="mt-4 flex items-center justify-between">
+                                    <div className="flex items-center text-yellow-600 font-bold text-xl">
+                                        <MdStar className="mr-1" />
+                                        {product.price_points}
+                                    </div>
+                                    <button
+                                        onClick={() => handleRedeem(product.id, product.price_points)}
+                                        disabled={product.stock === 0 || balance < product.price_points}
+                                        className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors ${product.stock === 0 ? 'bg-gray-100 text-gray-400 cursor-not-allowed' :
+                                                balance < product.price_points ? 'bg-gray-100 text-gray-400 cursor-not-allowed' :
+                                                    'bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-200'
+                                            }`}
+                                    >
+                                        {product.stock === 0 ? 'Habis' : 'Tukar'}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
                 </div>
-            </td>
-            <td className="px-6 py-4 whitespace-nowrap">
-                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${catColors[catColor]}`}>
-                    {category}
-                </span>
-            </td>
-            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                {date}
-            </td>
-            <td className="px-6 py-4 whitespace-nowrap text-right">
-                <span className={`${pointsColor === 'green' ? 'text-green-600 dark:text-green-400' : 'text-red-500 dark:text-red-400'} font-bold`}>{points}</span>
-            </td>
-            <td className="px-6 py-4 whitespace-nowrap text-center">
-                <MdCheck className="text-green-500 text-sm inline-block" title="Completed" />
-            </td>
-        </tr>
+            ) : (
+                <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                    {orders.length === 0 ? (
+                        <div className="p-12 text-center text-gray-500">Belum ada riwayat penukaran.</div>
+                    ) : (
+                        <div className="divide-y">
+                            {orders.map((order) => (
+                                <div key={order.id} className="p-4 flex items-center justify-between hover:bg-gray-50">
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+                                            <img src={order.image_url} alt={order.product_name} className="w-full h-full object-cover" />
+                                        </div>
+                                        <div>
+                                            <h4 className="font-bold text-gray-800">{order.product_name}</h4>
+                                            <p className="text-xs text-gray-500">
+                                                {new Date(order.created_at).toLocaleDateString()} • {new Date(order.created_at).toLocaleTimeString()}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="text-right">
+                                        <div className="flex items-center justify-end text-red-600 font-bold mb-1">
+                                            -{order.total_points} Pts
+                                        </div>
+                                        <span className="bg-green-100 text-green-700 px-2 py-0.5 rounded text-xs font-semibold capitalize">
+                                            {order.status}
+                                        </span>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            )}
+        </div>
     );
 };
 

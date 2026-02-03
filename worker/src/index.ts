@@ -3,8 +3,9 @@ import { cors } from 'hono/cors'
 import auth from './routes/auth'
 import attendance from './routes/attendance'
 import admin from './routes/admin'
+import shop from './routes/shop'
 
-type Bindings = {
+export type Bindings = {
     DB: D1Database
     JWT_SECRET: string
 }
@@ -20,5 +21,6 @@ app.get('/', (c) => {
 app.route('/auth', auth)
 app.route('/attendance', attendance)
 app.route('/admin', admin)
+app.route('/shop', shop)
 
 export default app
