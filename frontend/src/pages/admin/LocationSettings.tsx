@@ -3,7 +3,7 @@ import api from '../../services/api';
 import { MdAdd, MdLocationOn } from 'react-icons/md';
 import { APIProvider, Map, Marker, InfoWindow } from '@vis.gl/react-google-maps';
 
-const GOOGLE_MAPS_API_KEY = 'AIzaSyDYIc7jBfPMmkS6FPUcimXjWI9pCd2_4pA';
+const GOOGLE_MAPS_API_KEY = 'AIzaSyCsIPdS9shnKfJb2SVlOuWUbLq0ZC5ov3E';
 
 // Office locations map component with Google Maps
 const OfficeMap = ({
