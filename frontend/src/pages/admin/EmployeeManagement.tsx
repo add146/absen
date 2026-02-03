@@ -6,6 +6,13 @@ const EmployeeManagement = () => {
     const [employees, setEmployees] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState('');
+    const [showForm, setShowForm] = useState(false);
+    const [formData, setFormData] = useState({
+        name: '',
+        email: '',
+        password: '',
+        role: 'employee'
+    });
 
     useEffect(() => {
         fetchEmployees();
@@ -23,6 +30,20 @@ const EmployeeManagement = () => {
         }
     };
 
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        try {
+            await api.post('/admin/users', formData);
+            setShowForm(false);
+            setFormData({ name: '', email: '', password: '', role: 'employee' });
+            fetchEmployees();
+            alert('Employee created successfully! Share the credentials with the employee.');
+        } catch (error: any) {
+            console.error('Failed to create employee', error);
+            alert(error.response?.data?.error || 'Failed to create employee');
+        }
+    };
+
     const filteredEmployees = employees.filter(emp =>
         emp.name.toLowerCase().includes(filter.toLowerCase()) ||
         emp.email.toLowerCase().includes(filter.toLowerCase())
@@ -32,11 +53,86 @@ const EmployeeManagement = () => {
         <div className="space-y-6">
             <div className="flex justify-between items-center">
                 <h2 className="text-2xl font-bold text-gray-800">Employee Management</h2>
-                <button className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+                <button
+                    onClick={() => setShowForm(true)}
+                    className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+                >
                     <MdAdd size={20} />
                     <span>Add Employee</span>
                 </button>
             </div>
+
+            {showForm && (
+                <div className="bg-white p-6 rounded-xl shadow-sm border border-blue-100">
+                    <h3 className="text-lg font-semibold mb-4">Add New Employee</h3>
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Full Name</label>
+                            <input
+                                type="text"
+                                required
+                                className="mt-1 w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                value={formData.name}
+                                onChange={e => setFormData({ ...formData, name: e.target.value })}
+                                placeholder="e.g. John Doe"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Email</label>
+                            <input
+                                type="email"
+                                required
+                                className="mt-1 w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                value={formData.email}
+                                onChange={e => setFormData({ ...formData, email: e.target.value })}
+                                placeholder="john@company.com"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Password</label>
+                            <input
+                                type="password"
+                                required
+                                minLength={6}
+                                className="mt-1 w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                value={formData.password}
+                                onChange={e => setFormData({ ...formData, password: e.target.value })}
+                                placeholder="Minimum 6 characters"
+                            />
+                            <p className="text-xs text-gray-500 mt-1">⚠️ Share this password with the employee securely</p>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Role</label>
+                            <select
+                                className="mt-1 w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                value={formData.role}
+                                onChange={e => setFormData({ ...formData, role: e.target.value })}
+                            >
+                                <option value="employee">Employee</option>
+                                <option value="admin">Admin</option>
+                            </select>
+                        </div>
+                        <div className="flex justify-end space-x-3">
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setShowForm(false);
+                                    setFormData({ name: '', email: '', password: '', role: 'employee' });
+                                }}
+                                className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="submit"
+                                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                            >
+                                Create Employee
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            )}
 
             <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center space-x-3">
                 <MdSearch className="text-gray-400" size={24} />

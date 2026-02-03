@@ -58,8 +58,45 @@ admin.get('/users', async (c) => {
 
 // POST /users - Create new employee manually
 admin.post('/users', async (c) => {
-    // To be implemented: Create user with hashed password
-    return c.json({ message: 'Create user endpoint' })
+    const { email, name, password, role = 'employee' } = await c.req.json()
+    const user = c.get('user')
+
+    if (!email || !name || !password) {
+        return c.json({ error: 'Missing required fields: email, name, password' }, 400)
+    }
+
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email)) {
+        return c.json({ error: 'Invalid email format' }, 400)
+    }
+
+    // Check if email already exists
+    const existing = await c.env.DB.prepare('SELECT id FROM users WHERE email = ?').bind(email).first()
+    if (existing) {
+        return c.json({ error: 'Email already registered' }, 400)
+    }
+
+    // Hash password using Web Crypto API (SHA-256)
+    const encoder = new TextEncoder()
+    const data = encoder.encode(password)
+    const hash = await crypto.subtle.digest('SHA-256', data)
+    const hashedPassword = Array.from(new Uint8Array(hash))
+        .map(b => b.toString(16).padStart(2, '0'))
+        .join('')
+
+    const id = crypto.randomUUID()
+    const tenant_id = user.tenant_id // Inherit tenant from admin
+
+    await c.env.DB.prepare(
+        'INSERT INTO users (id, tenant_id, email, password_hash, name, role, status) VALUES (?, ?, ?, ?, ?, ?, ?)'
+    ).bind(id, tenant_id, email, hashedPassword, name, role, 'active').run()
+
+    return c.json({
+        message: 'Employee created successfully',
+        id,
+        user: { id, email, name, role, status: 'active', created_at: new Date().toISOString() }
+    })
 })
 
 // GET /locations - List all office locations
