@@ -10,7 +10,7 @@ declare module 'hono' {
         // User context from JWT
         user: any
         userId: string
-        userRole: 'owner' | 'admin' | 'employee'
+        userRole: 'super_admin' | 'admin' | 'employee'
 
         // Tenant context
         tenantId: string

@@ -26,3 +26,11 @@ export const adminAuthMiddleware = async (c: Context, next: Next) => {
     }
     await next()
 }
+
+export const superAdminMiddleware = async (c: Context, next: Next) => {
+    const user = c.get('user')
+    if (!user || user.role !== 'super_admin') {
+        return c.json({ error: 'Forbidden: Super Admin access required' }, 403)
+    }
+    await next()
+}

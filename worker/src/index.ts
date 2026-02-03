@@ -16,6 +16,7 @@ import profile from './routes/profile'
 import tenants from './routes/tenants'
 import subscriptions from './routes/subscriptions'
 import customDomains from './routes/custom-domains'
+import superadmin from './routes/super-admin'
 import { tenantContext, rateLimiter, customDomainRouter } from './middleware/tenant'
 
 export type Bindings = {
@@ -51,6 +52,9 @@ app.get('/', (c) => {
 app.route('/auth', auth)
 // Webhook endpoints (public but should verify signature)
 app.route('/subscriptions', subscriptions) // Some endpoints are public (webhook)
+
+// Super Admin routes (auth required but NO tenant context)
+app.route('/super-admin', superadmin)
 
 // Protected routes (require authentication + tenant context)
 app.use('/*', tenantContext) // Apply tenant middleware to all routes below

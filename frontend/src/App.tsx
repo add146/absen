@@ -23,6 +23,13 @@ import AdminLayout from './layouts/AdminLayout';
 import TenantOnboarding from './pages/TenantOnboarding';
 import Subscription from './pages/Subscription';
 import TenantDashboard from './pages/TenantDashboard';
+import SuperAdminLayout from './layouts/SuperAdminLayout';
+import SuperAdminDashboard from './pages/superadmin/Dashboard';
+import SuperAdminProfile from './pages/superadmin/Profile';
+import UserManagement from './pages/superadmin/UserManagement';
+import GlobalSettings from './pages/superadmin/GlobalSettings';
+import TenantManagement from './pages/superadmin/TenantManagement';
+import PlanManagement from './pages/superadmin/PlanManagement';
 
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -67,6 +74,18 @@ function App() {
             <Route index element={<Navigate to="/admin/dashboard" replace />} />
           </Route>
         </Route>
+
+        {/* Super Admin Routes */}
+        <Route path="/superadmin" element={<ProtectedRoute><SuperAdminLayout /></ProtectedRoute>}>
+          <Route path="dashboard" element={<SuperAdminDashboard />} />
+          <Route path="tenants" element={<TenantManagement />} />
+          <Route path="users" element={<UserManagement />} />
+          <Route path="plans" element={<PlanManagement />} />
+          <Route path="settings" element={<GlobalSettings />} />
+          <Route path="profile" element={<SuperAdminProfile />} />
+          <Route index element={<Navigate to="/superadmin/dashboard" replace />} />
+        </Route>
+
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>

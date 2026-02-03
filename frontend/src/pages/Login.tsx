@@ -41,8 +41,10 @@ const Login: React.FC = () => {
             localStorage.setItem('user_data', JSON.stringify(res.data.user));
 
             // Redirect based on role
-            if (res.data.user.role === 'owner' || res.data.user.role === 'super_admin') {
-                navigate('/tenant/dashboard');
+            if (res.data.user.role === 'super_admin') {
+                navigate('/superadmin/dashboard');
+            } else if (res.data.user.role === 'admin') {
+                navigate('/admin/dashboard');
             } else {
                 navigate('/dashboard');
             }
