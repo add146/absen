@@ -1,0 +1,622 @@
+# Product Requirement Document (PRD)
+## Sistem Manajemen Kehadiran Terintegrasi Loyalitas
+
+---
+
+## 1. Ringkasan Eksekutif
+
+Dokumen ini menjabarkan spesifikasi aplikasi **Manajemen Kehadiran (Attendance Management)** yang terintegrasi dengan sistem loyalitas toko online. Aplikasi ini mengubah data kehadiran menjadi poin reward yang dapat ditukarkan dengan diskon di platform e-commerce.
+
+### Visi Produk
+> Membangun ekosistem terintegrasi di mana perilaku kehadiran karyawan/pengguna dikonversi menjadi mata uang digital (poin loyalitas) yang dapat ditukarkan dengan benefit di aplikasi satelit (toko online).
+
+---
+
+## 2. User Flow
+
+### 2.1 Alur Pengguna (Employee/User)
+
+```mermaid
+flowchart TD
+    A[Buka Aplikasi] --> B{Sudah Login?}
+    B -->|Tidak| C[Halaman Login]
+    C --> D[Input Email/HP + Password]
+    D --> E{Validasi}
+    E -->|Gagal| C
+    E -->|Berhasil| F[Dashboard Utama]
+    
+    B -->|Ya| F
+    
+    F --> G[Pilih Menu]
+    G --> H[Check-in Kehadiran]
+    G --> I[Lihat Riwayat]
+    G --> J[Lihat Saldo Poin]
+    G --> K[Tukar Poin di Toko]
+    
+    H --> L[Deteksi Lokasi GPS]
+    L --> M{Validasi Geofence}
+    M -->|Dalam Area| N[Check-in Berhasil]
+    N --> O[+Poin Loyalitas]
+    O --> F
+    M -->|Luar Area| P[Check-in Gagal]
+    P --> F
+    
+    K --> Q[Redirect ke Toko Online]
+    Q --> R[Pilih Produk]
+    R --> S[Apply Diskon dengan Poin]
+    S --> T[Checkout]
+```
+
+### 2.2 Langkah Detail - Pengguna
+
+| Step | Aksi | Deskripsi |
+|------|------|-----------|
+| 1 | **Login** | User membuka aplikasi → Input kredensial → Sistem validasi |
+| 2 | **Dashboard** | Melihat status kehadiran hari ini, saldo poin, notifikasi |
+| 3 | **Check-in** | Klik tombol Check-in → GPS aktif → Validasi lokasi geofence |
+| 4 | **Konfirmasi** | Sistem validasi anti-spoofing (IP, mock location detector) |
+| 5 | **Earning Poin** | Check-in berhasil → Poin otomatis ditambahkan ke saldo |
+| 6 | **Check-out** | Saat pulang, klik Check-out → Sistem catat durasi kerja |
+| 7 | **Lihat Riwayat** | Akses menu Riwayat → Lihat log kehadiran & poin |
+| 8 | **Tukar Poin** | Klik menu Toko → Redirect ke toko online → Gunakan poin |
+
+### 2.3 Alur Admin/Pemilik Toko
+
+```mermaid
+flowchart TD
+    A[Login Admin] --> B[Dashboard Admin]
+    B --> C[Kelola Karyawan]
+    B --> D[Kelola Lokasi/Geofence]
+    B --> E[Atur Aturan Poin]
+    B --> F[Kelola Diskon Toko]
+    B --> G[Lihat Laporan]
+    
+    C --> C1[Tambah/Edit/Hapus User]
+    D --> D1[Set Koordinat & Radius]
+    E --> E1[Poin per Check-in]
+    E --> E2[Bonus Tepat Waktu]
+    F --> F1[Atur Rate Konversi Poin]
+    G --> G1[Export Laporan Kehadiran]
+```
+
+---
+
+## 3. Data Structure
+
+### 3.1 Database Schema (Cloudflare D1)
+
+#### Tabel: `tenants` (Multi-tenant Support)
+```sql
+CREATE TABLE tenants (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    slug TEXT UNIQUE NOT NULL,
+    logo_url TEXT,
+    settings JSON,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+#### Tabel: `users`
+```sql
+CREATE TABLE users (
+    id TEXT PRIMARY KEY,
+    tenant_id TEXT NOT NULL,
+    email TEXT UNIQUE,
+    phone TEXT,
+    password_hash TEXT NOT NULL,
+    name TEXT NOT NULL,
+    role TEXT DEFAULT 'employee', -- 'admin', 'employee', 'owner'
+    points_balance INTEGER DEFAULT 0,
+    status TEXT DEFAULT 'active',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (tenant_id) REFERENCES tenants(id)
+);
+```
+
+#### Tabel: `locations` (Geofence Areas)
+```sql
+CREATE TABLE locations (
+    id TEXT PRIMARY KEY,
+    tenant_id TEXT NOT NULL,
+    name TEXT NOT NULL,
+    latitude REAL NOT NULL,
+    longitude REAL NOT NULL,
+    radius_meters INTEGER DEFAULT 100,
+    polygon_coords JSON, -- Untuk complex geofence
+    is_active INTEGER DEFAULT 1,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (tenant_id) REFERENCES tenants(id)
+);
+```
+
+#### Tabel: `attendances`
+```sql
+CREATE TABLE attendances (
+    id TEXT PRIMARY KEY,
+    user_id TEXT NOT NULL,
+    location_id TEXT NOT NULL,
+    check_in_time DATETIME NOT NULL,
+    check_out_time DATETIME,
+    check_in_lat REAL,
+    check_in_lng REAL,
+    check_out_lat REAL,
+    check_out_lng REAL,
+    ip_address TEXT,
+    device_info TEXT,
+    is_valid INTEGER DEFAULT 1,
+    fraud_flags JSON,
+    points_earned INTEGER DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (location_id) REFERENCES locations(id)
+);
+```
+
+#### Tabel: `points_ledger` (Buku Besar Poin)
+```sql
+CREATE TABLE points_ledger (
+    id TEXT PRIMARY KEY,
+    user_id TEXT NOT NULL,
+    transaction_type TEXT NOT NULL, -- 'earn', 'redeem', 'adjust'
+    amount INTEGER NOT NULL, -- Positif = tambah, Negatif = kurang
+    reference_type TEXT, -- 'attendance', 'purchase', 'bonus'
+    reference_id TEXT,
+    description TEXT,
+    balance_after INTEGER NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+```
+
+#### Tabel: `discount_rules` (Aturan Diskon per Tenant)
+```sql
+CREATE TABLE discount_rules (
+    id TEXT PRIMARY KEY,
+    tenant_id TEXT NOT NULL,
+    name TEXT NOT NULL,
+    rule_type TEXT NOT NULL, -- 'percentage', 'fixed', 'tiered'
+    points_required INTEGER NOT NULL,
+    discount_value REAL NOT NULL,
+    max_discount REAL,
+    min_purchase REAL,
+    valid_from DATETIME,
+    valid_until DATETIME,
+    is_active INTEGER DEFAULT 1,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (tenant_id) REFERENCES tenants(id)
+);
+```
+
+#### Tabel: `point_rules` (Aturan Earning Poin)
+```sql
+CREATE TABLE point_rules (
+    id TEXT PRIMARY KEY,
+    tenant_id TEXT NOT NULL,
+    name TEXT NOT NULL,
+    rule_type TEXT NOT NULL, -- 'check_in', 'on_time', 'full_day', 'streak'
+    points_amount INTEGER NOT NULL,
+    conditions JSON, -- Kondisi tambahan
+    is_active INTEGER DEFAULT 1,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (tenant_id) REFERENCES tenants(id)
+);
+```
+
+### 3.2 File Storage (Cloudflare R2)
+
+```
+r2-bucket/
+├── tenants/
+│   └── {tenant_id}/
+│       ├── logo.png
+│       └── assets/
+├── users/
+│   └── {user_id}/
+│       └── avatar.jpg
+├── reports/
+│   └── {tenant_id}/
+│       └── attendance_2026_01.csv
+└── evidence/
+    └── {attendance_id}/
+        └── selfie.jpg  (Jika fitur foto aktif)
+```
+
+---
+
+## 4. Tech Stack
+
+### 4.1 Arsitektur Cloudflare
+
+```mermaid
+graph TB
+    subgraph "Client Layer"
+        A[Web App - PWA]
+        B[Mobile Browser]
+    end
+    
+    subgraph "Cloudflare Edge"
+        C[Cloudflare Pages<br/>Frontend Hosting]
+        D[Cloudflare Workers<br/>Backend API]
+        E[Service Bindings]
+    end
+    
+    subgraph "Cloudflare Storage"
+        F[(D1 Database<br/>SQLite)]
+        G[R2 Object Storage<br/>Files/Images]
+        H[KV Storage<br/>Cache/Sessions]
+    end
+    
+    A --> C
+    B --> C
+    C --> D
+    D --> E
+    E --> D
+    D --> F
+    D --> G
+    D --> H
+```
+
+### 4.2 Stack Detail
+
+| Layer | Teknologi | Kegunaan |
+|-------|-----------|----------|
+| **Frontend** | React/Vue + Vite | SPA dengan PWA support |
+| **Styling** | Tailwind CSS | Rapid UI development |
+| **Hosting** | Cloudflare Pages | Static hosting + edge functions |
+| **Backend** | Cloudflare Workers | Serverless API (Hono/Itty-router) |
+| **Database** | Cloudflare D1 | SQLite di edge |
+| **File Storage** | Cloudflare R2 | S3-compatible object storage |
+| **Cache** | Cloudflare KV | Session & data caching |
+| **Auth** | JWT + Argon2 | Secure authentication |
+| **Maps** | Leaflet.js | Geofencing UI |
+
+### 4.3 Struktur Project
+
+```
+absen/
+├── frontend/                 # Cloudflare Pages
+│   ├── src/
+│   │   ├── components/
+│   │   ├── pages/
+│   │   ├── hooks/
+│   │   ├── lib/
+│   │   └── App.tsx
+│   ├── public/
+│   ├── package.json
+│   └── vite.config.ts
+│
+├── worker/                   # Cloudflare Workers
+│   ├── src/
+│   │   ├── index.ts          # Entry point
+│   │   ├── routes/
+│   │   │   ├── auth.ts
+│   │   │   ├── attendance.ts
+│   │   │   ├── points.ts
+│   │   │   └── admin.ts
+│   │   ├── middleware/
+│   │   │   ├── auth.ts
+│   │   │   └── validation.ts
+│   │   ├── services/
+│   │   │   ├── geofence.ts
+│   │   │   ├── fraud-detection.ts
+│   │   │   └── points-engine.ts
+│   │   └── utils/
+│   ├── wrangler.toml
+│   └── package.json
+│
+├── schema/
+│   └── migrations/
+│       └── 0001_initial.sql
+│
+├── docs/
+│   └── PRD.md
+│
+├── .github/
+│   └── workflows/
+│       └── deploy.yml
+│
+└── README.md
+```
+
+### 4.4 Konfigurasi Wrangler (wrangler.toml)
+
+```toml
+name = "absen-api"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "absen-db"
+database_id = "<database-id>"
+
+[[r2_buckets]]
+binding = "STORAGE"
+bucket_name = "absen-files"
+
+[[kv_namespaces]]
+binding = "CACHE"
+id = "<kv-namespace-id>"
+
+[vars]
+ENVIRONMENT = "production"
+```
+
+---
+
+## 5. Deployment & GitHub Integration
+
+### 5.1 Setup Repository
+
+```bash
+# 1. Initialize git repository
+cd c:\Aplikasi\absen
+git init
+git add .
+git commit -m "Initial commit: PRD and project structure"
+
+# 2. Add remote origin
+git remote add origin https://github.com/add146/absen.git
+
+# 3. Push ke GitHub
+git branch -M main
+git push -u origin main
+```
+
+### 5.2 Cloudflare Pages Connection
+
+1. **Login ke Cloudflare Dashboard** → Pages
+2. **Create a Project** → Connect to Git
+3. **Select Repository**: `add146/absen`
+4. **Build Settings**:
+   - Framework preset: `Vite`
+   - Build command: `npm run build`
+   - Build output directory: `dist`
+   - Root directory: `frontend`
+5. **Environment Variables**:
+   ```
+   VITE_API_URL = https://absen-api.<account>.workers.dev
+   ```
+
+### 5.3 GitHub Actions Workflow
+
+```yaml
+# .github/workflows/deploy.yml
+name: Deploy to Cloudflare
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy-worker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Install Dependencies
+        run: |
+          cd worker
+          npm ci
+      
+      - name: Deploy Worker
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          workingDirectory: worker
+          command: deploy
+
+  deploy-pages:
+    runs-on: ubuntu-latest
+    needs: deploy-worker
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Install & Build Frontend
+        run: |
+          cd frontend
+          npm ci
+          npm run build
+      
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          projectName: absen
+          directory: frontend/dist
+```
+
+---
+
+## 6. UI/UX Recommendations
+
+### 6.1 Design System
+
+#### Color Palette
+```css
+:root {
+  /* Primary - Professional Blue */
+  --primary-50: #eff6ff;
+  --primary-500: #3b82f6;
+  --primary-600: #2563eb;
+  --primary-700: #1d4ed8;
+  
+  /* Success - Check-in Green */
+  --success-500: #22c55e;
+  
+  /* Warning - Late Orange */
+  --warning-500: #f59e0b;
+  
+  /* Error - Absent Red */  
+  --error-500: #ef4444;
+  
+  /* Neutral */
+  --gray-50: #f9fafb;
+  --gray-900: #111827;
+}
+```
+
+#### Typography
+- **Font Family**: Inter atau Outfit (Google Fonts)
+- **Heading**: Bold, tracking tight
+- **Body**: Regular, line-height 1.6
+
+### 6.2 Mobile-First Design
+
+```
+┌─────────────────────────────────┐
+│  ⏱️ 08:45:23                    │  ← Status Bar
+├─────────────────────────────────┤
+│                                 │
+│     👤 Selamat Pagi, John!     │
+│                                 │
+│  ┌─────────────────────────────┐   │
+│  │                         │   │
+│  │    🟢 CHECK-IN NOW      │   │  ← Big CTA Button
+│  │                         │   │
+│  └─────────────────────────────┘   │
+│                                 │
+│  📍 Kantor Pusat - Dalam Area  │  ← Location Status
+│                                 │
+├─────────────────────────────────┤
+│  ⭐ Saldo Poin: 1,250          │
+│  📊 Kehadiran Bulan Ini: 95%   │
+├─────────────────────────────────┤
+│                                 │
+│  Riwayat Terakhir              │
+│  ├ Hari ini    ✅ 08:02       │
+│  ├ Kemarin     ✅ 07:58       │
+│  └ 2 hari lalu ⚠️ 08:35       │
+│                                 │
+├─────────────────────────────────┤
+│  🏠    📊    🏪    👤          │  ← Bottom Nav
+└─────────────────────────────────┘
+```
+
+### 6.3 Key UI Components
+
+| Component | Description | Design Notes |
+|-----------|-------------|--------------|
+| **Check-in Button** | Tombol utama | Besar, prominent, dengan animasi pulse |
+| **Location Indicator** | Status GPS | Real-time, dengan ikon dan warna status |
+| **Points Card** | Saldo poin | Glassmorphism effect, gradient background |
+| **Attendance Calendar** | Kalender | Heat map style, warna per status |
+| **History List** | Riwayat | Cards dengan timeline connector |
+| **Admin Dashboard** | Panel admin | Data tables + charts (Chart.js) |
+
+### 6.4 Micro-Interactions
+
+- **Check-in Success**: Confetti animation + haptic feedback
+- **Points Earned**: Counter animation dari 0 ke nilai final
+- **Button Hover**: Scale transform + shadow elevation
+- **Loading States**: Skeleton screens, bukan spinner
+- **Pull to Refresh**: Custom illustration + smooth transition
+
+### 6.5 Accessibility (A11y)
+
+- Contrast ratio minimal 4.5:1
+- Focus indicators jelas
+- Touch targets minimal 44x44px
+- Screen reader labels pada semua interactive elements
+- Support dark mode
+
+### 6.6 Progressive Web App (PWA)
+
+- **Offline Support**: Service worker untuk caching
+- **Push Notifications**: Reminder check-in/out
+- **Add to Home Screen**: App-like experience
+- **Background Sync**: Queue check-in saat offline
+
+---
+
+## 7. Security Considerations
+
+### 7.1 Anti-Fraud Measures
+
+1. **GPS Spoofing Detection**
+   - Cek mock location flag dari device
+   - Validasi IP geolocation vs GPS coords
+   - Analisis kecepatan movement (impossible travel)
+
+2. **Request Authentication**
+   - Nonce untuk setiap request
+   - Short-lived tokens (15 menit)
+   - Device fingerprinting
+
+3. **Data Integrity**
+   - Immutable audit log
+   - Cryptographic signatures pada records
+   - Rate limiting per user
+
+### 7.2 Authentication Flow
+
+```mermaid
+sequenceDiagram
+    User->>+Frontend: Login (email, password)
+    Frontend->>+Worker: POST /auth/login
+    Worker->>+D1: Verify credentials
+    D1-->>-Worker: User data
+    Worker->>Worker: Generate JWT + Refresh Token
+    Worker-->>-Frontend: {accessToken, refreshToken}
+    Frontend->>Frontend: Store tokens (httpOnly cookie)
+    Frontend-->>-User: Redirect to Dashboard
+```
+
+---
+
+## 8. Verification Plan
+
+### 8.1 Automated Tests
+
+```bash
+# Unit tests
+npm run test
+
+# Integration tests  
+npm run test:integration
+
+# E2E tests dengan Playwright
+npm run test:e2e
+```
+
+### 8.2 Manual Verification
+
+- [ ] Test geofencing dengan lokasi real
+- [ ] Test mock location detection
+- [ ] Test multi-tenant isolation
+- [ ] Test points earning & redemption flow
+- [ ] Performance testing (latency < 100ms)
+- [ ] Security penetration testing
+
+---
+
+## 9. Timeline Estimasi
+
+| Phase | Duration | Deliverables |
+|-------|----------|--------------|
+| Setup | 1 minggu | Repo, CI/CD, Cloudflare resources |
+| Backend Core | 2 minggu | Auth, Attendance, Points API |
+| Frontend MVP | 2 minggu | Check-in flow, Dashboard |
+| Admin Panel | 1 minggu | User & location management |
+| Integration | 1 minggu | Shop integration, testing |
+| Polish | 1 minggu | Bug fixes, performance tuning |
+
+**Total: ~8 minggu**
+
+---
+
+> **Note**: Dokumen ini adalah versi singkat PRD. Untuk implementasi production, perlu ditambahkan:
+> - API specification (OpenAPI/Swagger)
+> - Detail error handling
+> - Monitoring & logging strategy
+> - Disaster recovery plan
