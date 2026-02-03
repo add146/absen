@@ -12,6 +12,9 @@ import AttendanceReports from './pages/admin/AttendanceReports';
 import LeaveApproval from './pages/admin/LeaveApproval';
 import ProductManagement from './pages/admin/ProductManagement';
 import OrderManagement from './pages/admin/OrderManagement';
+import AnalyticsDashboard from './pages/admin/AnalyticsDashboard';
+import PointRulesManagement from './pages/admin/PointRulesManagement';
+import FraudDetection from './pages/admin/FraudDetection';
 import AdminRoute from './components/AdminRoute';
 import AdminLayout from './layouts/AdminLayout';
 
@@ -45,6 +48,9 @@ function App() {
             <Route path="reports" element={<AttendanceReports />} />
             <Route path="products" element={<ProductManagement />} />
             <Route path="orders" element={<OrderManagement />} />
+            <Route path="analytics" element={<AnalyticsDashboard />} />
+            <Route path="point-rules" element={<PointRulesManagement />} />
+            <Route path="fraud-detection" element={<FraudDetection />} />
             <Route index element={<Navigate to="/admin/dashboard" replace />} />
           </Route>
         </Route>
