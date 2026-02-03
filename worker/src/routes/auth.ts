@@ -48,10 +48,16 @@ auth.post('/login', async (c) => {
         'SELECT * FROM users WHERE email = ?'
     ).bind(email).first()
 
-    if (!user) return c.json({ error: 'Invalid credentials' }, 401)
+    if (!user) {
+        console.log(`Login failed: User ${email} not found`);
+        return c.json({ error: 'Invalid credentials' }, 401)
+    }
 
     const isValid = await compare(password, user.password_hash as string)
-    if (!isValid) return c.json({ error: 'Invalid credentials' }, 401)
+    if (!isValid) {
+        console.log(`Login failed: Password mismatch for ${email}. Hash length: ${user.password_hash?.length}`);
+        return c.json({ error: 'Invalid credentials' }, 401)
+    }
 
     const payload = {
         sub: user.id,

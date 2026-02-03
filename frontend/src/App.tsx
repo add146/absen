@@ -5,6 +5,7 @@ import Dashboard from './pages/Dashboard';
 import AttendanceHistory from './pages/AttendanceHistory';
 import Rewards from './pages/Rewards';
 import LeaveRequest from './pages/LeaveRequest';
+import Profile from './pages/Profile';
 import AdminDashboard from './pages/admin/Dashboard';
 import EmployeeManagement from './pages/admin/EmployeeManagement';
 import LocationSettings from './pages/admin/LocationSettings';
@@ -15,8 +16,12 @@ import OrderManagement from './pages/admin/OrderManagement';
 import AnalyticsDashboard from './pages/admin/AnalyticsDashboard';
 import PointRulesManagement from './pages/admin/PointRulesManagement';
 import FraudDetection from './pages/admin/FraudDetection';
+import Settings from './pages/admin/Settings';
+import SystemHealth from './pages/admin/SystemHealth';
 import AdminRoute from './components/AdminRoute';
 import AdminLayout from './layouts/AdminLayout';
+import TenantOnboarding from './pages/TenantOnboarding';
+import Subscription from './pages/Subscription';
 
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -31,12 +36,16 @@ function App() {
   return (
     <Router>
       <Routes>
+        {/* Public Routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/onboarding" element={<TenantOnboarding />} />
         <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
         <Route path="/attendance" element={<ProtectedRoute><AttendanceHistory /></ProtectedRoute>} />
         <Route path="/rewards" element={<ProtectedRoute><Rewards /></ProtectedRoute>} />
         <Route path="/leaves" element={<ProtectedRoute><LeaveRequest /></ProtectedRoute>} />
+        <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+        <Route path="/subscription" element={<ProtectedRoute><Subscription /></ProtectedRoute>} />
 
         {/* Admin Routes */}
         <Route path="/admin" element={<AdminRoute />}>
@@ -51,6 +60,8 @@ function App() {
             <Route path="analytics" element={<AnalyticsDashboard />} />
             <Route path="point-rules" element={<PointRulesManagement />} />
             <Route path="fraud-detection" element={<FraudDetection />} />
+            <Route path="settings" element={<Settings />} />
+            <Route path="health" element={<SystemHealth />} />
             <Route index element={<Navigate to="/admin/dashboard" replace />} />
           </Route>
         </Route>

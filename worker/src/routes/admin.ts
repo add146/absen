@@ -1,5 +1,6 @@
 import { Hono } from 'hono'
 import { authMiddleware, adminAuthMiddleware } from '../middleware/auth'
+import { hash } from 'bcryptjs'
 
 type Bindings = {
     DB: D1Database
@@ -77,13 +78,8 @@ admin.post('/users', async (c) => {
         return c.json({ error: 'Email already registered' }, 400)
     }
 
-    // Hash password using Web Crypto API (SHA-256)
-    const encoder = new TextEncoder()
-    const data = encoder.encode(password)
-    const hash = await crypto.subtle.digest('SHA-256', data)
-    const hashedPassword = Array.from(new Uint8Array(hash))
-        .map(b => b.toString(16).padStart(2, '0'))
-        .join('')
+    // Hash password using bcrypt
+    const hashedPassword = await hash(password, 10)
 
     const id = crypto.randomUUID()
     const tenant_id = user.tenant_id // Inherit tenant from admin
@@ -97,6 +93,51 @@ admin.post('/users', async (c) => {
         id,
         user: { id, email, name, role, status: 'active', created_at: new Date().toISOString() }
     })
+})
+
+// PUT /users/:id - Update user
+admin.put('/users/:id', async (c) => {
+    const id = c.req.param('id')
+    const { email, name, password, role, status } = await c.req.json()
+
+    if (!email || !name) {
+        return c.json({ error: 'Missing required fields' }, 400)
+    }
+
+    // Build update query
+    let query = 'UPDATE users SET email = ?, name = ?, role = ?, status = ?, updated_at = CURRENT_TIMESTAMP'
+    let params: any[] = [email, name, role || 'employee', status || 'active']
+
+    // Update password if provided
+    if (password) {
+        const hashedPassword = await hash(password, 10)
+
+        query += ', password_hash = ?'
+        params.push(hashedPassword)
+    }
+
+    query += ' WHERE id = ?'
+    params.push(id)
+
+    try {
+        await c.env.DB.prepare(query).bind(...params).run()
+        return c.json({ message: 'User updated successfully' })
+    } catch (e: any) {
+        return c.json({ error: 'Failed to update user', details: e.message }, 500)
+    }
+})
+
+// DELETE /users/:id - Delete user
+admin.delete('/users/:id', async (c) => {
+    const id = c.req.param('id')
+    try {
+        await c.env.DB.prepare('DELETE FROM users WHERE id = ?').bind(id).run()
+        return c.json({ message: 'User deleted successfully' })
+    } catch (e: any) {
+        console.error("Delete user error", e);
+        // Constraint violation likely
+        return c.json({ error: 'Failed to delete user. User might have attendance records.', details: e.message }, 500)
+    }
 })
 
 // GET /locations - List all office locations

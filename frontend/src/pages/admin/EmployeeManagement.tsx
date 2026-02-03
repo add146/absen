@@ -7,6 +7,7 @@ const EmployeeManagement = () => {
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState('');
     const [showForm, setShowForm] = useState(false);
+    const [editingId, setEditingId] = useState<string | null>(null);
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -33,16 +34,49 @@ const EmployeeManagement = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            await api.post('/admin/users', formData);
+            if (editingId) {
+                // Update existing
+                await api.put(`/admin/users/${editingId}`, formData);
+                alert('Employee updated successfully!');
+            } else {
+                // Create new
+                await api.post('/admin/users', formData);
+                alert('Employee created successfully! Share the credentials with the employee.');
+            }
+
             setShowForm(false);
+            setEditingId(null);
             setFormData({ name: '', email: '', password: '', role: 'employee' });
             fetchEmployees();
-            alert('Employee created successfully! Share the credentials with the employee.');
         } catch (error: any) {
-            console.error('Failed to create employee', error);
-            alert(error.response?.data?.error || 'Failed to create employee');
+            console.error('Failed to save employee', error);
+            alert(error.response?.data?.error || 'Failed to save employee');
         }
     };
+
+    const handleEdit = (employee: any) => {
+        setEditingId(employee.id);
+        setFormData({
+            name: employee.name,
+            email: employee.email,
+            password: '', // Keep empty to indicate no change
+            role: employee.role
+        });
+        setShowForm(true);
+    };
+
+    const handleDelete = async (id: string, name: string) => {
+        if (!confirm(`Are you sure you want to delete ${name}? This action cannot be undone.`)) return;
+
+        try {
+            await api.delete(`/admin/users/${id}`);
+            alert('Employee deleted successfully');
+            fetchEmployees();
+        } catch (error: any) {
+            console.error('Failed to delete employee', error);
+            alert(error.response?.data?.error || 'Failed to delete employee');
+        }
+    }
 
     const filteredEmployees = employees.filter(emp =>
         emp.name.toLowerCase().includes(filter.toLowerCase()) ||
@@ -64,7 +98,7 @@ const EmployeeManagement = () => {
 
             {showForm && (
                 <div className="bg-white p-6 rounded-xl shadow-sm border border-blue-100">
-                    <h3 className="text-lg font-semibold mb-4">Add New Employee</h3>
+                    <h3 className="text-lg font-semibold mb-4">{editingId ? 'Edit Employee' : 'Add New Employee'}</h3>
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div>
                             <label className="block text-sm font-medium text-gray-700">Full Name</label>
@@ -97,7 +131,7 @@ const EmployeeManagement = () => {
                                 className="mt-1 w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                 value={formData.password}
                                 onChange={e => setFormData({ ...formData, password: e.target.value })}
-                                placeholder="Minimum 6 characters"
+                                placeholder={editingId ? "Leave blank to keep current password" : "Minimum 6 characters"}
                             />
                             <p className="text-xs text-gray-500 mt-1">⚠️ Share this password with the employee securely</p>
                         </div>
@@ -127,7 +161,7 @@ const EmployeeManagement = () => {
                                 type="submit"
                                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
                             >
-                                Create Employee
+                                {editingId ? 'Update Employee' : 'Create Employee'}
                             </button>
                         </div>
                     </form>
@@ -151,6 +185,7 @@ const EmployeeManagement = () => {
                         <tr>
                             <th className="p-4 font-semibold text-gray-600">Name</th>
                             <th className="p-4 font-semibold text-gray-600">Email</th>
+                            <th className="p-4 font-semibold text-gray-600">Role</th>
                             <th className="p-4 font-semibold text-gray-600">Status</th>
                             <th className="p-4 font-semibold text-gray-600">Joined</th>
                             <th className="p-4 font-semibold text-gray-600">Actions</th>
@@ -158,14 +193,20 @@ const EmployeeManagement = () => {
                     </thead>
                     <tbody>
                         {loading ? (
-                            <tr><td colSpan={5} className="p-8 text-center text-gray-500">Loading...</td></tr>
+                            <tr><td colSpan={6} className="p-8 text-center text-gray-500">Loading...</td></tr>
                         ) : filteredEmployees.length === 0 ? (
-                            <tr><td colSpan={5} className="p-8 text-center text-gray-500">No employees found.</td></tr>
+                            <tr><td colSpan={6} className="p-8 text-center text-gray-500">No employees found.</td></tr>
                         ) : (
                             filteredEmployees.map((emp) => (
                                 <tr key={emp.id} className="border-b last:border-0 hover:bg-gray-50">
                                     <td className="p-4 font-medium text-gray-800">{emp.name}</td>
                                     <td className="p-4 text-gray-600">{emp.email}</td>
+                                    <td className="p-4">
+                                        <span className={`px-2 py-1 rounded-full text-xs font-semibold capitalize ${emp.role === 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'
+                                            }`}>
+                                            {emp.role}
+                                        </span>
+                                    </td>
                                     <td className="p-4">
                                         <span className={`px-2 py-1 rounded-full text-xs font-semibold ${emp.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
                                             }`}>
@@ -174,8 +215,8 @@ const EmployeeManagement = () => {
                                     </td>
                                     <td className="p-4 text-gray-500">{new Date(emp.created_at).toLocaleDateString()}</td>
                                     <td className="p-4 flex space-x-2">
-                                        <button className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg"><MdEdit /></button>
-                                        <button className="p-2 text-red-600 hover:bg-red-50 rounded-lg"><MdDelete /></button>
+                                        <button onClick={() => handleEdit(emp)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg"><MdEdit /></button>
+                                        <button onClick={() => handleDelete(emp.id, emp.name)} className="p-2 text-red-600 hover:bg-red-50 rounded-lg"><MdDelete /></button>
                                     </td>
                                 </tr>
                             ))

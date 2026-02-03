@@ -1,13 +1,13 @@
 import { Hono } from 'hono';
 import { Bindings } from '../index';
 import { authMiddleware, adminAuthMiddleware } from '../middleware/auth';
+import { WAHAService } from '../services/waha-service';
 
 type Variables = {
     user: {
-        id: string;
-        email: string;
+        sub: string;
         role: string;
-        tenant_id: string;
+        tenant_id?: string;
     }
 }
 
@@ -129,7 +129,7 @@ app.post('/redeem', authMiddleware, async (c) => {
         // 2. Check User Balance
         const userRec: any = await c.env.DB.prepare(
             "SELECT points_balance FROM users WHERE id = ?"
-        ).bind(user.id).first();
+        ).bind(user.sub).first();
 
         if (!userRec) {
             return c.json({
@@ -155,7 +155,7 @@ app.post('/redeem', authMiddleware, async (c) => {
             // Deduct Points
             c.env.DB.prepare(
                 "UPDATE users SET points_balance = points_balance - ? WHERE id = ?"
-            ).bind(totalCost, user.id),
+            ).bind(totalCost, user.sub),
 
             // Reduce Stock
             c.env.DB.prepare(
@@ -165,7 +165,7 @@ app.post('/redeem', authMiddleware, async (c) => {
             // Create Order
             c.env.DB.prepare(
                 "INSERT INTO orders (id, user_id, total_points, status) VALUES (?, ?, ?, 'completed')"
-            ).bind(orderId, user.id, totalCost),
+            ).bind(orderId, user.sub, totalCost),
 
             // Create Order Item
             c.env.DB.prepare(
@@ -177,7 +177,7 @@ app.post('/redeem', authMiddleware, async (c) => {
                 "INSERT INTO points_ledger (id, user_id, transaction_type, amount, reference_type, reference_id, description, balance_after) VALUES (?, ?, 'redeem', ?, 'order', ?, ?, ?)"
             ).bind(
                 crypto.randomUUID(),
-                user.id,
+                user.sub,
                 -totalCost,
                 orderId,
                 `Redeem ${product.name} (${quantity}x)`,
@@ -187,7 +187,33 @@ app.post('/redeem', authMiddleware, async (c) => {
 
         await c.env.DB.batch(batch);
 
-        console.log(`[REDEMPTION] User ${user.id} redeemed ${quantity}x ${product.name} for ${totalCost} points`);
+        console.log(`[REDEMPTION] User ${user.sub} redeemed ${quantity}x ${product.name} for ${totalCost} points`);
+
+        // 4. Send WhatsApp Notification
+        try {
+            if (c.env.WAHA_BASE_URL && c.env.WAHA_SESSION) {
+                // Get user phone
+                const userDetails: any = await c.env.DB.prepare(
+                    "SELECT phone, name FROM users WHERE id = ?"
+                ).bind(user.sub).first();
+
+                if (userDetails && userDetails.phone) {
+                    const waha = new WAHAService({
+                        baseUrl: c.env.WAHA_BASE_URL,
+                        apiKey: c.env.WAHA_API_KEY,
+                        sessionName: c.env.WAHA_SESSION
+                    });
+
+                    const message = `🎉 *Penukaran Poin Berhasil!* 🎉\n\nHalo ${userDetails.name},\nKamu telah berhasil menukar *${quantity}x ${product.name}* senilai *${totalCost} poin*.\n\nSisa Poin: ${newBalance}\nRef: ${orderId}\n\nTerima kasih atas kerja kerasmu! 💪`;
+
+                    await waha.sendTextMessage(userDetails.phone, message);
+                    console.log(`[WAHA] Notification sent to ${userDetails.phone}`);
+                }
+            }
+        } catch (wahaError) {
+            console.error('[WAHA] Failed to send notification:', wahaError);
+            // Don't fail the request if notification fails
+        }
 
         return c.json({
             success: true,
@@ -224,7 +250,7 @@ app.get('/orders', authMiddleware, async (c) => {
             JOIN products p ON oi.product_id = p.id
             WHERE o.user_id = ?
             ORDER BY o.created_at DESC
-        `).bind(user.id).all();
+        `).bind(user.sub).all();
 
         return c.json({
             success: true,

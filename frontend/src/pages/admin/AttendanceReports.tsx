@@ -30,7 +30,31 @@ const AttendanceReports = () => {
         <div className="space-y-6">
             <div className="flex justify-between items-center">
                 <h2 className="text-2xl font-bold text-gray-800">Attendance Reports</h2>
-                <button className="flex items-center space-x-2 bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition">
+                <button
+                    onClick={() => {
+                        const headers = ["Employee", "Location", "Check In", "Check Out", "Status"];
+                        const csvContent = [
+                            headers.join(","),
+                            ...logs.map(log => [
+                                log.user_name,
+                                log.location_name,
+                                new Date(log.check_in_time).toLocaleTimeString(),
+                                log.check_out_time ? new Date(log.check_out_time).toLocaleTimeString() : '-',
+                                log.is_valid ? 'Valid' : 'Flagged'
+                            ].join(","))
+                        ].join("\n");
+
+                        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                        const link = document.createElement("a");
+                        const url = URL.createObjectURL(blob);
+                        link.setAttribute("href", url);
+                        link.setAttribute("download", `attendance_report_${date}.csv`);
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                    }}
+                    className="flex items-center space-x-2 bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition"
+                >
                     <MdDownload size={20} />
                     <span>Export CSV</span>
                 </button>

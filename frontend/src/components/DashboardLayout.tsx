@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
     MdToken,
     MdDashboard,
@@ -12,7 +12,8 @@ import {
     MdNotifications,
     MdDarkMode,
     MdLightMode,
-    MdMenu
+    MdMenu,
+    MdPerson
 } from 'react-icons/md';
 
 interface DashboardLayoutProps {
@@ -23,6 +24,13 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [darkMode, setDarkMode] = useState(false);
     const location = useLocation();
+    const navigate = useNavigate();
+
+    const handleLogout = () => {
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('user_data');
+        navigate('/login');
+    };
 
     const toggleTheme = () => {
         setDarkMode(!darkMode);
@@ -37,6 +45,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
         { name: 'Leaves', icon: <MdFlightTakeoff />, path: '/leaves' },
         { name: 'Team', icon: <MdGroup />, path: '/team' },
         { name: 'Rewards', icon: <MdLeaderboard />, path: '/rewards', badge: '120 pts' },
+        { name: 'Profile', icon: <MdPerson />, path: '/profile' },
         { name: 'Settings', icon: <MdSettings />, path: '/settings' },
     ];
 
@@ -89,7 +98,11 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
                             <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{user.name || 'User'}</p>
                             <p className="text-xs text-gray-500 dark:text-gray-400 truncate capitalize">{user.role || 'Employee'}</p>
                         </div>
-                        <button className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                        <button
+                            onClick={handleLogout}
+                            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                            title="Logout"
+                        >
                             <MdLogout className="text-xl" />
                         </button>
                     </div>

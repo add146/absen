@@ -1,6 +1,7 @@
 name = "absen-api"
 main = "src/index.ts"
 compatibility_date = "2024-02-03"
+compatibility_flags = ["nodejs_compat"]
 
 [[d1_databases]]
 binding = "DB"
@@ -8,6 +9,18 @@ database_name = "absen-db"
 database_id = "3f448513-701b-4c95-abed-64f571564f5e"
 migrations_dir = "../schema/migrations"
 
+[ai]
+binding = "AI"
+
+[[r2_buckets]]
+binding = "STORAGE"
+bucket_name = "absen-storage"
+
+[[kv_namespaces]]
+binding = "CACHE"
+id = "b9f7c774a5bf4b649abaeee07169f563"
+
 [vars]
-ENVIRONMENT = "development"
-JWT_SECRET = "dev_secret_key_change_in_prod"
+ENVIRONMENT = "production"
+# JWT_SECRET should be set via: npx wrangler secret put JWT_SECRET
+# MIDTRANS keys should be set via wrangler secrets for security

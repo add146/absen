@@ -6,9 +6,10 @@ import { MdHistory, MdAddCircle, MdCheckCircle, MdCancel, MdPending } from 'reac
 const LeaveRequest = () => {
     const [activeTab, setActiveTab] = useState<'request' | 'history'>('request');
     const [leaves, setLeaves] = useState<any[]>([]);
+    const [leaveTypes, setLeaveTypes] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [formData, setFormData] = useState({
-        type: 'annual',
+        leave_type_id: '',
         start_date: '',
         end_date: '',
         reason: ''
@@ -17,8 +18,22 @@ const LeaveRequest = () => {
     useEffect(() => {
         if (activeTab === 'history') {
             fetchLeaves();
+        } else {
+            fetchLeaveTypes();
         }
     }, [activeTab]);
+
+    const fetchLeaveTypes = async () => {
+        try {
+            const res = await api.get('/leaves/types');
+            setLeaveTypes(res.data.data);
+            if (res.data.data.length > 0) {
+                setFormData(prev => ({ ...prev, leave_type_id: res.data.data[0].id }));
+            }
+        } catch (error) {
+            console.error('Failed to fetch leave types', error);
+        }
+    };
 
     const fetchLeaves = async () => {
         try {
@@ -38,7 +53,7 @@ const LeaveRequest = () => {
         try {
             await api.post('/leaves', formData);
             alert('Permohonan cuti berhasil dikirim!');
-            setFormData({ type: 'annual', start_date: '', end_date: '', reason: '' });
+            setFormData(prev => ({ ...prev, start_date: '', end_date: '', reason: '' }));
             setActiveTab('history');
         } catch (error: any) {
             alert(error.response?.data?.error || 'Gagal mengajukan cuti');
@@ -67,6 +82,8 @@ const LeaveRequest = () => {
     return (
         <DashboardLayout>
             <div className="space-y-6">
+                {/* ... Header and Tabs ... */}
+
                 <header className="flex justify-between items-center bg-gradient-to-r from-teal-600 to-emerald-600 p-6 rounded-2xl text-white shadow-lg">
                     <div>
                         <h1 className="text-3xl font-bold">Manajemen Cuti</h1>
@@ -95,14 +112,17 @@ const LeaveRequest = () => {
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">Tipe Cuti</label>
                                 <select
-                                    value={formData.type}
-                                    onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+                                    required
+                                    value={formData.leave_type_id}
+                                    onChange={(e) => setFormData({ ...formData, leave_type_id: e.target.value })}
                                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm p-2 border"
                                 >
-                                    <option value="annual">Cuti Tahunan</option>
-                                    <option value="sick">Sakit</option>
-                                    <option value="unpaid">Unpaid Leave</option>
-                                    <option value="other">Lainnya</option>
+                                    <option value="" disabled>Pilih tipe cuti</option>
+                                    {leaveTypes.map(type => (
+                                        <option key={type.id} value={type.id}>
+                                            {type.name} ({type.max_days_per_year} hari/tahun)
+                                        </option>
+                                    ))}
                                 </select>
                             </div>
 
@@ -176,7 +196,14 @@ const LeaveRequest = () => {
                                             </td>
                                             <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">{leave.reason}</td>
                                             <td className="px-6 py-4 whitespace-nowrap">
-                                                <StatusBadge status={leave.status} />
+                                                <div className="flex flex-col items-start gap-1">
+                                                    <StatusBadge status={leave.status} />
+                                                    {leave.status === 'rejected' && (
+                                                        <span className="text-xs text-red-600 bg-red-50 px-2 py-1 rounded border border-red-100 max-w-[200px] whitespace-normal">
+                                                            {leave.rejection_reason ? `Note: ${leave.rejection_reason}` : 'Alasan: -'}
+                                                        </span>
+                                                    )}
+                                                </div>
                                             </td>
                                         </tr>
                                     ))}
@@ -186,7 +213,7 @@ const LeaveRequest = () => {
                     </div>
                 )}
             </div>
-        </DashboardLayout>
+        </DashboardLayout >
     );
 };
 

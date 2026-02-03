@@ -1,5 +1,5 @@
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
-import { MdDashboard, MdPeople, MdLocationOn, MdAssessment, MdLogout, MdArrowBack, MdCheckCircle, MdShoppingCart, MdInventory, MdShowChart, MdStars, MdSecurity } from 'react-icons/md';
+import { MdDashboard, MdPeople, MdLocationOn, MdAssessment, MdLogout, MdArrowBack, MdCheckCircle, MdShoppingCart, MdInventory, MdShowChart, MdStars, MdSecurity, MdSettings, MdMonitorHeart } from 'react-icons/md';
 
 const AdminLayout = () => {
     const navigate = useNavigate();
@@ -22,6 +22,8 @@ const AdminLayout = () => {
         { path: '/admin/orders', icon: <MdShoppingCart size={20} />, label: 'Orders' },
         { path: '/admin/point-rules', icon: <MdStars size={20} />, label: 'Point Rules' },
         { path: '/admin/fraud-detection', icon: <MdSecurity size={20} />, label: 'Fraud Detection' },
+        { path: '/admin/settings', icon: <MdSettings size={20} />, label: 'Settings' },
+        { path: '/admin/health', icon: <MdMonitorHeart size={20} />, label: 'System Health' },
     ];
 
     return (
