@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import api from '../../services/api';
 import { MdAdd, MdLocationOn } from 'react-icons/md';
-import { APIProvider, Map, AdvancedMarker, InfoWindow } from '@vis.gl/react-google-maps';
+import { APIProvider, Map, Marker, InfoWindow } from '@vis.gl/react-google-maps';
 
 const GOOGLE_MAPS_API_KEY = 'AIzaSyDYIc7jBfPMmkS6FPUcimXjWI9pCd2_4pA';
 
@@ -23,8 +23,10 @@ const OfficeMap = ({
         : { lat: -6.2088, lng: 106.8456 };
 
     const handleMapClick = (e: any) => {
-        if (showClickHandler && onMapClick && e.latLng) {
-            onMapClick(e.latLng.lat(), e.latLng.lng());
+        if (showClickHandler && onMapClick && e.detail?.latLng) {
+            const lat = e.detail.latLng.lat;
+            const lng = e.detail.latLng.lng;
+            onMapClick(lat, lng);
         }
     };
 
@@ -34,41 +36,37 @@ const OfficeMap = ({
                 <Map
                     defaultCenter={center}
                     defaultZoom={13}
-                    mapId="office-locations-map"
                     onClick={handleMapClick}
                     gestureHandling="greedy"
+                    disableDefaultUI={false}
+                    clickableIcons={false}
                 >
-                    {/* Display all locations with markers and circles */}
+                    {/* Display all locations with markers */}
                     {locations.map(loc => (
-                        <div key={loc.id}>
-                            {/* Marker */}
-                            <AdvancedMarker
-                                position={{ lat: loc.latitude, lng: loc.longitude }}
-                                onClick={() => setSelectedLocation(loc)}
-                            />
-
-                            {/* Info Window */}
-                            {selectedLocation?.id === loc.id && (
-                                <InfoWindow
-                                    position={{ lat: loc.latitude, lng: loc.longitude }}
-                                    onCloseClick={() => setSelectedLocation(null)}
-                                >
-                                    <div className="p-2">
-                                        <strong className="text-gray-800">{loc.name}</strong><br />
-                                        <span className="text-xs text-gray-500">
-                                            {loc.latitude.toFixed(6)}, {loc.longitude.toFixed(6)}
-                                        </span><br />
-                                        <span className="text-xs font-semibold text-blue-600">
-                                            Radius: {loc.radius_meters}m
-                                        </span>
-                                    </div>
-                                </InfoWindow>
-                            )}
-
-                            {/* Geofence Circle - using Google Maps Circle overlay would be better but requires more setup */}
-                            {/* For now, we show the radius in the info window */}
-                        </div>
+                        <Marker
+                            key={loc.id}
+                            position={{ lat: loc.latitude, lng: loc.longitude }}
+                            onClick={() => setSelectedLocation(loc)}
+                        />
                     ))}
+
+                    {/* Info Window */}
+                    {selectedLocation && (
+                        <InfoWindow
+                            position={{ lat: selectedLocation.latitude, lng: selectedLocation.longitude }}
+                            onCloseClick={() => setSelectedLocation(null)}
+                        >
+                            <div className="p-2">
+                                <strong className="text-gray-800">{selectedLocation.name}</strong><br />
+                                <span className="text-xs text-gray-500">
+                                    {selectedLocation.latitude.toFixed(6)}, {selectedLocation.longitude.toFixed(6)}
+                                </span><br />
+                                <span className="text-xs font-semibold text-blue-600">
+                                    Radius: {selectedLocation.radius_meters}m
+                                </span>
+                            </div>
+                        </InfoWindow>
+                    )}
                 </Map>
             </div>
         </APIProvider>
@@ -145,22 +143,24 @@ const LocationSettings = () => {
 
             {/* Map View */}
             <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                <h3 className="text-lg font-semibold mb-4 text-gray-800">Office Locations Map</h3>
+                <h3 className="text-lg font-semibold mb-4 text-gray-800">📍 Office Locations Map</h3>
                 {loading ? (
                     <div className="h-[400px] flex items-center justify-center bg-gray-50 rounded-lg">
                         <p className="text-gray-500">Loading map...</p>
                     </div>
                 ) : (
-                    <OfficeMap
-                        locations={locations}
-                        onMapClick={showForm ? handleMapClick : undefined}
-                        showClickHandler={showForm}
-                    />
-                )}
-                {showForm && (
-                    <p className="text-sm text-blue-600 mt-2">
-                        💡 Tip: Click on the map to automatically fill coordinates
-                    </p>
+                    <>
+                        <OfficeMap
+                            locations={locations}
+                            onMapClick={showForm ? handleMapClick : undefined}
+                            showClickHandler={showForm}
+                        />
+                        {showForm && (
+                            <p className="text-sm text-blue-600 mt-2">
+                                💡 Tip: Click on the map to automatically fill coordinates
+                            </p>
+                        )}
+                    </>
                 )}
             </div>
 
@@ -235,25 +235,30 @@ const LocationSettings = () => {
             )}
 
             {/* Location Cards Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {loading ? <p>Loading locations...</p> : locations.map(loc => (
-                    <div key={loc.id} className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-start space-x-4">
-                        <div className="p-3 bg-blue-50 text-blue-600 rounded-lg">
-                            <MdLocationOn size={24} />
-                        </div>
-                        <div>
-                            <h3 className="font-bold text-gray-800">{loc.name}</h3>
-                            <p className="text-sm text-gray-500 mt-1">
-                                Lat: {loc.latitude}<br />
-                                Lng: {loc.longitude}
-                            </p>
-                            <div className="mt-3 inline-block px-3 py-1 bg-green-50 text-green-700 text-xs font-semibold rounded-full">
-                                Radius: {loc.radius_meters}m
+            {locations.length > 0 && (
+                <div>
+                    <h3 className="text-lg font-semibold mb-4 text-gray-800">Saved Locations</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {locations.map(loc => (
+                            <div key={loc.id} className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-start space-x-4">
+                                <div className="p-3 bg-blue-50 text-blue-600 rounded-lg">
+                                    <MdLocationOn size={24} />
+                                </div>
+                                <div>
+                                    <h3 className="font-bold text-gray-800">{loc.name}</h3>
+                                    <p className="text-sm text-gray-500 mt-1">
+                                        Lat: {loc.latitude}<br />
+                                        Lng: {loc.longitude}
+                                    </p>
+                                    <div className="mt-3 inline-block px-3 py-1 bg-green-50 text-green-700 text-xs font-semibold rounded-full">
+                                        Radius: {loc.radius_meters}m
+                                    </div>
+                                </div>
                             </div>
-                        </div>
+                        ))}
                     </div>
-                ))}
-            </div>
+                </div>
+            )}
         </div>
     );
 };
