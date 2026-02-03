@@ -18,33 +18,36 @@ Dokumen ini menjabarkan spesifikasi aplikasi **Manajemen Kehadiran (Attendance M
 
 ```mermaid
 flowchart TD
-    A[Buka Aplikasi] --> B{Sudah Login?}
-    B -->|Tidak| C[Halaman Login]
-    C --> D[Input Email/HP + Password]
-    D --> E{Validasi}
-    E -->|Gagal| C
-    E -->|Berhasil| F[Dashboard Utama]
+    A[Start] --> B{Punya Akun?}
     
-    B -->|Ya| F
+    B -->|Belum| C{Tipe User?}
+    C -->|Pemilik Bisnis| D[Register / Onboarding]
+    C -->|Karyawan| E[Join via Invite / Code]
     
-    F --> G[Pilih Menu]
-    G --> H[Check-in Kehadiran]
-    G --> I[Lihat Riwayat]
-    G --> J[Lihat Saldo Poin]
-    G --> K[Tukar Poin di Toko]
+    D --> D1[Buat Tenant Baru]
+    D1 --> F[Tenant Dashboard]
     
-    H --> L[Deteksi Lokasi GPS]
-    L --> M{Validasi Geofence}
-    M -->|Dalam Area| N[Check-in Berhasil]
-    N --> O[+Poin Loyalitas]
-    O --> F
-    M -->|Luar Area| P[Check-in Gagal]
-    P --> F
+    E --> E1[Input Company Code]
+    E1 --> G[Employee Dashboard]
     
-    K --> Q[Redirect ke Toko Online]
-    Q --> R[Pilih Produk]
-    R --> S[Apply Diskon dengan Poin]
-    S --> T[Checkout]
+    B -->|Sudah| H[Login]
+    H --> I{Cek Role}
+    I -->|Owner/Super Admin| F
+    I -->|Employee| G
+    
+    subgraph "Employee Flow"
+        G --> J[Check-in/Out]
+        G --> K[Redeem Points]
+        J --> L{Validasi Lokasi}
+        L -->|Valid| M[Success]
+        L -->|Invalid| N[Fail]
+    end
+    
+    subgraph "Owner Flow"
+        F --> O[Manage Employees]
+        F --> P[Manage Subscription]
+        F --> Q[View Reports]
+    end
 ```
 
 ### 2.2 Langkah Detail - Pengguna
@@ -92,6 +95,12 @@ CREATE TABLE tenants (
     name TEXT NOT NULL,
     slug TEXT UNIQUE NOT NULL,
     logo_url TEXT,
+    status TEXT DEFAULT 'trial', -- 'active', 'suspended', 'trial', 'cancelled'
+    plan_type TEXT DEFAULT 'free', -- 'free', 'basic', 'premium', 'enterprise'
+    max_users INTEGER DEFAULT 5,
+    trial_ends_at DATETIME,
+    subdomain TEXT UNIQUE,
+    custom_branding JSON,
     settings JSON,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
@@ -107,7 +116,7 @@ CREATE TABLE users (
     phone TEXT,
     password_hash TEXT NOT NULL,
     name TEXT NOT NULL,
-    role TEXT DEFAULT 'employee', -- 'admin', 'employee', 'owner'
+    role TEXT DEFAULT 'employee', -- 'super_admin', 'owner', 'admin', 'employee'
     points_balance INTEGER DEFAULT 0,
     status TEXT DEFAULT 'active',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -205,7 +214,84 @@ CREATE TABLE point_rules (
 );
 ```
 
-### 3.2 File Storage (Cloudflare R2)
+### 3.2 Billing & Subscriptions (SaaS)
+
+#### Tabel: `subscription_plans`
+```sql
+CREATE TABLE subscription_plans (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    slug TEXT UNIQUE NOT NULL,
+    price INTEGER NOT NULL,
+    currency TEXT DEFAULT 'IDR',
+    interval TEXT DEFAULT 'month', -- 'month', 'year'
+    features JSON,
+    is_active INTEGER DEFAULT 1,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+#### Tabel: `subscriptions`
+```sql
+CREATE TABLE subscriptions (
+    id TEXT PRIMARY KEY,
+    tenant_id TEXT NOT NULL,
+    plan_id TEXT NOT NULL,
+    status TEXT NOT NULL, -- 'active', 'past_due', 'canceled', 'incomplete'
+    current_period_start DATETIME,
+    current_period_end DATETIME,
+    cancel_at_period_end INTEGER DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (tenant_id) REFERENCES tenants(id),
+    FOREIGN KEY (plan_id) REFERENCES subscription_plans(id)
+);
+```
+
+#### Tabel: `invoices`
+```sql
+CREATE TABLE invoices (
+    id TEXT PRIMARY KEY,
+    tenant_id TEXT NOT NULL,
+    subscription_id TEXT,
+    amount_due INTEGER NOT NULL,
+    amount_paid INTEGER DEFAULT 0,
+    status TEXT NOT NULL, -- 'paid', 'open', 'void', 'uncollectible'
+    invoice_url TEXT,
+    pdf_url TEXT,
+    due_date DATETIME,
+    paid_at DATETIME,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (tenant_id) REFERENCES tenants(id)
+);
+```
+
+#### Tabel: `custom_domains`
+```sql
+CREATE TABLE custom_domains (
+    id TEXT PRIMARY KEY,
+    tenant_id TEXT NOT NULL,
+    domain TEXT UNIQUE NOT NULL,
+    status TEXT DEFAULT 'pending', -- 'pending', 'active', 'failed'
+    verification_details JSON,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (tenant_id) REFERENCES tenants(id)
+);
+```
+
+#### Tabel: `usage_metrics`
+```sql
+CREATE TABLE usage_metrics (
+    id TEXT PRIMARY KEY,
+    tenant_id TEXT NOT NULL,
+    metric_name TEXT NOT NULL, -- 'users_count', 'storage_used', 'api_calls'
+    metric_value REAL NOT NULL,
+    recorded_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (tenant_id) REFERENCES tenants(id)
+);
+```
+
+### 3.3 File Storage (Cloudflare R2)
 
 ```
 r2-bucket/

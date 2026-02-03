@@ -10,6 +10,13 @@ Aplikasi manajemen kehadiran berbasis web dengan integrasi sistem loyalitas poin
 - **Storage**: Cloudflare R2
 - **Cache**: Cloudflare KV
 
+## 🌟 Fitur Utama (SaaS Multi-Tenant)
+- **Multi-Tenant Architecture**: Data terisolasi per perusahaan.
+- **Role Management**: Owner, Admin, Employee.
+- **Billing System**: Langganan bulanan/tahunan (via Midtrans).
+- **Custom Domain**: Dukungan domain sendiri untuk Enterprise.
+- **Tenant Dashboard**: Statistik dan konfigurasi mandiri.
+
 ## 📁 Struktur Project
 
 ```
