@@ -122,9 +122,10 @@ const LocationSettings = () => {
             setFormData({ name: '', latitude: '', longitude: '', radius_meters: '100' });
             fetchLocations();
             alert('Location added successfully');
-        } catch (error) {
+        } catch (error: any) {
             console.error('Failed to add location', error);
-            alert('Failed to add location');
+            const errorMessage = error.response?.data?.error || error.message || 'Failed to add location';
+            alert(errorMessage);
         }
     };
 
