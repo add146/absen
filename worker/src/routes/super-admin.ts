@@ -404,11 +404,45 @@ superadmin.get('/analytics', async (c) => {
         WHERE created_at >= datetime('now', '-30 days')
     `).first() as any;
 
+    // Historical growth data (last 6 months)
+    const months = [];
+    for (let i = 5; i >= 0; i--) {
+        const d = new Date();
+        d.setMonth(d.getMonth() - i);
+        months.push(d.toISOString().slice(0, 7)); // YYYY-MM
+    }
+
+    const growthData = await Promise.all(months.map(async (month) => {
+        const tenantCount = await db.prepare(`
+            SELECT COUNT(*) as count FROM tenants 
+            WHERE strftime('%Y-%m', created_at) = ?
+        `).bind(month).first() as any;
+
+        const userCount = await db.prepare(`
+            SELECT COUNT(*) as count FROM users 
+            WHERE strftime('%Y-%m', created_at) = ?
+        `).bind(month).first() as any;
+
+        // Revenue from paid invoices in this month
+        const revenue = await db.prepare(`
+            SELECT SUM(amount_paid) as total FROM invoices 
+            WHERE status = 'paid' AND strftime('%Y-%m', paid_at) = ?
+        `).bind(month).first() as any;
+
+        return {
+            month: month, // "2024-01"
+            tenants: tenantCount.count,
+            users: userCount.count,
+            revenue: revenue.total || 0
+        };
+    }));
+
     return c.json({
         tenantStats: tenantStats.results,
         totalUsers: totalUsers.count,
         mrr: mrr.total_mrr || 0,
-        recentSignups: recentSignups.count
+        recentSignups: recentSignups.count,
+        growth: growthData
     });
 });
 

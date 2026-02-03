@@ -40,15 +40,10 @@ const PlatformAnalytics: React.FC = () => {
 
     const COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444'];
 
-    // Mock growth data (replace with real data from backend)
-    const growthData = [
-        { month: 'Jan', tenants: 5, users: 50, revenue: 5000000 },
-        { month: 'Feb', tenants: 8, users: 80, revenue: 8000000 },
-        { month: 'Mar', tenants: 12, users: 120, revenue: 12000000 },
-        { month: 'Apr', tenants: 15, users: 150, revenue: 15000000 },
-        { month: 'May', tenants: 20, users: 200, revenue: 20000000 },
-        { month: 'Jun', tenants: 25, users: 250, revenue: 25000000 },
-    ];
+    const growthData = analytics?.growth?.map((val: any) => ({
+        ...val,
+        month: new Date(val.month + '-01').toLocaleDateString('en-US', { month: 'short' })
+    })) || [];
 
     return (
         <div>
