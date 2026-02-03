@@ -17,23 +17,21 @@ auth.post('/register', async (c) => {
             return c.json({ error: 'Missing required fields' }, 400)
         }
 
-        // 1. Create Tenant
-        const tenantId = crypto.randomUUID()
-        const tenantSlug = tenant_name.toLowerCase().replace(/[^a-z0-9]/g, '-') + '-' + Math.floor(Math.random() * 1000) // Ensure uniqueness
+        // Use standard tenant creation service
+        // This ensures all defaults (plan, points, settings) are applied consistently
+        const { createTenant } = await import('../services/tenant-service')
+        const { tenant, admin } = await createTenant({
+            name: tenant_name,
+            adminEmail: email,
+            adminPassword: password,
+            adminName: name
+        }, c.env)
 
-        await c.env.DB.prepare(
-            'INSERT INTO tenants (id, name, slug) VALUES (?, ?, ?)'
-        ).bind(tenantId, tenant_name, tenantSlug).run()
-
-        // 2. Create User
-        const userId = crypto.randomUUID()
-        const passwordHash = await hash(password, 10)
-
-        await c.env.DB.prepare(
-            'INSERT INTO users (id, tenant_id, email, password_hash, name, role) VALUES (?, ?, ?, ?, ?, ?)'
-        ).bind(userId, tenantId, email, passwordHash, name, 'admin').run()
-
-        return c.json({ message: 'Registered successfully', tenantId, userId })
+        return c.json({
+            message: 'Registered successfully',
+            tenantId: tenant.id,
+            userId: admin.id
+        })
 
     } catch (e: any) {
         console.error(e)
@@ -44,6 +42,7 @@ auth.post('/register', async (c) => {
 auth.post('/login', async (c) => {
     const { email, password } = await c.req.json()
 
+    // 1. Get User
     const user: any = await c.env.DB.prepare(
         'SELECT * FROM users WHERE email = ?'
     ).bind(email).first()
@@ -53,12 +52,35 @@ auth.post('/login', async (c) => {
         return c.json({ error: 'Invalid credentials' }, 401)
     }
 
+    // 2. Verify Password
     const isValid = await compare(password, user.password_hash as string)
     if (!isValid) {
         console.log(`Login failed: Password mismatch for ${email}. Hash length: ${user.password_hash?.length}`);
         return c.json({ error: 'Invalid credentials' }, 401)
     }
 
+    // 3. Verify Tenant Status
+    const tenant: any = await c.env.DB.prepare(
+        'SELECT status, trial_ends_at FROM tenants WHERE id = ?'
+    ).bind(user.tenant_id).first()
+
+    if (!tenant) {
+        return c.json({ error: 'Tenant not found' }, 403)
+    }
+
+    if (tenant.status === 'suspended' || tenant.status === 'cancelled') {
+        return c.json({ error: 'Your account is suspended. Please contact support.' }, 403)
+    }
+
+    // Check trial expiration
+    if (tenant.status === 'trial' && tenant.trial_ends_at) {
+        const trialEnd = new Date(tenant.trial_ends_at)
+        if (new Date() > trialEnd) {
+            return c.json({ error: 'Trial period expired. Please upgrade your plan.' }, 403)
+        }
+    }
+
+    // 4. Generate Token
     const payload = {
         sub: user.id,
         role: user.role,

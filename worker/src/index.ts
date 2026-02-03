@@ -15,6 +15,7 @@ import settings from './routes/settings'
 import profile from './routes/profile'
 import tenants from './routes/tenants'
 import subscriptions from './routes/subscriptions'
+import customDomains from './routes/custom-domains'
 import { tenantContext, rateLimiter, customDomainRouter } from './middleware/tenant'
 
 export type Bindings = {
@@ -68,6 +69,7 @@ app.route('/upload', upload)
 app.route('/analytics', analytics)
 app.route('/notifications', notifications)
 app.route('/settings', settings)
+app.route('/custom-domains', customDomains)
 app.route('/profile', profile)
 
 export default app

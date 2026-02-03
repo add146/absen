@@ -22,6 +22,7 @@ import AdminRoute from './components/AdminRoute';
 import AdminLayout from './layouts/AdminLayout';
 import TenantOnboarding from './pages/TenantOnboarding';
 import Subscription from './pages/Subscription';
+import TenantDashboard from './pages/TenantDashboard';
 
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -46,6 +47,7 @@ function App() {
         <Route path="/leaves" element={<ProtectedRoute><LeaveRequest /></ProtectedRoute>} />
         <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
         <Route path="/subscription" element={<ProtectedRoute><Subscription /></ProtectedRoute>} />
+        <Route path="/tenant/dashboard" element={<ProtectedRoute><TenantDashboard /></ProtectedRoute>} />
 
         {/* Admin Routes */}
         <Route path="/admin" element={<AdminRoute />}>

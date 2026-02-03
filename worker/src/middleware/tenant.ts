@@ -66,9 +66,16 @@ export const tenantContext = async (c: Context<{ Bindings: Bindings }>, next: Ne
         // If not in cache, query database
         if (!tenant) {
             tenant = await c.env.DB
-                .prepare('SELECT id, name, status, plan_type, max_users FROM tenants WHERE id = ?')
+                .prepare('SELECT id, name FROM tenants WHERE id = ?')
                 .bind(payload.tenant_id)
                 .first()
+
+            if (tenant) {
+                // Default values for missing columns to prevent errors
+                tenant.status = tenant.status || 'active'
+                tenant.plan_type = tenant.plan_type || 'free'
+                tenant.max_users = tenant.max_users || 5
+            }
 
             if (!tenant) {
                 return c.json({ error: 'Tenant not found' }, 404)
