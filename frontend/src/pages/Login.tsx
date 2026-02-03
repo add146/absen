@@ -39,7 +39,13 @@ const Login: React.FC = () => {
             const res = await api.post('/auth/login', formData);
             localStorage.setItem('access_token', res.data.access_token);
             localStorage.setItem('user_data', JSON.stringify(res.data.user));
-            navigate('/dashboard');
+
+            // Redirect based on role
+            if (res.data.user.role === 'owner' || res.data.user.role === 'super_admin') {
+                navigate('/tenant/dashboard');
+            } else {
+                navigate('/dashboard');
+            }
         } catch (err: any) {
             console.error(err);
             setError(err.response?.data?.error || 'Login failed. Please check your credentials.');
