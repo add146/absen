@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Attendance Reports &amp; Export</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Theme Configuration -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0d59f2",
+                        "background-light": "#f5f6f8",
+                        "background-dark": "#101622",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.filled {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white font-display">
+<div class="flex h-screen w-full overflow-hidden">
+<!-- Side Navigation -->
+<aside class="hidden w-64 flex-col border-r border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 md:flex">
+<div class="flex h-16 items-center gap-3 px-6 border-b border-slate-100 dark:border-slate-800">
+<div class="size-8 rounded-lg bg-primary flex items-center justify-center text-white">
+<span class="material-symbols-outlined">hexagon</span>
+</div>
+<div>
+<h1 class="text-base font-bold text-slate-900 dark:text-white">HR Nexus</h1>
+<p class="text-xs text-slate-500 dark:text-slate-400">Admin Console</p>
+</div>
+</div>
+<div class="flex flex-1 flex-col justify-between px-4 py-6">
+<nav class="flex flex-col gap-1">
+<a class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-slate-600 transition-colors hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-sm font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-slate-600 transition-colors hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="text-sm font-medium">Employees</span>
+</a>
+<a class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-slate-600 transition-colors hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800" href="#">
+<span class="material-symbols-outlined">calendar_month</span>
+<span class="text-sm font-medium">Attendance</span>
+</a>
+<a class="flex items-center gap-3 rounded-lg bg-primary/10 px-3 py-2.5 text-primary dark:bg-primary/20" href="#">
+<span class="material-symbols-outlined filled">bar_chart</span>
+<span class="text-sm font-medium">Reports</span>
+</a>
+<a class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-slate-600 transition-colors hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-sm font-medium">Settings</span>
+</a>
+</nav>
+<div class="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3 dark:border-slate-700 dark:bg-slate-800">
+<div class="size-10 rounded-full bg-cover bg-center" data-alt="Admin user profile picture" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDNU2G9dU-cw6eA9FQ4WfIMSVCbJT_fZpyHAyggQtwUw4xvKK3T3B9omzN1bwpa8Mj_gDCd8IxpG6XpcwRGk_tnYjf4spn638EfmLaSJp56iDTFSMaeHtgUJHrt5PtGd7x0fEixaAB1BamROJm-JownX9S20fUOhpPwPOSW97Va980DPGbIp4tMTjQASnAjrWWNe_FAb5RN9uGsPzvl9uvR-1vCuzeIqKrw1K-SoXRzodzSRQYFxezMK5NXb_po580EwMuiUtXulQ');"></div>
+<div class="overflow-hidden">
+<p class="truncate text-sm font-medium text-slate-900 dark:text-white">Sarah Jenkins</p>
+<p class="truncate text-xs text-slate-500 dark:text-slate-400">Super Admin</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex flex-1 flex-col overflow-hidden">
+<!-- Top Header -->
+<header class="flex h-16 items-center justify-between border-b border-slate-200 bg-white px-8 dark:border-slate-800 dark:bg-slate-900">
+<div class="flex items-center gap-4">
+<button class="text-slate-500 hover:text-slate-700 md:hidden">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<!-- Breadcrumbs -->
+<div class="hidden items-center gap-2 text-sm text-slate-500 sm:flex">
+<a class="hover:text-primary transition-colors" href="#">Dashboard</a>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+<a class="hover:text-primary transition-colors" href="#">Reports</a>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+<span class="font-medium text-slate-900 dark:text-white">Attendance Export</span>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="flex size-10 items-center justify-center rounded-full text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="flex size-10 items-center justify-center rounded-full text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800">
+<span class="material-symbols-outlined">help</span>
+</button>
+</div>
+</header>
+<!-- Scrollable Content -->
+<div class="flex-1 overflow-y-auto p-4 sm:p-8">
+<div class="mx-auto max-w-7xl">
+<!-- Page Header -->
+<div class="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+<div>
+<h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-3xl">Attendance Reports</h1>
+<p class="mt-1 text-slate-500 dark:text-slate-400">Generate, filter and export detailed employee attendance logs.</p>
+</div>
+<div class="flex gap-3">
+<button class="flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700">
+<span class="material-symbols-outlined text-[20px] text-red-500">picture_as_pdf</span>
+                                Export PDF
+                            </button>
+<button class="flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
+<span class="material-symbols-outlined text-[20px]">table_view</span>
+                                Export Excel
+                            </button>
+</div>
+</div>
+<!-- Filter Section -->
+<div class="mb-6 rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+<div class="flex items-center gap-2 mb-4">
+<span class="material-symbols-outlined text-primary">tune</span>
+<h3 class="font-semibold text-slate-900 dark:text-white">Report Filters</h3>
+</div>
+<div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+<!-- Date Range -->
+<div class="space-y-1.5">
+<label class="text-sm font-medium text-slate-700 dark:text-slate-300">Date Range</label>
+<div class="relative">
+<select class="w-full appearance-none rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-slate-700 dark:bg-slate-800 dark:text-white">
+<option>Last 30 Days</option>
+<option>This Month</option>
+<option>Last Month</option>
+<option>Custom Range</option>
+</select>
+<div class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-500">
+<span class="material-symbols-outlined text-[20px]">expand_more</span>
+</div>
+</div>
+</div>
+<!-- Department -->
+<div class="space-y-1.5">
+<label class="text-sm font-medium text-slate-700 dark:text-slate-300">Department</label>
+<div class="relative">
+<select class="w-full appearance-none rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-slate-700 dark:bg-slate-800 dark:text-white">
+<option>All Departments</option>
+<option>Engineering</option>
+<option>Product Design</option>
+<option>Marketing</option>
+<option>Human Resources</option>
+</select>
+<div class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-500">
+<span class="material-symbols-outlined text-[20px]">expand_more</span>
+</div>
+</div>
+</div>
+<!-- Location/Geofence -->
+<div class="space-y-1.5">
+<label class="text-sm font-medium text-slate-700 dark:text-slate-300">Office Location</label>
+<div class="relative">
+<select class="w-full appearance-none rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-slate-700 dark:bg-slate-800 dark:text-white">
+<option>All Locations</option>
+<option>HQ - San Francisco</option>
+<option>Austin Branch</option>
+<option>London Office</option>
+<option>Remote</option>
+</select>
+<div class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-500">
+<span class="material-symbols-outlined text-[20px]">location_on</span>
+</div>
+</div>
+</div>
+<!-- Employee Search -->
+<div class="space-y-1.5">
+<label class="text-sm font-medium text-slate-700 dark:text-slate-300">Employee</label>
+<div class="relative">
+<input class="w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 pl-10 text-sm text-slate-900 placeholder-slate-400 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-slate-700 dark:bg-slate-800 dark:text-white" placeholder="Search by name..." type="text"/>
+<div class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">
+<span class="material-symbols-outlined text-[20px]">search</span>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-5 flex justify-end border-t border-slate-100 pt-4 dark:border-slate-800">
+<button class="text-sm font-medium text-slate-500 hover:text-primary dark:text-slate-400 mr-4">Clear All</button>
+<button class="rounded-lg bg-primary px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">Apply Filters</button>
+</div>
+</div>
+<!-- Report Preview Table -->
+<div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+<div class="border-b border-slate-200 bg-slate-50 px-6 py-4 dark:border-slate-800 dark:bg-slate-800/50">
+<h2 class="font-semibold text-slate-900 dark:text-white">Report Preview</h2>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left text-sm text-slate-600 dark:text-slate-400">
+<thead class="bg-slate-50 text-xs uppercase text-slate-500 dark:bg-slate-800/50 dark:text-slate-400">
+<tr>
+<th class="px-6 py-3 font-semibold">Employee</th>
+<th class="px-6 py-3 font-semibold">Date</th>
+<th class="px-6 py-3 font-semibold">Check In</th>
+<th class="px-6 py-3 font-semibold">Check Out</th>
+<th class="px-6 py-3 font-semibold">Location</th>
+<th class="px-6 py-3 font-semibold text-center">Points</th>
+<th class="px-6 py-3 font-semibold text-right">Status</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-200 dark:divide-slate-800">
+<!-- Row 1 -->
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-full bg-cover bg-center" data-alt="Avatar of Alex Morgan" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCNKO7kuAdb4lJ1X8-4jf-6SpCePiCTKCMt2o8by1scpwwJv-kL_EhT_FfXBJ73jdgwti-JgxxN02nrVDvqqH8uFHe--QTl5kH5cdx6ISCGdk1gjZ5IpVjxaqYAoJP7VilFcjc4iZ8UuzP-eHFBcygpnJUofSZQvRIKf4bdztTdMrGlXMxjnDKmL1zRAa_QltmvzA2FsL2INA0-e37i3tX6umm04fQK6dCy0Aa4haPo0auIa0dHF2D3Jh4KFUCi0w6JrYrnjK_-qA');"></div>
+<div>
+<div class="font-medium text-slate-900 dark:text-white">Alex Morgan</div>
+<div class="text-xs text-slate-500">Engineering</div>
+</div>
+</div>
+</td>
+<td class="whitespace-nowrap px-6 py-4">Oct 24, 2023</td>
+<td class="whitespace-nowrap px-6 py-4 text-slate-900 dark:text-white">08:55 AM</td>
+<td class="whitespace-nowrap px-6 py-4 text-slate-900 dark:text-white">05:30 PM</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-1.5 rounded-full bg-slate-100 px-2.5 py-0.5 w-fit text-xs font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-400">
+<span class="material-symbols-outlined text-[14px]">apartment</span>
+                                                HQ - SF
+                                            </div>
+</td>
+<td class="px-6 py-4 text-center">
+<span class="inline-flex items-center gap-1 rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400">
+<span class="material-symbols-outlined text-[14px] filled">star</span>
+                                                +50
+                                            </span>
+</td>
+<td class="px-6 py-4 text-right">
+<span class="inline-flex rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800 dark:bg-green-900/30 dark:text-green-400">On Time</span>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-full bg-cover bg-center" data-alt="Avatar of Sarah Lee" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuC06_3tfS72kbs8uBlV-Wa5IJh43cfilQj2lWO7qS7Nm9fkKU1CadYykpOpWeQ1Z2fw79A7fiCzXKxfL9IY-5EuiULGRIWpUIfsj03Ebc10o-rRdBRJpO0IraF1qbFLrzjQjTlcCFPV9wWtrD46j1pzPYPCFSI3MCCfdaslngkvidrnXktoGu4oqkF6UV7ShdDUwWKg-VdpN87gh-VDJSoxLaheLDovNLINQWrbp0xDPo5xeL-_Uf_pQ8IZU3lGmViOYw59Q63NVg');"></div>
+<div>
+<div class="font-medium text-slate-900 dark:text-white">Sarah Lee</div>
+<div class="text-xs text-slate-500">Design</div>
+</div>
+</div>
+</td>
+<td class="whitespace-nowrap px-6 py-4">Oct 24, 2023</td>
+<td class="whitespace-nowrap px-6 py-4 text-slate-900 dark:text-white">09:15 AM</td>
+<td class="whitespace-nowrap px-6 py-4 text-slate-900 dark:text-white">06:00 PM</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-1.5 rounded-full bg-slate-100 px-2.5 py-0.5 w-fit text-xs font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-400">
+<span class="material-symbols-outlined text-[14px]">home_work</span>
+                                                Remote
+                                            </div>
+</td>
+<td class="px-6 py-4 text-center">
+<span class="inline-flex items-center gap-1 rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400">
+<span class="material-symbols-outlined text-[14px] filled">star</span>
+                                                +45
+                                            </span>
+</td>
+<td class="px-6 py-4 text-right">
+<span class="inline-flex rounded-full bg-orange-100 px-2.5 py-0.5 text-xs font-medium text-orange-800 dark:bg-orange-900/30 dark:text-orange-400">Late Check-in</span>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-full bg-cover bg-center" data-alt="Avatar of David Chen" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCZ3EpDhkBAbHSHMFyXxVyu-fnUrpsCe4iqdIL1vCdzu7xVKRVmJc9QtwJOoeU7Wkb0E7yOk-zZSJQdjfZ1U2AD3SVxvchvNB6lyxeApO1Z1cUHyXG14n6_qOpqeLLmLb0cgQiv9wMfRSlZVJoc8LqnbwZfdnKx-2EjMOq9Ke8J8gqseAXVUE_4uDiBcefd98P8miwxOkJ_xRzSHUp0zStD1EzEc_j-BVwV7rCktDQO3nbWdrNYvnCSYq-L8C9LOtaC3u3Kzrvwsg');"></div>
+<div>
+<div class="font-medium text-slate-900 dark:text-white">David Chen</div>
+<div class="text-xs text-slate-500">Product</div>
+</div>
+</div>
+</td>
+<td class="whitespace-nowrap px-6 py-4">Oct 24, 2023</td>
+<td class="whitespace-nowrap px-6 py-4 text-slate-900 dark:text-white">08:45 AM</td>
+<td class="whitespace-nowrap px-6 py-4 text-slate-900 dark:text-white">05:15 PM</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-1.5 rounded-full bg-slate-100 px-2.5 py-0.5 w-fit text-xs font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-400">
+<span class="material-symbols-outlined text-[14px]">apartment</span>
+                                                HQ - SF
+                                            </div>
+</td>
+<td class="px-6 py-4 text-center">
+<span class="inline-flex items-center gap-1 rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400">
+<span class="material-symbols-outlined text-[14px] filled">star</span>
+                                                +50
+                                            </span>
+</td>
+<td class="px-6 py-4 text-right">
+<span class="inline-flex rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800 dark:bg-green-900/30 dark:text-green-400">On Time</span>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-full bg-cover bg-center" data-alt="Avatar of Maria Gonzales" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDTJO_E_D4RxgvrOGI_5dogZEpoyJdAuaKj8gJPIE_pIxxZ-ASsCiuOGAlS7PxWiqCksiLD9RCdahj1ikrlxfpr7ESHD4OQGpacOl5LwbbkSl_Y-Uj8r4EksH2cxtqZjEI5K2se_9BgisOtzKY7MYKSQ6XmAdAnO3CKf_ASYVNt_VSbCScFbsTKHe16qfCWBMaCNimlaanCjg8vDsiJqJAN_u5S7gT7fJzsxyOTHvzpwyqanab9MXzT-uQB3O1GJmp12AgwrV5T_g');"></div>
+<div>
+<div class="font-medium text-slate-900 dark:text-white">Maria Gonzales</div>
+<div class="text-xs text-slate-500">Sales</div>
+</div>
+</div>
+</td>
+<td class="whitespace-nowrap px-6 py-4">Oct 24, 2023</td>
+<td class="whitespace-nowrap px-6 py-4 text-slate-900 dark:text-white">08:30 AM</td>
+<td class="whitespace-nowrap px-6 py-4 text-slate-900 dark:text-white">05:00 PM</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-1.5 rounded-full bg-slate-100 px-2.5 py-0.5 w-fit text-xs font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-400">
+<span class="material-symbols-outlined text-[14px]">apartment</span>
+                                                Austin Branch
+                                            </div>
+</td>
+<td class="px-6 py-4 text-center">
+<span class="inline-flex items-center gap-1 rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400">
+<span class="material-symbols-outlined text-[14px] filled">star</span>
+                                                +50
+                                            </span>
+</td>
+<td class="px-6 py-4 text-right">
+<span class="inline-flex rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800 dark:bg-green-900/30 dark:text-green-400">On Time</span>
+</td>
+</tr>
+<!-- Row 5 -->
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-full bg-cover bg-center" data-alt="Avatar of James Wilson" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDSApkpo7Ivqd5oGP5pkqqiZwhV8Nyo_HdihELFSKON_jlVvgTaXTj9EXXauAuQJHhV-RnHcTV0ifr6PH0odkY8k_45mL6xk_-KgP_5zyjkN4VLTzXMs1EoLbegtI7RruS3ZDxz79kqRBYNydpQTpndPsyzQTmZYixziLyluNDwaFZRqTpkSIJ-_DirB7n645q0MpaGvsMmcCVUA8VSJzTAW5sJQZmuqmB2cUEn9RjIaBnz8KVDucW2cVREuJ-h0-Nx7UNVDCTEBg');"></div>
+<div>
+<div class="font-medium text-slate-900 dark:text-white">James Wilson</div>
+<div class="text-xs text-slate-500">Engineering</div>
+</div>
+</div>
+</td>
+<td class="whitespace-nowrap px-6 py-4">Oct 24, 2023</td>
+<td class="whitespace-nowrap px-6 py-4 text-slate-900 dark:text-white">--</td>
+<td class="whitespace-nowrap px-6 py-4 text-slate-900 dark:text-white">--</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-1.5 rounded-full bg-slate-100 px-2.5 py-0.5 w-fit text-xs font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-400">
+<span class="material-symbols-outlined text-[14px]">apartment</span>
+                                                HQ - SF
+                                            </div>
+</td>
+<td class="px-6 py-4 text-center">
+<span class="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-500 dark:bg-slate-800 dark:text-slate-400">
+                                                0
+                                            </span>
+</td>
+<td class="px-6 py-4 text-right">
+<span class="inline-flex rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-800 dark:bg-red-900/30 dark:text-red-400">Absent</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination -->
+<div class="flex items-center justify-between border-t border-slate-200 bg-white px-6 py-4 dark:border-slate-800 dark:bg-slate-900">
+<p class="text-sm text-slate-500 dark:text-slate-400">Showing <span class="font-medium text-slate-900 dark:text-white">1</span> to <span class="font-medium text-slate-900 dark:text-white">5</span> of <span class="font-medium text-slate-900 dark:text-white">248</span> results</p>
+<div class="flex gap-2">
+<button class="rounded-lg border border-slate-300 bg-white px-3 py-1 text-sm font-medium text-slate-700 disabled:opacity-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200">Previous</button>
+<button class="rounded-lg border border-slate-300 bg-white px-3 py-1 text-sm font-medium text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200">Next</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

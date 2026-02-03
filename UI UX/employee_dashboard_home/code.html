@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Employee Dashboard | Clock In</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#4F46E5", // Indigo-600 used as primary
+                        secondary: "#7C3AED", // Violet-600 for gradients
+                        "background-light": "#F3F4F6", // Gray-100
+                        "background-dark": "#0F172A", // Slate-900
+                        "surface-light": "#FFFFFF",
+                        "surface-dark": "#1E293B", // Slate-800
+                        "text-light": "#111827", // Gray-900
+                        "text-dark": "#F9FAFB", // Gray-50
+                    },
+                    fontFamily: {
+                        display: ["Inter", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.75rem", // 12px default
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
+                        'glow': '0 0 15px rgba(79, 70, 229, 0.3)',
+                    }
+                },
+            },
+        };
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }.btn-gradient {
+            background: linear-gradient(135deg, #4F46E5 0%, #9333EA 100%);
+        }
+        .text-gradient {
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-image: linear-gradient(to right, #4F46E5, #9333EA);
+        }.ripple-container {
+            position: relative;
+        }
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            border: 1px solid rgba(79, 70, 229, 0.3);
+            animation: ripple-anim 2s infinite ease-out;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .ripple:nth-child(1) { width: 100%; height: 100%; animation-delay: 0s; }
+        .ripple:nth-child(2) { width: 120%; height: 120%; animation-delay: 0.5s; opacity: 0.5; }
+        .ripple:nth-child(3) { width: 140%; height: 140%; animation-delay: 1s; opacity: 0.2; }
+        @keyframes ripple-anim {
+            0% { transform: translate(-50%, -50%) scale(0.8); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1.2); opacity: 0; }
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark transition-colors duration-200">
+<div class="flex h-screen overflow-hidden">
+<aside class="hidden md:flex flex-col w-64 bg-surface-light dark:bg-surface-dark border-r border-gray-200 dark:border-gray-700 h-full fixed left-0 top-0 z-20">
+<div class="flex items-center justify-center h-20 border-b border-gray-200 dark:border-gray-700">
+<div class="flex items-center space-x-2">
+<span class="material-icons-round text-primary text-3xl">token</span>
+<span class="text-xl font-bold tracking-wide">WorkPulse</span>
+</div>
+</div>
+<nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+<a class="flex items-center px-4 py-3 bg-primary/10 text-primary rounded-lg transition-colors group" href="#">
+<span class="material-icons-round mr-3">dashboard</span>
+<span class="font-medium">Dashboard</span>
+</a>
+<a class="flex items-center px-4 py-3 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white rounded-lg transition-colors group" href="#">
+<span class="material-icons-round mr-3 group-hover:text-primary">schedule</span>
+<span class="font-medium">Attendance</span>
+</a>
+<a class="flex items-center px-4 py-3 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white rounded-lg transition-colors group" href="#">
+<span class="material-icons-round mr-3 group-hover:text-primary">flight_takeoff</span>
+<span class="font-medium">Leaves</span>
+</a>
+<a class="flex items-center px-4 py-3 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white rounded-lg transition-colors group" href="#">
+<span class="material-icons-round mr-3 group-hover:text-primary">group</span>
+<span class="font-medium">Team</span>
+</a>
+<a class="flex items-center px-4 py-3 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white rounded-lg transition-colors group" href="#">
+<span class="material-icons-round mr-3 group-hover:text-primary">leaderboard</span>
+<span class="font-medium">Rewards</span>
+<span class="ml-auto bg-yellow-100 text-yellow-800 text-xs font-bold px-2 py-0.5 rounded-full dark:bg-yellow-900 dark:text-yellow-100">120 pts</span>
+</a>
+<a class="flex items-center px-4 py-3 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white rounded-lg transition-colors group" href="#">
+<span class="material-icons-round mr-3 group-hover:text-primary">settings</span>
+<span class="font-medium">Settings</span>
+</a>
+</nav>
+<div class="p-4 border-t border-gray-200 dark:border-gray-700">
+<div class="flex items-center gap-3 px-2">
+<img alt="User Profile" class="h-10 w-10 rounded-full object-cover border-2 border-white dark:border-gray-600 shadow-sm" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB-574WK1y8hqZNIZmgP-FkD7W0CDq_VixdMogWqeyzR_3riE9bWAnPgdFlCMR6_Y9TFHnXw1kd3-ER2m_jwfZP9WjJXLCpvevYBg83LzxP99aEsHRTwTrIc924mrWGcAWzrZrdfSNbwrOEC3qY3sJZ_jvwhWRUS2hU9zuirXvQBiTOxJu9wM2qcYBKKwYOYnDJ7COLX6KLWWjphgmlF9MCAoOestLnDINEK-1WndTsekyoaAhlJ-KBNHb24jYxa6gK-LqlvEJDng"/>
+<div class="flex-1 min-w-0">
+<p class="text-sm font-medium text-gray-900 dark:text-white truncate">Alex Morgan</p>
+<p class="text-xs text-gray-500 dark:text-gray-400 truncate">Product Designer</p>
+</div>
+<button class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+<span class="material-icons-round text-xl">logout</span>
+</button>
+</div>
+</div>
+</aside>
+<main class="flex-1 md:ml-64 flex flex-col h-full relative overflow-y-auto scroll-smooth">
+<header class="bg-surface-light/80 dark:bg-surface-dark/80 backdrop-blur-md sticky top-0 z-10 px-6 py-4 flex justify-between items-center border-b border-gray-200 dark:border-gray-700">
+<div class="flex items-center md:hidden">
+<span class="material-icons-round text-primary text-2xl mr-2">token</span>
+<h1 class="font-bold text-lg">WorkPulse</h1>
+</div>
+<div class="hidden md:block">
+<h2 class="text-xl font-semibold text-gray-800 dark:text-white">Good Morning, Alex! ☀️</h2>
+<p class="text-sm text-gray-500 dark:text-gray-400">Wednesday, Dec 12 • 09:12 AM</p>
+</div>
+<div class="flex items-center gap-4">
+<button class="relative p-2 text-gray-500 hover:text-primary dark:text-gray-400 transition-colors rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
+<span class="material-icons-round text-xl">notifications</span>
+<span class="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-white dark:border-surface-dark"></span>
+</button>
+<button class="p-2 text-gray-500 hover:text-primary dark:text-gray-400 transition-colors rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
+<span class="material-icons-round text-xl dark:hidden">dark_mode</span>
+<span class="material-icons-round text-xl hidden dark:block">light_mode</span>
+</button>
+</div>
+</header>
+<div class="p-6 md:p-8 max-w-7xl mx-auto w-full flex-1">
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<div class="lg:col-span-2 space-y-6">
+<div class="bg-surface-light dark:bg-surface-dark rounded-2xl shadow-soft p-8 text-center relative overflow-hidden">
+<div class="absolute -top-20 -left-20 w-64 h-64 bg-blue-400/10 rounded-full blur-3xl dark:bg-blue-600/10 pointer-events-none"></div>
+<div class="absolute -bottom-20 -right-20 w-64 h-64 bg-purple-400/10 rounded-full blur-3xl dark:bg-purple-600/10 pointer-events-none"></div>
+<div class="relative z-10 flex flex-col items-center">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300 mb-6">
+<span class="w-2 h-2 bg-red-500 rounded-full mr-2"></span>
+                                    Currently Checked Out
+                                </span>
+<div class="mb-8">
+<h1 class="text-5xl md:text-6xl font-bold text-gray-900 dark:text-white tracking-tight mb-2">09:12<span class="text-2xl text-gray-400 font-medium ml-1">AM</span></h1>
+<p class="text-gray-500 dark:text-gray-400">Wednesday, December 12</p>
+</div>
+<div class="relative w-48 h-48 md:w-56 md:h-56 flex items-center justify-center cursor-pointer group mb-8">
+<div class="ripple-container w-full h-full absolute inset-0">
+<div class="ripple"></div>
+<div class="ripple"></div>
+<div class="ripple"></div>
+</div>
+<button class="relative w-40 h-40 md:w-48 md:h-48 rounded-full btn-gradient shadow-glow transform transition-transform duration-300 hover:scale-105 active:scale-95 flex flex-col items-center justify-center text-white z-20">
+<span class="material-icons-round text-5xl mb-1">touch_app</span>
+<span class="font-bold text-lg tracking-wider uppercase">Clock In</span>
+</button>
+</div>
+<div class="flex items-center text-sm text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800/50 px-4 py-2 rounded-lg border border-gray-100 dark:border-gray-700">
+<span class="material-icons-round text-green-500 text-base mr-2">location_on</span>
+                                    Location: <span class="font-medium text-gray-700 dark:text-gray-300 ml-1">Central Building Office</span>
+<span class="material-icons-round text-green-500 text-base ml-2">check_circle</span>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+<div class="bg-surface-light dark:bg-surface-dark p-4 rounded-xl shadow-soft flex flex-col items-center justify-center border border-gray-100 dark:border-gray-700/50">
+<div class="p-2 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full mb-2">
+<span class="material-icons-round text-xl">login</span>
+</div>
+<span class="text-xs text-gray-500 dark:text-gray-400 mb-1">Clock In</span>
+<span class="font-bold text-gray-900 dark:text-white">09:10 AM</span>
+</div>
+<div class="bg-surface-light dark:bg-surface-dark p-4 rounded-xl shadow-soft flex flex-col items-center justify-center border border-gray-100 dark:border-gray-700/50">
+<div class="p-2 bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 rounded-full mb-2">
+<span class="material-icons-round text-xl">logout</span>
+</div>
+<span class="text-xs text-gray-500 dark:text-gray-400 mb-1">Clock Out</span>
+<span class="font-bold text-gray-900 dark:text-white">--:--</span>
+</div>
+<div class="bg-surface-light dark:bg-surface-dark p-4 rounded-xl shadow-soft flex flex-col items-center justify-center border border-gray-100 dark:border-gray-700/50">
+<div class="p-2 bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 rounded-full mb-2">
+<span class="material-icons-round text-xl">schedule</span>
+</div>
+<span class="text-xs text-gray-500 dark:text-gray-400 mb-1">Working Hrs</span>
+<span class="font-bold text-gray-900 dark:text-white">0h 02m</span>
+</div>
+<div class="bg-surface-light dark:bg-surface-dark p-4 rounded-xl shadow-soft flex flex-col items-center justify-center border border-gray-100 dark:border-gray-700/50">
+<div class="p-2 bg-teal-100 dark:bg-teal-900/30 text-teal-600 dark:text-teal-400 rounded-full mb-2">
+<span class="material-icons-round text-xl">coffee</span>
+</div>
+<span class="text-xs text-gray-500 dark:text-gray-400 mb-1">Break Time</span>
+<span class="font-bold text-gray-900 dark:text-white">0h 00m</span>
+</div>
+</div>
+<div class="bg-surface-light dark:bg-surface-dark rounded-xl shadow-soft overflow-hidden border border-gray-100 dark:border-gray-700">
+<div class="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center">
+<h3 class="font-semibold text-gray-900 dark:text-white">Recent Activity</h3>
+<button class="text-sm text-primary hover:text-secondary font-medium">View All</button>
+</div>
+<div class="divide-y divide-gray-100 dark:divide-gray-700">
+<div class="px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+<div class="flex items-center gap-3">
+<div class="h-8 w-8 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-green-600 dark:text-green-400">
+<span class="material-icons-round text-sm">login</span>
+</div>
+<div>
+<p class="text-sm font-medium text-gray-900 dark:text-white">Clock In</p>
+<p class="text-xs text-gray-500 dark:text-gray-400">Office Network</p>
+</div>
+</div>
+<span class="text-sm font-semibold text-gray-700 dark:text-gray-300">09:10 AM</span>
+</div>
+<div class="px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors opacity-60">
+<div class="flex items-center gap-3">
+<div class="h-8 w-8 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-gray-500">
+<span class="material-icons-round text-sm">logout</span>
+</div>
+<div>
+<p class="text-sm font-medium text-gray-900 dark:text-white">Clock Out (Yesterday)</p>
+<p class="text-xs text-gray-500 dark:text-gray-400">Remote</p>
+</div>
+</div>
+<span class="text-sm font-semibold text-gray-700 dark:text-gray-300">06:24 PM</span>
+</div>
+</div>
+</div>
+</div>
+<div class="space-y-6">
+<div class="bg-surface-light dark:bg-surface-dark rounded-2xl shadow-soft p-6 border border-gray-100 dark:border-gray-700">
+<h3 class="font-semibold text-gray-900 dark:text-white mb-4">Leave Balance</h3>
+<div class="flex items-center justify-center relative w-48 h-48 mx-auto mb-4">
+<svg class="w-full h-full transform -rotate-90">
+<circle class="text-gray-100 dark:text-gray-700" cx="96" cy="96" fill="transparent" r="80" stroke="currentColor" stroke-width="12"></circle>
+<circle class="text-primary" cx="96" cy="96" fill="transparent" r="80" stroke="currentColor" stroke-dasharray="502" stroke-dashoffset="125" stroke-linecap="round" stroke-width="12"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center text-center">
+<span class="text-4xl font-bold text-gray-900 dark:text-white">15</span>
+<span class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Days Left</span>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-3 text-center">
+<div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg">
+<span class="block text-xs text-gray-500 dark:text-gray-400">Total Leaves</span>
+<span class="block text-lg font-bold text-gray-900 dark:text-white">20</span>
+</div>
+<div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg">
+<span class="block text-xs text-gray-500 dark:text-gray-400">Used</span>
+<span class="block text-lg font-bold text-gray-900 dark:text-white">5</span>
+</div>
+</div>
+<button class="w-full mt-4 py-2 bg-primary/10 hover:bg-primary/20 text-primary dark:text-indigo-400 font-medium rounded-lg transition-colors text-sm">
+                                Apply for Leave
+                            </button>
+</div>
+<div class="bg-surface-light dark:bg-surface-dark rounded-2xl shadow-soft p-6 border border-gray-100 dark:border-gray-700">
+<div class="flex justify-between items-center mb-4">
+<h3 class="font-semibold text-gray-900 dark:text-white">Weekly Hours</h3>
+<span class="text-xs font-medium bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 px-2 py-1 rounded">On Track</span>
+</div>
+<div class="flex items-end justify-between h-32 gap-2 mb-2">
+<div class="w-full bg-gray-100 dark:bg-gray-800 rounded-t-lg relative group">
+<div class="absolute bottom-0 w-full bg-primary/40 rounded-t-lg transition-all h-[60%] group-hover:bg-primary/60"></div>
+<div class="opacity-0 group-hover:opacity-100 absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs py-1 px-2 rounded transition-opacity">6h</div>
+</div>
+<div class="w-full bg-gray-100 dark:bg-gray-800 rounded-t-lg relative group">
+<div class="absolute bottom-0 w-full bg-primary/60 rounded-t-lg transition-all h-[85%] group-hover:bg-primary/80"></div>
+<div class="opacity-0 group-hover:opacity-100 absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs py-1 px-2 rounded transition-opacity">8.5h</div>
+</div>
+<div class="w-full bg-gray-100 dark:bg-gray-800 rounded-t-lg relative group">
+<div class="absolute bottom-0 w-full bg-gradient-to-t from-primary to-secondary rounded-t-lg transition-all h-[40%] group-hover:opacity-90"></div> 
+<div class="opacity-0 group-hover:opacity-100 absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs py-1 px-2 rounded transition-opacity">4h</div>
+</div>
+<div class="w-full bg-gray-100 dark:bg-gray-800 rounded-t-lg relative"></div>
+<div class="w-full bg-gray-100 dark:bg-gray-800 rounded-t-lg relative"></div>
+</div>
+<div class="flex justify-between text-xs text-gray-500 dark:text-gray-400 px-1">
+<span>Mon</span>
+<span>Tue</span>
+<span class="font-bold text-primary">Wed</span>
+<span>Thu</span>
+<span>Fri</span>
+</div>
+</div>
+<div class="bg-surface-light dark:bg-surface-dark rounded-2xl shadow-soft p-6 border border-gray-100 dark:border-gray-700">
+<h3 class="font-semibold text-gray-900 dark:text-white mb-4">Team Status</h3>
+<div class="space-y-3">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="relative">
+<img alt="Avatar" class="w-8 h-8 rounded-full border border-gray-200 dark:border-gray-600" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDKZYLe8SbpnyUtNs2cn-CP0fFSiYyls1d7CnFuavhTFyp9bBL8MWN_Dci6DN58RBTYCBA6MQ2bgtR-LdLjgT6QW36kYZ2GxsPBWbD_a24du0lHSg8rr3O3KULVrbkVbLgpsDkJoJhIH-BEzXHu_WXNoSJMJXBH6OqlyUCZEiX3bT2htzxmX7Kwc9DAH5PoVJDf8ZAALpUVVQnDCrXPn0N3mTZ5MyJmJQ9qJq4CjhDv36I40VjHI-KOyBovRbxOzqsYNtCYWJVoXg"/>
+<span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-white dark:border-surface-dark rounded-full"></span>
+</div>
+<span class="text-sm font-medium text-gray-700 dark:text-gray-300">Sarah K.</span>
+</div>
+<span class="text-xs text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 px-2 py-0.5 rounded">Online</span>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="relative">
+<img alt="Avatar" class="w-8 h-8 rounded-full border border-gray-200 dark:border-gray-600" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCUuMe1pUGzzJ_JHRFel9cbxyc4gqquoscoc_0ZXHrQSfu9oWSLQWSmqZqy69TDjns89Bk6r2ggisL49x0wnWOc4qU4BI8Aq5GIBNWFWIUca23USiUZ552QnpyypmrFoatCJ87HTRT-XZzdgWvquuQC7aBMLOsf0q67Gnwn-1sgmVsQd39hWQ5NWCFTeJ9VV-7Xscggw0QtTGeVl99UzKDtfnhFiMhf_BYWj4YVX3AcKkQ7pTS05E1y68wW5Js6NKCfjUuXhhrN_Q"/>
+<span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-yellow-500 border-2 border-white dark:border-surface-dark rounded-full"></span>
+</div>
+<span class="text-sm font-medium text-gray-700 dark:text-gray-300">Mike R.</span>
+</div>
+<span class="text-xs text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-900/20 px-2 py-0.5 rounded">Break</span>
+</div>
+<div class="flex items-center justify-between opacity-60">
+<div class="flex items-center gap-3">
+<div class="relative">
+<img alt="Avatar" class="w-8 h-8 rounded-full border border-gray-200 dark:border-gray-600 grayscale" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCLeAmBK3pbQw6osWeCrGcBms7Jt1QcvUbc2J8WQjEdJf2y6eJnn9coo7Aj5GeevnPs_WfnL97ah5YzRWf2dtFRYGj9g529ng_YSOOgu9olgjCUYQdTCMaIX05xosVhXCizR56jej7iX_kTCcDLBKl6Bb0HpiMWRNn5JuKCzZ56WLpgFKazoqGLFM8gNf7P0c3cqY9SvRP4PVJM0EltCp80nuFFlyUI8rzycDRDHZJU2KOd1nVQB7e7DOsyb0l5_vsqgpHWLyl1Xg"/>
+</div>
+<span class="text-sm font-medium text-gray-700 dark:text-gray-300">Jessica T.</span>
+</div>
+<span class="text-xs text-gray-500 dark:text-gray-400">Offline</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+
+</body></html>

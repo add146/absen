@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>My Shift Schedule</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0d59f2",
+                        "background-light": "#f5f6f8",
+                        "background-dark": "#101622",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem", 
+                        "lg": "0.5rem", 
+                        "xl": "0.75rem", 
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom scrollbar for better look in the card lists */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 20px;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-[#111318] dark:text-white h-screen w-full flex overflow-hidden font-display">
+<!-- SideNavBar -->
+<aside class="w-64 bg-white dark:bg-[#1a2234] border-r border-[#f0f1f5] dark:border-[#2a3447] flex-col justify-between h-full hidden md:flex shrink-0 z-20">
+<div class="flex flex-col gap-4 p-4">
+<!-- User Profile Snippet in Sidebar -->
+<div class="flex gap-3 pb-4 border-b border-[#f0f1f5] dark:border-[#2a3447]">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" data-alt="Portrait of John Doe, software engineer" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAaZ-2SgpXOk9JHkpRGmj7G_eXGfBKTWfR42Y2ds-LjL6kx5y4u4qCiH_q7tRmYIFqU9M8RAit-69Tou7zt4Xa9TBZ3GuDO1QYL5ja2Nu-WOBf3fenuhCfL3cLNjh2-IoNWVAfNUQ3EmPuympDGDXwJgXWTAXUgh3Ed2uJty-wGJYi1Hrgi83Hhz77wCAuIX6OWurX5Dtg3F_wLaN8JlH4MH8zmV8p7RO7rx3zOAAmhzKBDLZu0Y0ronyjmmJcZgAR5_q9moGStEg");'></div>
+<div class="flex flex-col">
+<h1 class="text-[#111318] dark:text-white text-base font-medium leading-normal">John Doe</h1>
+<p class="text-[#606e8a] dark:text-gray-400 text-sm font-normal leading-normal">Software Engineer</p>
+</div>
+</div>
+<!-- Navigation Links -->
+<nav class="flex flex-col gap-2">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-background-light dark:hover:bg-[#2a3447] transition-colors group" href="#">
+<span class="material-symbols-outlined text-[#606e8a] dark:text-gray-400 group-hover:text-primary transition-colors">dashboard</span>
+<p class="text-[#111318] dark:text-gray-200 text-sm font-medium leading-normal">Dashboard</p>
+</a>
+<!-- Active State -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary/10 dark:bg-primary/20" href="#">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">calendar_month</span>
+<p class="text-primary text-sm font-bold leading-normal">My Schedule</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-background-light dark:hover:bg-[#2a3447] transition-colors group" href="#">
+<span class="material-symbols-outlined text-[#606e8a] dark:text-gray-400 group-hover:text-primary transition-colors">event_available</span>
+<p class="text-[#111318] dark:text-gray-200 text-sm font-medium leading-normal">Attendance</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-background-light dark:hover:bg-[#2a3447] transition-colors group" href="#">
+<span class="material-symbols-outlined text-[#606e8a] dark:text-gray-400 group-hover:text-primary transition-colors">redeem</span>
+<p class="text-[#111318] dark:text-gray-200 text-sm font-medium leading-normal">Rewards</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-background-light dark:hover:bg-[#2a3447] transition-colors group" href="#">
+<span class="material-symbols-outlined text-[#606e8a] dark:text-gray-400 group-hover:text-primary transition-colors">person</span>
+<p class="text-[#111318] dark:text-gray-200 text-sm font-medium leading-normal">Profile</p>
+</a>
+</nav>
+</div>
+<div class="p-4">
+<button class="flex w-full items-center gap-3 px-3 py-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 transition-colors">
+<span class="material-symbols-outlined">logout</span>
+<span class="text-sm font-medium">Log Out</span>
+</button>
+</div>
+</aside>
+<!-- Main Content Layout -->
+<div class="flex-1 flex flex-col h-full min-w-0 bg-background-light dark:bg-background-dark overflow-hidden">
+<!-- TopNavBar -->
+<header class="flex items-center justify-between whitespace-nowrap bg-white dark:bg-[#1a2234] border-b border-solid border-b-[#f0f1f5] dark:border-b-[#2a3447] px-6 py-3 shrink-0">
+<div class="flex items-center gap-8">
+<!-- Mobile Menu Button (Visible on small screens) -->
+<button class="md:hidden text-[#111318] dark:text-white">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<div class="flex items-center gap-4 text-[#111318] dark:text-white">
+<div class="size-8 rounded-lg bg-primary flex items-center justify-center text-white">
+<span class="material-symbols-outlined">diversity_3</span>
+</div>
+<h2 class="text-[#111318] dark:text-white text-lg font-bold leading-tight tracking-[-0.015em]">HR Connect</h2>
+</div>
+<label class="hidden lg:flex flex-col min-w-40 !h-10 max-w-64">
+<div class="flex w-full flex-1 items-stretch rounded-lg h-full">
+<div class="text-[#606e8a] dark:text-gray-400 flex border-none bg-[#f0f1f5] dark:bg-[#2a3447] items-center justify-center pl-4 rounded-l-lg border-r-0">
+<span class="material-symbols-outlined text-[20px]">search</span>
+</div>
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-[#111318] dark:text-white focus:outline-0 focus:ring-0 border-none bg-[#f0f1f5] dark:bg-[#2a3447] focus:border-none h-full placeholder:text-[#606e8a] px-4 rounded-l-none border-l-0 pl-2 text-sm font-normal leading-normal" placeholder="Search colleagues, shifts..." value=""/>
+</div>
+</label>
+</div>
+<div class="flex flex-1 justify-end gap-6">
+<div class="flex gap-2 items-center">
+<button class="flex cursor-pointer items-center justify-center rounded-lg size-10 hover:bg-[#f0f1f5] dark:hover:bg-[#2a3447] text-[#111318] dark:text-white transition-colors relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 size-2 bg-red-500 rounded-full border border-white dark:border-[#1a2234]"></span>
+</button>
+<button class="flex cursor-pointer items-center justify-center rounded-lg size-10 hover:bg-[#f0f1f5] dark:hover:bg-[#2a3447] text-[#111318] dark:text-white transition-colors">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Scrollable Page Content -->
+<main class="flex-1 overflow-y-auto p-4 md:p-8 custom-scrollbar">
+<div class="max-w-[1200px] mx-auto flex flex-col gap-6">
+<!-- Page Heading -->
+<div class="flex flex-col gap-2">
+<h1 class="text-[#111318] dark:text-white text-3xl font-black leading-tight tracking-[-0.033em]">My Shift Schedule</h1>
+<p class="text-[#606e8a] dark:text-gray-400 text-base font-normal leading-normal">View your assigned shifts, locations, and team members for the month.</p>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+<!-- Left Col: Calendar (Smaller) -->
+<div class="lg:col-span-5 xl:col-span-4 flex flex-col gap-6">
+<div class="bg-white dark:bg-[#1a2234] rounded-xl border border-[#e5e7eb] dark:border-[#2a3447] overflow-hidden shadow-sm">
+<!-- Calendar Picker -->
+<div class="p-4 flex flex-col gap-2">
+<div class="flex items-center justify-between px-2 pb-2">
+<button class="p-2 hover:bg-gray-100 dark:hover:bg-[#2a3447] rounded-full transition-colors">
+<span class="material-symbols-outlined text-[#111318] dark:text-white text-[20px]">chevron_left</span>
+</button>
+<p class="text-[#111318] dark:text-white text-base font-bold leading-tight flex-1 text-center">October 2023</p>
+<button class="p-2 hover:bg-gray-100 dark:hover:bg-[#2a3447] rounded-full transition-colors">
+<span class="material-symbols-outlined text-[#111318] dark:text-white text-[20px]">chevron_right</span>
+</button>
+</div>
+<div class="grid grid-cols-7 gap-y-1">
+<!-- Days of Week -->
+<div class="text-[#606e8a] dark:text-gray-400 text-[11px] font-bold uppercase tracking-wider flex h-8 items-center justify-center">S</div>
+<div class="text-[#606e8a] dark:text-gray-400 text-[11px] font-bold uppercase tracking-wider flex h-8 items-center justify-center">M</div>
+<div class="text-[#606e8a] dark:text-gray-400 text-[11px] font-bold uppercase tracking-wider flex h-8 items-center justify-center">T</div>
+<div class="text-[#606e8a] dark:text-gray-400 text-[11px] font-bold uppercase tracking-wider flex h-8 items-center justify-center">W</div>
+<div class="text-[#606e8a] dark:text-gray-400 text-[11px] font-bold uppercase tracking-wider flex h-8 items-center justify-center">T</div>
+<div class="text-[#606e8a] dark:text-gray-400 text-[11px] font-bold uppercase tracking-wider flex h-8 items-center justify-center">F</div>
+<div class="text-[#606e8a] dark:text-gray-400 text-[11px] font-bold uppercase tracking-wider flex h-8 items-center justify-center">S</div>
+<!-- Dates (Using simpler structure for clarity and styling) -->
+<!-- Empty Cells for start of month -->
+<div class="h-10"></div>
+<div class="h-10"></div>
+<div class="h-10"></div>
+<!-- Date Cells -->
+<button class="h-10 w-full flex items-center justify-center relative group">
+<span class="flex size-8 items-center justify-center rounded-full text-sm font-medium text-[#111318] dark:text-white hover:bg-gray-100 dark:hover:bg-[#2a3447]">1</span>
+</button>
+<button class="h-10 w-full flex items-center justify-center relative group">
+<span class="flex size-8 items-center justify-center rounded-full text-sm font-medium text-[#111318] dark:text-white hover:bg-gray-100 dark:hover:bg-[#2a3447]">2</span>
+</button>
+<button class="h-10 w-full flex items-center justify-center relative group">
+<span class="flex size-8 items-center justify-center rounded-full text-sm font-medium text-[#111318] dark:text-white hover:bg-gray-100 dark:hover:bg-[#2a3447]">3</span>
+</button>
+<button class="h-10 w-full flex items-center justify-center relative group">
+<span class="flex size-8 items-center justify-center rounded-full text-sm font-medium text-[#111318] dark:text-white hover:bg-gray-100 dark:hover:bg-[#2a3447]">4</span>
+</button>
+<!-- Today -->
+<button class="h-10 w-full flex items-center justify-center relative group">
+<span class="flex size-8 items-center justify-center rounded-full text-sm font-bold bg-primary/10 text-primary ring-1 ring-primary">5</span>
+</button>
+<button class="h-10 w-full flex items-center justify-center relative group">
+<span class="flex size-8 items-center justify-center rounded-full text-sm font-medium text-[#111318] dark:text-white hover:bg-gray-100 dark:hover:bg-[#2a3447]">6</span>
+</button>
+<!-- ... rest of days simplified ... -->
+<button class="h-10 w-full flex items-center justify-center relative group">
+<span class="flex size-8 items-center justify-center rounded-full text-sm font-medium text-[#111318] dark:text-white hover:bg-gray-100 dark:hover:bg-[#2a3447]">...</span>
+</button>
+<button class="h-10 w-full flex items-center justify-center relative group">
+<span class="flex size-8 items-center justify-center rounded-full text-sm font-medium text-[#111318] dark:text-white hover:bg-gray-100 dark:hover:bg-[#2a3447]">23</span>
+</button>
+<!-- Selected Date -->
+<button class="h-10 w-full flex items-center justify-center relative group">
+<span class="flex size-8 items-center justify-center rounded-full text-sm font-bold bg-primary text-white shadow-lg shadow-primary/30">24</span>
+<div class="absolute bottom-1 w-1 h-1 bg-white rounded-full"></div>
+</button>
+<button class="h-10 w-full flex items-center justify-center relative group">
+<span class="flex size-8 items-center justify-center rounded-full text-sm font-medium text-[#111318] dark:text-white hover:bg-gray-100 dark:hover:bg-[#2a3447]">25</span>
+</button>
+<button class="h-10 w-full flex items-center justify-center relative group">
+<span class="flex size-8 items-center justify-center rounded-full text-sm font-medium text-[#111318] dark:text-white hover:bg-gray-100 dark:hover:bg-[#2a3447]">26</span>
+</button>
+<button class="h-10 w-full flex items-center justify-center relative group">
+<span class="flex size-8 items-center justify-center rounded-full text-sm font-medium text-[#111318] dark:text-white hover:bg-gray-100 dark:hover:bg-[#2a3447]">27</span>
+</button>
+<button class="h-10 w-full flex items-center justify-center relative group">
+<span class="flex size-8 items-center justify-center rounded-full text-sm font-medium text-[#111318] dark:text-white hover:bg-gray-100 dark:hover:bg-[#2a3447]">28</span>
+</button>
+<button class="h-10 w-full flex items-center justify-center relative group">
+<span class="flex size-8 items-center justify-center rounded-full text-sm font-medium text-[#111318] dark:text-white hover:bg-gray-100 dark:hover:bg-[#2a3447]">29</span>
+</button>
+<button class="h-10 w-full flex items-center justify-center relative group">
+<span class="flex size-8 items-center justify-center rounded-full text-sm font-medium text-[#111318] dark:text-white hover:bg-gray-100 dark:hover:bg-[#2a3447]">30</span>
+</button>
+</div>
+<div class="mt-4 pt-4 border-t border-[#f0f1f5] dark:border-[#2a3447]">
+<div class="flex items-center gap-2 mb-2">
+<div class="w-3 h-3 rounded-full bg-primary"></div>
+<span class="text-xs text-[#606e8a] dark:text-gray-400">Assigned Shift</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full border border-primary"></div>
+<span class="text-xs text-[#606e8a] dark:text-gray-400">Today</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Stats Card -->
+<div class="bg-primary/5 dark:bg-[#1a2234] border border-primary/10 rounded-xl p-5 flex items-center gap-4">
+<div class="bg-white dark:bg-[#2a3447] p-3 rounded-full text-primary shadow-sm">
+<span class="material-symbols-outlined">stars</span>
+</div>
+<div>
+<p class="text-xs font-bold text-[#606e8a] dark:text-gray-400 uppercase tracking-wide">Monthly Rewards</p>
+<p class="text-xl font-black text-[#111318] dark:text-white">1,250 <span class="text-sm font-normal text-[#606e8a]">pts</span></p>
+</div>
+</div>
+</div>
+<!-- Right Col: Details (Larger) -->
+<div class="lg:col-span-7 xl:col-span-8 flex flex-col gap-5">
+<div class="flex items-center justify-between">
+<h2 class="text-[#111318] dark:text-white text-[24px] font-bold leading-tight">Selected Shift: Oct 24</h2>
+<span class="px-3 py-1 rounded-full bg-green-100 text-green-700 text-sm font-bold flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">check_circle</span>
+                                Confirmed
+                            </span>
+</div>
+<!-- Shift Detail Card -->
+<div class="bg-white dark:bg-[#1a2234] rounded-xl border border-[#e5e7eb] dark:border-[#2a3447] overflow-hidden shadow-sm flex flex-col md:flex-row">
+<!-- Left: Info -->
+<div class="p-6 flex-1 flex flex-col justify-between gap-6">
+<div>
+<div class="flex items-center gap-2 text-primary font-bold text-sm mb-1 uppercase tracking-wider">
+<span class="material-symbols-outlined text-[18px]">schedule</span>
+                                        Day Shift
+                                    </div>
+<h3 class="text-2xl font-bold text-[#111318] dark:text-white">09:00 AM - 05:00 PM</h3>
+<p class="text-[#606e8a] dark:text-gray-400 text-sm mt-1">8 hours • Tech Park Campus</p>
+</div>
+<div class="flex flex-col gap-3">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-[#606e8a] mt-0.5">location_on</span>
+<div>
+<p class="text-[#111318] dark:text-white font-medium">Headquarters - Building B</p>
+<p class="text-sm text-[#606e8a] dark:text-gray-400">123 Innovation Dr, San Francisco, CA</p>
+</div>
+</div>
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-[#606e8a] mt-0.5">radar</span>
+<div>
+<p class="text-[#111318] dark:text-white font-medium">Geofencing Active</p>
+<p class="text-sm text-[#606e8a] dark:text-gray-400">Check-in allowed within 100m of location</p>
+</div>
+</div>
+</div>
+<div class="pt-4 border-t border-[#f0f1f5] dark:border-[#2a3447] flex gap-4">
+<button class="flex-1 bg-primary hover:bg-blue-700 text-white font-bold py-2.5 px-4 rounded-lg transition-colors text-sm flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[18px]">swap_horiz</span>
+                                        Request Swap
+                                     </button>
+<button class="flex-1 bg-white dark:bg-[#2a3447] border border-[#e5e7eb] dark:border-[#3a455b] hover:bg-gray-50 dark:hover:bg-[#343e52] text-[#111318] dark:text-white font-bold py-2.5 px-4 rounded-lg transition-colors text-sm">
+                                        View Instructions
+                                     </button>
+</div>
+</div>
+<!-- Right: Map -->
+<div class="w-full md:w-1/3 min-h-[200px] bg-gray-100 relative">
+<img alt="Map view of San Francisco showing office location" class="w-full h-full object-cover" data-alt="Map showing geofenced area around office building" data-location="San Francisco" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBVjBffXAgU5_ebZENyCPEJ3dvOoTsLpDY2jYCXykk-wBJv7xyPBeUWdA-DM0ne_7Ujf84M2AMghsuWVp_kwyZ7doPvaVEiPYXsq2WByT5xUxR5TUEGOMCePVNVHA0KdyQhWiF-vv4fzvhmY0kvra2t7ALkwbJfE6-ErSkYLejZ3MHRVha6n9cdQwvsCvf8eQnOMxqTgK9dMqvujWpGXczZJPtuaTwLUN6dbYhzbzwGUZfjZiPqH_QtKJIebKw0tz8N1_7yOmeXPw"/>
+<div class="absolute inset-0 bg-primary/10 flex items-center justify-center pointer-events-none">
+<div class="bg-primary text-white p-2 rounded-full shadow-lg animate-bounce">
+<span class="material-symbols-outlined block">location_on</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Team Section -->
+<div class="flex flex-col gap-4">
+<div class="flex items-center justify-between">
+<h3 class="text-lg font-bold text-[#111318] dark:text-white">Colleagues on Shift (4)</h3>
+<a class="text-primary text-sm font-bold hover:underline" href="#">View Team</a>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<!-- Colleague Card 1 -->
+<div class="bg-white dark:bg-[#1a2234] p-3 rounded-lg border border-[#e5e7eb] dark:border-[#2a3447] flex items-center gap-3">
+<div class="relative">
+<div class="bg-center bg-no-repeat bg-cover rounded-full size-12" data-alt="Portrait of Sarah Jenkins" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCWXwD32VUAulALdApH_bb904wl2XSnWqL5DFagMYTCKE7KN7Shaq28w2wJFK-cztAYpjC6B6-TNN8WjAv55OQtUe_FDH9K76gAy-idiUPd91ISchMC9h22iG22ANGn-UpcjdprlInQs44e_lvWR1S5PN9okJvYnd8XvErhxTMZc80dvrZ0e-J1XvkrALjr6LSNl6Ohxxp-Q-5QpptpDFiFd4b5kxaBTaAcZ-pP3GVyNr0V7So9HSIW5JnTcWNng1JDmKwRMFq1yA");'></div>
+<div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white dark:border-[#1a2234] rounded-full"></div>
+</div>
+<div class="flex flex-col flex-1">
+<p class="text-[#111318] dark:text-white font-bold text-sm">Sarah Jenkins</p>
+<p class="text-[#606e8a] dark:text-gray-400 text-xs">Product Manager</p>
+</div>
+<button class="text-[#606e8a] hover:text-primary transition-colors">
+<span class="material-symbols-outlined">chat</span>
+</button>
+</div>
+<!-- Colleague Card 2 -->
+<div class="bg-white dark:bg-[#1a2234] p-3 rounded-lg border border-[#e5e7eb] dark:border-[#2a3447] flex items-center gap-3">
+<div class="relative">
+<div class="bg-center bg-no-repeat bg-cover rounded-full size-12" data-alt="Portrait of Michael Chen" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCukN9thdpXfXwFao_oUFeHa8U-LJ17xCm7lFD9LRKH1HqSfMhPaBt1srStbUsNKHRWBFxs5g89rr1VdPrN4gFzru-xrMxtcUxzvqUUK-24vbBty4j3xu5BkSzRgqov6qXmJ58maib5exkAyqJ3T79X0kgXvVPY3OFeZOztlC0hAVF4cRENQsZelRPZJZHi1bxCNZHQO4TwVXhgyjYqfD5ZXhYdBz7R2iLkj6ZIe8qL6owMXpk8ZbVI1Fd23J0hF_HC91TTBsZEyg");'></div>
+<div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white dark:border-[#1a2234] rounded-full"></div>
+</div>
+<div class="flex flex-col flex-1">
+<p class="text-[#111318] dark:text-white font-bold text-sm">Michael Chen</p>
+<p class="text-[#606e8a] dark:text-gray-400 text-xs">UX Designer</p>
+</div>
+<button class="text-[#606e8a] hover:text-primary transition-colors">
+<span class="material-symbols-outlined">chat</span>
+</button>
+</div>
+<!-- Colleague Card 3 -->
+<div class="bg-white dark:bg-[#1a2234] p-3 rounded-lg border border-[#e5e7eb] dark:border-[#2a3447] flex items-center gap-3">
+<div class="relative">
+<div class="bg-center bg-no-repeat bg-cover rounded-full size-12" data-alt="Portrait of Emily Davis" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCjjN9gVSDFjur0x2jhzhBj_wwXqFO83pgjrzK8jT1T3Bf8H8DolWxQuGHt-1Ks47EFX1Sdg-cunhfi9LTv-K3j6X7w2_0-G1q69kBjN9iLeMFWAKYeGVOPyq3lo8oqFKMxKotz4ggyheGWwb2JNAdC-SLGyaDs39mmnwP8xUG0yX9sOuo2IkXmMvPV_uxGWFfKPkXiQN06Z9vW2uxAAPNJJ2fYItRR8HlKIB4_MZbSBmVbUjCmzXzU8nDz2vbjEASTVnJYlYpVUg");'></div>
+<div class="absolute bottom-0 right-0 w-3 h-3 bg-yellow-500 border-2 border-white dark:border-[#1a2234] rounded-full"></div>
+</div>
+<div class="flex flex-col flex-1">
+<p class="text-[#111318] dark:text-white font-bold text-sm">Emily Davis</p>
+<p class="text-[#606e8a] dark:text-gray-400 text-xs">Frontend Dev</p>
+</div>
+<button class="text-[#606e8a] hover:text-primary transition-colors">
+<span class="material-symbols-outlined">chat</span>
+</button>
+</div>
+<!-- Colleague Card 4 -->
+<div class="bg-white dark:bg-[#1a2234] p-3 rounded-lg border border-[#e5e7eb] dark:border-[#2a3447] flex items-center gap-3">
+<div class="relative">
+<div class="bg-center bg-no-repeat bg-cover rounded-full size-12" data-alt="Portrait of David Wilson" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDkyfG_vZkRtuK3V6pimDvzVZve9dfl-S97eh9dBC3xGlezpEk1p7bTNxtkZ8eUYwBeRbm6m97Cn5qsf3zV8YXN4YtScf15IxvSsCuNA8DYfoq0akqTQb2Tgg_Xsg3c9XrELUh5ITues8-ypzM-qXQHU65Kv3mpqJ87LT7jzGdA-wO99U2Np_CGlGCJDsUdq5CORgWj_daruNwqHHDRUYXHcnAfjFerj5HwNTu3og06taOZhpr3_LMpx5oGSQtt8dQvEJG0v6HWZQ");'></div>
+<div class="absolute bottom-0 right-0 w-3 h-3 bg-gray-400 border-2 border-white dark:border-[#1a2234] rounded-full"></div>
+</div>
+<div class="flex flex-col flex-1">
+<p class="text-[#111318] dark:text-white font-bold text-sm">David Wilson</p>
+<p class="text-[#606e8a] dark:text-gray-400 text-xs">QA Engineer</p>
+</div>
+<button class="text-[#606e8a] hover:text-primary transition-colors">
+<span class="material-symbols-outlined">chat</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

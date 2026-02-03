@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Tenant Organization Registration</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0d59f2",
+                        "primary-dark": "#0a46c2",
+                        "background-light": "#f5f6f8",
+                        "background-dark": "#101622",
+                        "surface-light": "#ffffff",
+                        "surface-dark": "#1e293b",
+                        "border-light": "#dbdfe6",
+                        "border-dark": "#334155",
+                        "text-main": "#111318",
+                        "text-main-dark": "#f8fafc",
+                        "text-secondary": "#606e8a",
+                        "text-secondary-dark": "#94a3b8",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        /* Custom scrollbar for better aesthetics */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 20px;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background-color: #475569;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-text-main dark:text-text-main-dark font-display antialiased min-h-screen flex flex-col overflow-x-hidden">
+<!-- TopNavBar -->
+<header class="sticky top-0 z-50 w-full bg-surface-light dark:bg-surface-dark border-b border-border-light dark:border-border-dark">
+<div class="px-4 md:px-10 py-3 flex items-center justify-between">
+<div class="flex items-center gap-4 text-primary">
+<div class="size-8 rounded bg-primary/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-2xl">domain</span>
+</div>
+<h2 class="text-text-main dark:text-white text-lg font-bold leading-tight tracking-[-0.015em]">HR Platform</h2>
+</div>
+<!-- Desktop Nav -->
+<div class="hidden md:flex flex-1 justify-end gap-8 items-center">
+<div class="flex items-center gap-6">
+<a class="text-text-main dark:text-gray-200 text-sm font-medium hover:text-primary transition-colors" href="#">Features</a>
+<a class="text-text-main dark:text-gray-200 text-sm font-medium hover:text-primary transition-colors" href="#">Pricing</a>
+<a class="text-text-main dark:text-gray-200 text-sm font-medium hover:text-primary transition-colors" href="#">Support</a>
+</div>
+<div class="flex items-center gap-4">
+<a class="text-text-main dark:text-gray-200 text-sm font-medium hover:text-primary transition-colors" href="#">Login</a>
+<button class="flex cursor-pointer items-center justify-center overflow-hidden rounded-lg h-9 px-4 bg-primary hover:bg-primary-dark transition-colors text-white text-sm font-bold">
+<span class="truncate">Get Started</span>
+</button>
+</div>
+</div>
+<!-- Mobile Menu Icon -->
+<div class="md:hidden">
+<span class="material-symbols-outlined text-text-main dark:text-white cursor-pointer">menu</span>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex-grow flex flex-col items-center justify-start py-8 px-4 sm:px-6 lg:px-8">
+<div class="w-full max-w-[1200px] flex flex-col gap-8">
+<!-- Header Image / Hero Banner -->
+<div class="rounded-xl overflow-hidden relative min-h-[160px] md:min-h-[200px] flex flex-col justify-end bg-primary group" data-alt="Abstract blue digital network connection pattern" style='background-image: linear-gradient(0deg, rgba(13, 89, 242, 0.8) 0%, rgba(13, 89, 242, 0.4) 100%), url("https://lh3.googleusercontent.com/aida-public/AB6AXuCFj1XnZiGkjOokaqvdJSl0nQiqVBBTafNY5bpwJ1QqMAFWWBYaBRubpF6hal05yKlELponGVKR-c8QnCFpYBnCtfHu8WxJNRWREPRo6BP-bGbOQRpXWEufO2ZuljSpNVT1Op9kUgsj-V8mYmnjKgcsVsAw7cOH8yMTE7b6VKRGQaduN1Y41Xl2JOPALhCEVZ7F3C9a5KZH7tONodgIcVCOLPe-Oc1YwVGh6Ej0OqQJRoqhOfCiO3XdAqO8llFdzuldO8O-i5Gt7w"); background-size: cover; background-position: center;'>
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+<div class="relative z-10 p-6 md:p-8">
+<h1 class="text-white text-3xl md:text-4xl font-bold tracking-tight">Create Your Organization Account</h1>
+<p class="text-white/90 mt-2 text-base md:text-lg max-w-2xl">Start managing your workforce efficiently with our enterprise-grade HR solutions.</p>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+<!-- Left Column: Registration Form (8 cols) -->
+<div class="lg:col-span-7 xl:col-span-8 flex flex-col gap-6">
+<div class="bg-surface-light dark:bg-surface-dark rounded-xl border border-border-light dark:border-border-dark p-6 md:p-8 shadow-sm">
+<div class="mb-8">
+<h2 class="text-xl font-bold text-text-main dark:text-white mb-1">Organization Details</h2>
+<p class="text-text-secondary dark:text-text-secondary-dark text-sm">Please provide accurate information to verify your business identity.</p>
+</div>
+<form class="flex flex-col gap-6">
+<!-- Company Info Row -->
+<div class="flex flex-col md:flex-row gap-5">
+<label class="flex flex-col flex-1">
+<span class="text-text-main dark:text-gray-200 text-sm font-medium pb-2">Company Name</span>
+<div class="relative">
+<input class="w-full rounded-lg border border-border-light dark:border-border-dark bg-white dark:bg-slate-800 text-text-main dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent h-12 px-4 placeholder:text-text-secondary dark:placeholder:text-gray-500 text-sm transition-all" placeholder="e.g. Acme Corp" type="text"/>
+<span class="material-symbols-outlined absolute right-3 top-3 text-text-secondary dark:text-gray-500 text-[20px]">apartment</span>
+</div>
+</label>
+<label class="flex flex-col flex-1">
+<span class="text-text-main dark:text-gray-200 text-sm font-medium pb-2">Industry</span>
+<div class="relative">
+<select class="w-full appearance-none rounded-lg border border-border-light dark:border-border-dark bg-white dark:bg-slate-800 text-text-main dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent h-12 px-4 pr-10 text-sm transition-all">
+<option disabled="" selected="" value="">Select industry</option>
+<option value="tech">Technology</option>
+<option value="finance">Finance</option>
+<option value="healthcare">Healthcare</option>
+<option value="retail">Retail</option>
+<option value="other">Other</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-3 text-text-secondary dark:text-gray-500 pointer-events-none text-[20px]">expand_more</span>
+</div>
+</label>
+</div>
+<!-- Contact Info Row -->
+<div class="flex flex-col md:flex-row gap-5">
+<label class="flex flex-col flex-1">
+<span class="text-text-main dark:text-gray-200 text-sm font-medium pb-2">Business Email</span>
+<div class="relative">
+<input class="w-full rounded-lg border border-border-light dark:border-border-dark bg-white dark:bg-slate-800 text-text-main dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent h-12 px-4 placeholder:text-text-secondary dark:placeholder:text-gray-500 text-sm transition-all" placeholder="contact@company.com" type="email"/>
+<span class="material-symbols-outlined absolute right-3 top-3 text-text-secondary dark:text-gray-500 text-[20px]">mail</span>
+</div>
+</label>
+<label class="flex flex-col flex-1">
+<span class="text-text-main dark:text-gray-200 text-sm font-medium pb-2">Contact Person</span>
+<div class="relative">
+<input class="w-full rounded-lg border border-border-light dark:border-border-dark bg-white dark:bg-slate-800 text-text-main dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent h-12 px-4 placeholder:text-text-secondary dark:placeholder:text-gray-500 text-sm transition-all" placeholder="Full Name" type="text"/>
+<span class="material-symbols-outlined absolute right-3 top-3 text-text-secondary dark:text-gray-500 text-[20px]">person</span>
+</div>
+</label>
+</div>
+<!-- Password Row (Generated as per need for registration) -->
+<div class="flex flex-col md:flex-row gap-5">
+<label class="flex flex-col flex-1">
+<span class="text-text-main dark:text-gray-200 text-sm font-medium pb-2">Create Password</span>
+<div class="relative">
+<input class="w-full rounded-lg border border-border-light dark:border-border-dark bg-white dark:bg-slate-800 text-text-main dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent h-12 px-4 placeholder:text-text-secondary dark:placeholder:text-gray-500 text-sm transition-all" placeholder="••••••••" type="password"/>
+<span class="material-symbols-outlined absolute right-3 top-3 text-text-secondary dark:text-gray-500 text-[20px]">lock</span>
+</div>
+</label>
+<label class="flex flex-col flex-1">
+<span class="text-text-main dark:text-gray-200 text-sm font-medium pb-2">Confirm Password</span>
+<div class="relative">
+<input class="w-full rounded-lg border border-border-light dark:border-border-dark bg-white dark:bg-slate-800 text-text-main dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent h-12 px-4 placeholder:text-text-secondary dark:placeholder:text-gray-500 text-sm transition-all" placeholder="••••••••" type="password"/>
+<span class="material-symbols-outlined absolute right-3 top-3 text-text-secondary dark:text-gray-500 text-[20px]">lock_reset</span>
+</div>
+</label>
+</div>
+<!-- Plan Selection (Modified Feature Component logic) -->
+<div class="mt-4">
+<span class="text-text-main dark:text-gray-200 text-sm font-medium pb-2 block">Select Plan</span>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+<!-- Starter Plan -->
+<label class="cursor-pointer relative">
+<input class="peer sr-only" name="plan" type="radio" value="starter"/>
+<div class="h-full rounded-lg border border-border-light dark:border-border-dark bg-background-light dark:bg-slate-800/50 p-4 flex flex-col gap-2 peer-checked:ring-2 peer-checked:ring-primary peer-checked:bg-primary/5 transition-all hover:bg-white dark:hover:bg-slate-800">
+<div class="flex justify-between items-center">
+<h3 class="font-bold text-text-main dark:text-white">Starter</h3>
+<span class="material-symbols-outlined text-text-secondary dark:text-gray-400 peer-checked:text-primary">rocket_launch</span>
+</div>
+<p class="text-2xl font-bold text-text-main dark:text-white">$49<span class="text-sm font-normal text-text-secondary dark:text-gray-400">/mo</span></p>
+<p class="text-xs text-text-secondary dark:text-gray-400 mt-auto">Up to 15 employees. Basic tracking.</p>
+</div>
+</label>
+<!-- Growth Plan -->
+<label class="cursor-pointer relative">
+<input checked="" class="peer sr-only" name="plan" type="radio" value="growth"/>
+<div class="h-full rounded-lg border border-border-light dark:border-border-dark bg-background-light dark:bg-slate-800/50 p-4 flex flex-col gap-2 peer-checked:ring-2 peer-checked:ring-primary peer-checked:bg-primary/5 transition-all hover:bg-white dark:hover:bg-slate-800">
+<div class="flex justify-between items-center">
+<h3 class="font-bold text-text-main dark:text-white">Growth</h3>
+<span class="material-symbols-outlined text-text-secondary dark:text-gray-400 peer-checked:text-primary">trending_up</span>
+</div>
+<p class="text-2xl font-bold text-text-main dark:text-white">$149<span class="text-sm font-normal text-text-secondary dark:text-gray-400">/mo</span></p>
+<p class="text-xs text-text-secondary dark:text-gray-400 mt-auto">Up to 50 employees. Geofencing included.</p>
+</div>
+</label>
+<!-- Enterprise Plan -->
+<label class="cursor-pointer relative">
+<input class="peer sr-only" name="plan" type="radio" value="enterprise"/>
+<div class="h-full rounded-lg border border-border-light dark:border-border-dark bg-background-light dark:bg-slate-800/50 p-4 flex flex-col gap-2 peer-checked:ring-2 peer-checked:ring-primary peer-checked:bg-primary/5 transition-all hover:bg-white dark:hover:bg-slate-800">
+<div class="flex justify-between items-center">
+<h3 class="font-bold text-text-main dark:text-white">Enterprise</h3>
+<span class="material-symbols-outlined text-text-secondary dark:text-gray-400 peer-checked:text-primary">domain</span>
+</div>
+<p class="text-2xl font-bold text-text-main dark:text-white">Custom</p>
+<p class="text-xs text-text-secondary dark:text-gray-400 mt-auto">Unlimited employees. Full suite.</p>
+</div>
+</label>
+</div>
+</div>
+<!-- Form Actions -->
+<div class="mt-6 flex flex-col md:flex-row items-center justify-between gap-4 border-t border-border-light dark:border-border-dark pt-6">
+<p class="text-sm text-text-secondary dark:text-gray-400">
+                                    By creating an account, you agree to our <a class="text-primary hover:underline" href="#">Terms</a> and <a class="text-primary hover:underline" href="#">Privacy Policy</a>.
+                                </p>
+<button class="w-full md:w-auto min-w-[160px] bg-primary hover:bg-primary-dark text-white h-12 rounded-lg font-bold text-sm px-8 transition-colors shadow-lg shadow-primary/20" type="button">
+                                    Create Account
+                                </button>
+</div>
+</form>
+</div>
+</div>
+<!-- Right Column: Benefits Sidebar (4 cols) -->
+<div class="lg:col-span-5 xl:col-span-4 flex flex-col gap-6">
+<!-- Modified Feature Section -->
+<div class="bg-surface-light dark:bg-surface-dark rounded-xl border border-border-light dark:border-border-dark p-6 shadow-sm h-full">
+<h3 class="text-lg font-bold text-text-main dark:text-white mb-6">Why choose our platform?</h3>
+<div class="flex flex-col gap-4">
+<!-- Feature 1 -->
+<div class="flex gap-4 p-3 rounded-lg hover:bg-background-light dark:hover:bg-slate-800 transition-colors">
+<div class="shrink-0 size-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[20px]">location_on</span>
+</div>
+<div class="flex flex-col gap-1">
+<h4 class="text-text-main dark:text-gray-100 text-sm font-bold">Geofencing Attendance</h4>
+<p class="text-text-secondary dark:text-gray-400 text-xs leading-relaxed">Ensure employees are on-site when they clock in using precise GPS boundaries.</p>
+</div>
+</div>
+<!-- Feature 2 -->
+<div class="flex gap-4 p-3 rounded-lg hover:bg-background-light dark:hover:bg-slate-800 transition-colors">
+<div class="shrink-0 size-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-green-600 dark:text-green-400">
+<span class="material-symbols-outlined text-[20px]">payments</span>
+</div>
+<div class="flex flex-col gap-1">
+<h4 class="text-text-main dark:text-gray-100 text-sm font-bold">Seamless Payroll</h4>
+<p class="text-text-secondary dark:text-gray-400 text-xs leading-relaxed">Automated calculations that sync directly with attendance records.</p>
+</div>
+</div>
+<!-- Feature 3 -->
+<div class="flex gap-4 p-3 rounded-lg hover:bg-background-light dark:hover:bg-slate-800 transition-colors">
+<div class="shrink-0 size-10 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-purple-600 dark:text-purple-400">
+<span class="material-symbols-outlined text-[20px]">account_circle</span>
+</div>
+<div class="flex flex-col gap-1">
+<h4 class="text-text-main dark:text-gray-100 text-sm font-bold">Employee Self-Service</h4>
+<p class="text-text-secondary dark:text-gray-400 text-xs leading-relaxed">Portal for employees to view payslips, request leave, and update info.</p>
+</div>
+</div>
+<!-- Feature 4 -->
+<div class="flex gap-4 p-3 rounded-lg hover:bg-background-light dark:hover:bg-slate-800 transition-colors">
+<div class="shrink-0 size-10 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center text-orange-600 dark:text-orange-400">
+<span class="material-symbols-outlined text-[20px]">analytics</span>
+</div>
+<div class="flex flex-col gap-1">
+<h4 class="text-text-main dark:text-gray-100 text-sm font-bold">Real-time Analytics</h4>
+<p class="text-text-secondary dark:text-gray-400 text-xs leading-relaxed">Get insights into workforce productivity and attendance trends instantly.</p>
+</div>
+</div>
+</div>
+<!-- Testimonial Mini Card -->
+<div class="mt-8 pt-6 border-t border-border-light dark:border-border-dark">
+<div class="flex items-start gap-3">
+<div class="size-10 rounded-full bg-cover bg-center shrink-0" data-alt="Portrait of a smiling HR manager" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBqbGYAtPwyH5qhPwp1CUgwJg-FzmowIgASxUdfidkQMQNIj2BDMmjGDQyHhNOMj2lb-ITarn1FS2mQkY_ITrResNqEkb9dZ8swSnK1ca8uY3t-3cM-98mytz0b4apVkBr07Lcsy7whUSfy1sD5B1f6UfU_k5pNwWV3TaTd-dLMPQL3ThSpMxWvjhd7rstmM5qFghB3T48klxZtTF8eVdWgA0pwNaXkFahRMZUO6xJsw3UlYdwzKaJwS1UpnXMcz0wvREbO20tAkw")'></div>
+<div>
+<p class="text-xs italic text-text-secondary dark:text-gray-300 mb-2">"This platform transformed how we manage our remote teams. The geofencing is a game changer."</p>
+<p class="text-xs font-bold text-text-main dark:text-white">Sarah Jenkins, <span class="font-normal text-text-secondary">HR Director</span></p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Simple Footer -->
+<footer class="w-full py-6 mt-8 bg-surface-light dark:bg-surface-dark border-t border-border-light dark:border-border-dark">
+<div class="px-4 md:px-10 flex flex-col md:flex-row justify-between items-center gap-4">
+<p class="text-sm text-text-secondary dark:text-text-secondary-dark">© 2023 HR Platform Inc. All rights reserved.</p>
+<div class="flex gap-6">
+<a class="text-sm text-text-secondary dark:text-text-secondary-dark hover:text-primary" href="#">Help Center</a>
+<a class="text-sm text-text-secondary dark:text-text-secondary-dark hover:text-primary" href="#">Contact</a>
+</div>
+</div>
+</footer>
+</body></html>

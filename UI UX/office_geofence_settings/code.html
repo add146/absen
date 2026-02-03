@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Office Geofence Settings - HR System</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
+<script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#4F46E5", // Indigo-600 used as primary
+              "primary-light": "#6366F1", // Indigo-500
+              "primary-dark": "#4338CA", // Indigo-700
+              "background-light": "#F3F4F6", // Gray-100
+              "background-dark": "#111827", // Gray-900
+              "surface-light": "#FFFFFF",
+              "surface-dark": "#1F2937", // Gray-800
+              "border-light": "#E5E7EB", // Gray-200
+              "border-dark": "#374151", // Gray-700
+              "text-primary-light": "#111827",
+              "text-primary-dark": "#F9FAFB",
+              "text-secondary-light": "#6B7280",
+              "text-secondary-dark": "#9CA3AF",
+            },
+            fontFamily: {
+              display: ["Inter", "sans-serif"],
+              sans: ["Inter", "sans-serif"],
+            },
+            borderRadius: {
+              DEFAULT: "0.5rem",
+            },
+          },
+        },
+      };
+    </script>
+<style>::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #D1D5DB; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #9CA3AF; 
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #4B5563; 
+        }
+        .dark ::-webkit-scrollbar-thumb:hover {
+            background: #6B7280; 
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-text-primary-light dark:text-text-primary-dark font-sans h-screen flex overflow-hidden transition-colors duration-200">
+<aside class="w-64 bg-surface-light dark:bg-surface-dark border-r border-border-light dark:border-border-dark flex flex-col flex-shrink-0 transition-colors duration-200">
+<div class="h-16 flex items-center px-6 border-b border-border-light dark:border-border-dark">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white font-bold">S</div>
+<span class="font-bold text-lg tracking-tight">Startup<br/><span class="text-xs font-normal text-text-secondary-light dark:text-text-secondary-dark">Ventures</span></span>
+</div>
+</div>
+<nav class="flex-1 overflow-y-auto py-4 px-3 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark hover:bg-background-light dark:hover:bg-gray-700 rounded-md transition-colors" href="#">
+<span class="material-icons-outlined text-xl">dashboard</span>
+                Overview
+            </a>
+<div class="space-y-1">
+<a class="flex items-center justify-between gap-3 px-3 py-2 text-sm font-medium text-white bg-primary rounded-md shadow-sm" href="#">
+<div class="flex items-center gap-3">
+<span class="material-icons-outlined text-xl">business</span>
+                        Offices &amp; Locations
+                    </div>
+<span class="material-icons-outlined text-base">add</span>
+</a>
+</div>
+<a class="flex items-center justify-between gap-3 px-3 py-2 text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark hover:bg-background-light dark:hover:bg-gray-700 rounded-md transition-colors" href="#">
+<div class="flex items-center gap-3">
+<span class="material-icons-outlined text-xl">people</span>
+                    Employees
+                </div>
+<span class="material-icons-outlined text-base text-primary">add_box</span>
+</a>
+<a class="flex items-center justify-between gap-3 px-3 py-2 text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark hover:bg-background-light dark:hover:bg-gray-700 rounded-md transition-colors" href="#">
+<div class="flex items-center gap-3">
+<span class="material-icons-outlined text-xl">groups</span>
+                    Teams
+                </div>
+<span class="material-icons-outlined text-base text-primary">add_box</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark hover:bg-background-light dark:hover:bg-gray-700 rounded-md transition-colors" href="#">
+<span class="material-icons-outlined text-xl">event_busy</span>
+                Leaves
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark hover:bg-background-light dark:hover:bg-gray-700 rounded-md transition-colors" href="#">
+<span class="material-icons-outlined text-xl">settings</span>
+                Settings
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark hover:bg-background-light dark:hover:bg-gray-700 rounded-md transition-colors mt-8" href="#">
+<span class="material-icons-outlined text-xl">logout</span>
+                Logout
+            </a>
+</nav>
+<div class="p-4 text-xs text-text-secondary-light dark:text-text-secondary-dark border-t border-border-light dark:border-border-dark">
+<p>© 2024 Startup Ventures</p>
+<p>All rights reserved.</p>
+</div>
+</aside>
+<main class="flex-1 flex flex-col h-full overflow-hidden relative">
+<header class="h-16 bg-surface-light dark:bg-surface-dark border-b border-border-light dark:border-border-dark flex items-center justify-between px-8 flex-shrink-0 transition-colors duration-200">
+<div class="flex items-center gap-2">
+<h1 class="text-xl font-semibold text-text-secondary-light dark:text-text-secondary-dark">Offices &amp; Locations</h1>
+<span class="text-text-secondary-light dark:text-text-secondary-dark material-icons-outlined text-sm">chevron_right</span>
+<h1 class="text-xl font-bold text-text-primary-light dark:text-text-primary-dark">Add Company Office</h1>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2 text-xs text-text-secondary-light dark:text-text-secondary-dark">
+<span>Last auto save - 7:20:01 pm</span>
+</div>
+<div class="flex items-center gap-3">
+<button class="relative p-2 text-text-secondary-light dark:text-text-secondary-dark hover:bg-background-light dark:hover:bg-gray-700 rounded-full">
+<span class="material-icons-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full"></span>
+</button>
+<div class="flex items-center gap-2">
+<span class="text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark">ahmad@nockapp.us</span>
+<div class="w-8 h-8 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center text-xs font-bold text-gray-600 dark:text-gray-200">AH</div>
+</div>
+</div>
+</div>
+</header>
+<div class="bg-surface-light dark:bg-surface-dark border-b border-border-light dark:border-border-dark px-8 transition-colors duration-200">
+<nav class="flex gap-8 -mb-px overflow-x-auto">
+<a class="py-4 text-sm font-medium text-primary border-b-2 border-primary whitespace-nowrap" href="#">Office Details</a>
+<a class="py-4 text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark border-b-2 border-transparent hover:text-text-primary-light dark:hover:text-text-primary-dark hover:border-gray-300 dark:hover:border-gray-600 whitespace-nowrap transition-colors" href="#">Office Location</a>
+<a class="py-4 text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark border-b-2 border-transparent hover:text-text-primary-light dark:hover:text-text-primary-dark hover:border-gray-300 dark:hover:border-gray-600 whitespace-nowrap transition-colors" href="#">Office Timings</a>
+<a class="py-4 text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark border-b-2 border-transparent hover:text-text-primary-light dark:hover:text-text-primary-dark hover:border-gray-300 dark:hover:border-gray-600 whitespace-nowrap transition-colors" href="#">Working Days</a>
+<a class="py-4 text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark border-b-2 border-transparent hover:text-text-primary-light dark:hover:text-text-primary-dark hover:border-gray-300 dark:hover:border-gray-600 whitespace-nowrap transition-colors" href="#">Leaves &amp; Holidays</a>
+</nav>
+</div>
+<div class="flex-1 overflow-y-auto bg-background-light dark:bg-background-dark p-8 pb-32">
+<div class="max-w-5xl mx-auto space-y-6">
+<div class="bg-surface-light dark:bg-surface-dark rounded-lg shadow-sm p-6 border border-border-light dark:border-border-dark transition-colors duration-200">
+<h2 class="text-lg font-semibold mb-6 flex items-center gap-2">
+                        Office Detail
+                    </h2>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<div class="space-y-6">
+<div>
+<label class="block text-xs font-medium text-text-secondary-light dark:text-text-secondary-dark mb-1">Office Name</label>
+<input class="w-full rounded-md border-border-light dark:border-border-dark bg-white dark:bg-gray-800 text-sm py-2.5 focus:ring-primary focus:border-primary dark:text-white dark:placeholder-gray-500" placeholder="Office Name ( Oman Office, UAE Office )" type="text"/>
+</div>
+<div>
+<label class="block text-xs font-medium text-text-secondary-light dark:text-text-secondary-dark mb-1">Website URL</label>
+<input class="w-full rounded-md border-border-light dark:border-border-dark bg-white dark:bg-gray-800 text-sm py-2.5 focus:ring-primary focus:border-primary dark:text-white dark:placeholder-gray-500" placeholder="http://www.company website.com" type="text"/>
+</div>
+</div>
+<div>
+<label class="block text-xs font-medium text-text-secondary-light dark:text-text-secondary-dark mb-1">Office Photo</label>
+<div class="border-2 border-dashed border-border-light dark:border-border-dark rounded-lg p-6 flex flex-col items-center justify-center text-center bg-gray-50 dark:bg-gray-800/50 h-[126px]">
+<span class="material-icons-outlined text-gray-400 text-3xl mb-2">add_photo_alternate</span>
+<p class="text-xs text-text-secondary-light dark:text-text-secondary-dark mb-3">Upload Company Office Location Photo</p>
+<button class="bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-text-primary-light dark:text-text-primary-dark text-xs font-medium py-1.5 px-4 rounded transition-colors" type="button">
+                                    Upload
+                                </button>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-surface-light dark:bg-surface-dark rounded-lg shadow-sm p-6 border border-border-light dark:border-border-dark transition-colors duration-200">
+<div class="flex justify-between items-center mb-6">
+<h2 class="text-lg font-semibold">Office Location</h2>
+<span class="material-icons-outlined text-gray-400 cursor-help" title="Location Info">info</span>
+</div>
+<div class="mb-6">
+<label class="block text-xs font-medium text-text-secondary-light dark:text-text-secondary-dark mb-1">Office Location</label>
+<div class="relative">
+<span class="absolute left-3 top-2.5 material-icons-outlined text-gray-400 text-lg">location_on</span>
+<input class="w-full pl-10 rounded-md border-border-light dark:border-border-dark bg-white dark:bg-gray-800 text-sm py-2.5 focus:ring-primary focus:border-primary dark:text-white dark:placeholder-gray-500" placeholder="Street, City, Country" type="text"/>
+</div>
+</div>
+<div class="mb-4">
+<label class="block text-xs font-medium text-text-secondary-light dark:text-text-secondary-dark mb-2">Clock In Limite ( Radius )</label>
+<div class="flex gap-2">
+<button class="px-4 py-1.5 text-xs font-medium rounded bg-gray-100 dark:bg-gray-700 text-text-secondary-light dark:text-text-secondary-dark hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors" type="button">100 Meter</button>
+<button class="px-4 py-1.5 text-xs font-medium rounded bg-gray-100 dark:bg-gray-700 text-text-secondary-light dark:text-text-secondary-dark hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors" type="button">200 Meter</button>
+<button class="px-4 py-1.5 text-xs font-medium rounded bg-gray-100 dark:bg-gray-700 text-text-secondary-light dark:text-text-secondary-dark hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors" type="button">500 Meter</button>
+<button class="px-4 py-1.5 text-xs font-medium rounded bg-primary text-white shadow-sm" type="button">1 KM</button>
+</div>
+</div>
+<div class="relative w-full h-80 rounded-lg overflow-hidden border border-border-light dark:border-border-dark bg-gray-100 dark:bg-gray-800">
+<img alt="Map showing location radius" class="w-full h-full object-cover opacity-80 dark:opacity-60" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCIPXSWrarC2MihNZGEWOB3AIk2fBjezzcs_vvWE24u7GrRjeQVwkKrlDYmkJROuNQrmwhO0aVq-t0HTLwEjOR9XYr87dOSukaFObr1T0nPlZxrpnYXvWN_FD0-DLwNGwEc2vTK5e672s6jA3kN3Pq3a6eQNwF0gqN6HSjGCIXzqsEQErxQ9duCtulVuZ11WpJziriTwln9HPV8OUTPNbZEI7W5aiwtVxqjtqK6HA5ZovXUTWHlA-ka1-dLFEyTzRLrdbRDDfO4og"/>
+<div class="absolute top-4 left-4">
+<button class="bg-primary text-white p-2 rounded shadow-md hover:bg-primary-dark transition-colors">
+<span class="material-icons-outlined text-lg">fullscreen</span>
+</button>
+</div>
+<div class="absolute top-4 right-4 bg-gray-800 text-white text-xs px-3 py-2 rounded shadow-lg opacity-90">
+                             You can move pin on map<br/>to point your exact location
+                         </div>
+<div class="absolute bottom-4 right-4 flex flex-col bg-white dark:bg-gray-700 rounded shadow-md overflow-hidden">
+<button class="p-1 hover:bg-gray-100 dark:hover:bg-gray-600 border-b border-gray-200 dark:border-gray-600">
+<span class="material-icons-outlined text-gray-600 dark:text-gray-300">add</span>
+</button>
+<button class="p-1 hover:bg-gray-100 dark:hover:bg-gray-600">
+<span class="material-icons-outlined text-gray-600 dark:text-gray-300">remove</span>
+</button>
+</div>
+<div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
+<div class="w-32 h-32 border-2 border-primary bg-primary/20 rounded-full flex items-center justify-center animate-pulse">
+<div class="w-4 h-4 bg-primary rounded-full border-2 border-white shadow-md"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-surface-light dark:bg-surface-dark rounded-lg shadow-sm p-6 border border-border-light dark:border-border-dark transition-colors duration-200">
+<h2 class="text-lg font-semibold mb-6">Office Timings</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+<div>
+<label class="block text-xs font-medium text-text-secondary-light dark:text-text-secondary-dark mb-1">Office Start Time</label>
+<div class="relative">
+<select class="w-full rounded-md border-border-light dark:border-border-dark bg-white dark:bg-gray-800 text-sm py-2.5 focus:ring-primary focus:border-primary dark:text-white">
+<option>09:00 AM</option>
+<option>10:00 AM</option>
+</select>
+</div>
+</div>
+<div>
+<label class="block text-xs font-medium text-text-secondary-light dark:text-text-secondary-dark mb-1">Office Closing Time</label>
+<div class="relative">
+<select class="w-full rounded-md border-border-light dark:border-border-dark bg-white dark:bg-gray-800 text-sm py-2.5 focus:ring-primary focus:border-primary dark:text-white">
+<option>06:00 PM</option>
+<option>07:00 PM</option>
+</select>
+</div>
+</div>
+<div class="flex items-end pb-3 text-xs text-text-secondary-light dark:text-text-secondary-dark">
+                            08 Working hours - 1 hours Brake
+                        </div>
+</div>
+<h3 class="text-sm font-semibold mb-4 text-text-primary-light dark:text-text-primary-dark">Break Timings</h3>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
+<div>
+<label class="flex items-center gap-2 mb-2 text-xs font-medium text-text-secondary-light dark:text-text-secondary-dark">
+<input checked="" class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4" type="checkbox"/>
+                                Break Start Time
+                            </label>
+<select class="w-full rounded-md border-border-light dark:border-border-dark bg-white dark:bg-gray-800 text-sm py-2.5 focus:ring-primary focus:border-primary dark:text-white">
+<option>01:00 PM</option>
+</select>
+</div>
+<div class="col-span-2">
+<label class="block text-xs font-medium text-text-secondary-light dark:text-text-secondary-dark mb-1">Break Duration</label>
+<div class="flex gap-4">
+<select class="w-full rounded-md border-border-light dark:border-border-dark bg-white dark:bg-gray-800 text-sm py-2.5 focus:ring-primary focus:border-primary dark:text-white">
+<option>1 hour</option>
+</select>
+<select class="w-full rounded-md border-border-light dark:border-border-dark bg-white dark:bg-gray-800 text-sm py-2.5 focus:ring-primary focus:border-primary dark:text-white">
+<option>00 min</option>
+</select>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-surface-light dark:bg-surface-dark rounded-lg shadow-sm p-6 border border-border-light dark:border-border-dark transition-colors duration-200">
+<h2 class="text-lg font-semibold mb-6">Working Days</h2>
+<div class="flex flex-wrap gap-6 mb-6">
+<label class="inline-flex items-center text-sm text-text-secondary-light dark:text-text-secondary-dark">
+<input checked="" class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4 mr-2" type="checkbox"/>
+                            Mon
+                        </label>
+<label class="inline-flex items-center text-sm text-text-secondary-light dark:text-text-secondary-dark">
+<input checked="" class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4 mr-2" type="checkbox"/>
+                            Tue
+                        </label>
+<label class="inline-flex items-center text-sm text-text-secondary-light dark:text-text-secondary-dark">
+<input checked="" class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4 mr-2" type="checkbox"/>
+                            Wed
+                        </label>
+<label class="inline-flex items-center text-sm text-text-secondary-light dark:text-text-secondary-dark">
+<input checked="" class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4 mr-2" type="checkbox"/>
+                            Thur
+                        </label>
+<label class="inline-flex items-center text-sm text-text-secondary-light dark:text-text-secondary-dark">
+<input checked="" class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4 mr-2" type="checkbox"/>
+                            Fri
+                        </label>
+<label class="inline-flex items-center text-sm text-text-secondary-light dark:text-text-secondary-dark">
+<input class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4 mr-2" type="checkbox"/>
+                            Sat
+                        </label>
+<label class="inline-flex items-center text-sm text-text-secondary-light dark:text-text-secondary-dark">
+<input class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4 mr-2" type="checkbox"/>
+                            Sun
+                        </label>
+</div>
+<div class="flex flex-wrap gap-6 border-t border-border-light dark:border-border-dark pt-4">
+<label class="inline-flex items-center text-sm text-text-secondary-light dark:text-text-secondary-dark">
+<input class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4 mr-2" type="checkbox"/>
+                            Alternate Fri
+                        </label>
+<label class="inline-flex items-center text-sm text-text-secondary-light dark:text-text-secondary-dark">
+<input class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4 mr-2" type="checkbox"/>
+                            Alternate Sat
+                        </label>
+<label class="inline-flex items-center text-sm text-text-secondary-light dark:text-text-secondary-dark">
+<input class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4 mr-2" type="checkbox"/>
+                            Alternate Sun
+                        </label>
+</div>
+</div>
+<div class="bg-surface-light dark:bg-surface-dark rounded-lg shadow-sm p-6 border border-border-light dark:border-border-dark transition-colors duration-200">
+<div class="flex justify-between items-center mb-6">
+<h2 class="text-lg font-semibold">Leaves</h2>
+<span class="material-icons-outlined text-gray-400 cursor-help">info</span>
+</div>
+<div class="space-y-4">
+<div class="flex flex-col md:flex-row gap-4 items-center">
+<input class="flex-1 rounded-md border-border-light dark:border-border-dark bg-gray-50 dark:bg-gray-800 text-sm py-2.5 dark:text-white" readonly="" type="text" value="Sick Leave"/>
+<input class="w-24 rounded-md border-border-light dark:border-border-dark bg-white dark:bg-gray-800 text-sm py-2.5 text-center dark:text-white" type="text" value="10 Day's"/>
+<label class="flex items-center gap-2 text-xs text-text-secondary-light dark:text-text-secondary-dark w-40">
+<input class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4" type="checkbox"/>
+                                Reset on Fiscal Year Start
+                            </label>
+<label class="flex items-center gap-2 text-xs text-text-secondary-light dark:text-text-secondary-dark w-40">
+<input class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4" type="checkbox"/>
+                                Require Document
+                            </label>
+<button class="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded">
+<span class="material-icons-outlined text-lg">close</span>
+</button>
+</div>
+<div class="flex flex-col md:flex-row gap-4 items-center">
+<input class="flex-1 rounded-md border-border-light dark:border-border-dark bg-white dark:bg-gray-800 text-sm py-2.5 dark:text-white dark:placeholder-gray-500" placeholder="Leave Type ( ie... Sick Leave, Casual Leave )" type="text"/>
+<input class="w-24 rounded-md border-border-light dark:border-border-dark bg-white dark:bg-gray-800 text-sm py-2.5 text-center dark:text-white dark:placeholder-gray-500" placeholder="00 Day's" type="text"/>
+<label class="flex items-center gap-2 text-xs text-text-secondary-light dark:text-text-secondary-dark w-40">
+<input class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4" type="checkbox"/>
+                                Reset on Fiscal Year Start
+                            </label>
+<label class="flex items-center gap-2 text-xs text-text-secondary-light dark:text-text-secondary-dark w-40">
+<input class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4" type="checkbox"/>
+                                Require Document
+                            </label>
+<button class="px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded text-sm font-medium transition-colors">
+                                Save
+                            </button>
+</div>
+</div>
+<div class="mt-8 pt-6 border-t border-border-light dark:border-border-dark grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+<div>
+<div class="flex justify-between items-center mb-1">
+<label class="text-xs font-medium text-text-secondary-light dark:text-text-secondary-dark">Fiscal year starts from</label>
+<span class="material-icons-outlined text-xs text-gray-400">info</span>
+</div>
+<div class="relative">
+<input class="w-full rounded-md border-border-light dark:border-border-dark bg-white dark:bg-gray-800 text-sm py-2.5 dark:text-white" type="text" value="01 - Jan"/>
+<span class="absolute right-3 top-2.5 material-icons-outlined text-gray-400 text-lg">calendar_today</span>
+</div>
+</div>
+<div class="bg-gray-700 text-white p-4 rounded text-xs leading-relaxed">
+                            Setting up a Fiscal Year will reset all the leave on that day.
+                        </div>
+</div>
+</div>
+<div class="bg-surface-light dark:bg-surface-dark rounded-lg shadow-sm p-6 border border-border-light dark:border-border-dark transition-colors duration-200">
+<h2 class="text-lg font-semibold mb-6">Holidays</h2>
+<button class="w-full bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-200 py-3 rounded-md text-sm font-medium hover:bg-orange-200 dark:hover:bg-orange-900/50 transition-colors mb-6">
+                        Setup Holidays Using Google
+                    </button>
+<div>
+<label class="block text-xs font-medium text-text-secondary-light dark:text-text-secondary-dark mb-2">Add Custome Holidays</label>
+<div class="flex gap-4">
+<input class="flex-1 rounded-md border-border-light dark:border-border-dark bg-white dark:bg-gray-800 text-sm py-2.5 dark:text-white dark:placeholder-gray-500" placeholder="Leave Type ( ie... Sick Leave, Casual Leave )" type="text"/>
+<div class="relative w-40">
+<input class="w-full rounded-md border-border-light dark:border-border-dark bg-white dark:bg-gray-800 text-sm py-2.5 dark:text-white dark:placeholder-gray-500" placeholder="DD - MM" type="text"/>
+<span class="absolute right-3 top-2.5 material-icons-outlined text-gray-400 text-lg">calendar_today</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<footer class="absolute bottom-0 w-full bg-surface-light dark:bg-surface-dark border-t border-border-light dark:border-border-dark p-4 flex justify-end gap-4 z-10 transition-colors duration-200">
+<button class="px-6 py-2.5 bg-gray-200 dark:bg-gray-700 text-text-secondary-light dark:text-text-secondary-dark hover:bg-gray-300 dark:hover:bg-gray-600 rounded-md text-sm font-medium transition-colors">
+                Cancel
+            </button>
+<button class="px-8 py-2.5 bg-primary hover:bg-primary-dark text-white rounded-md text-sm font-medium shadow-sm transition-colors">
+                Save
+            </button>
+</footer>
+</main>
+
+</body></html>

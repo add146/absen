@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Shift Manager &amp; Scheduler</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Theme Configuration -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0d59f2",
+                        "primary-content": "#ffffff",
+                        "background-light": "#f5f6f8",
+                        "background-dark": "#101622",
+                        "surface-light": "#ffffff",
+                        "surface-dark": "#1a2230",
+                        "border-light": "#e5e7eb",
+                        "border-dark": "#2d3748",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display transition-colors duration-200">
+<div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+<!-- Top Navigation -->
+<header class="sticky top-0 z-50 flex items-center justify-between border-b border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark px-6 py-3 shadow-sm">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-3 text-slate-900 dark:text-white">
+<div class="flex size-8 items-center justify-center rounded bg-primary/10 text-primary">
+<span class="material-symbols-outlined">grid_view</span>
+</div>
+<h2 class="text-lg font-bold leading-tight tracking-tight">Shift Manager</h2>
+</div>
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-sm font-medium text-slate-500 hover:text-primary dark:text-slate-400 dark:hover:text-primary" href="#">Dashboard</a>
+<a class="text-sm font-bold text-primary" href="#">Schedule</a>
+<a class="text-sm font-medium text-slate-500 hover:text-primary dark:text-slate-400 dark:hover:text-primary" href="#">Employees</a>
+<a class="text-sm font-medium text-slate-500 hover:text-primary dark:text-slate-400 dark:hover:text-primary" href="#">Reports</a>
+<a class="text-sm font-medium text-slate-500 hover:text-primary dark:text-slate-400 dark:hover:text-primary" href="#">Settings</a>
+</nav>
+</div>
+<div class="flex flex-1 justify-end gap-4 items-center">
+<div class="relative hidden sm:block w-full max-w-xs">
+<span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500">
+<span class="material-symbols-outlined text-[20px]">search</span>
+</span>
+<input class="w-full rounded-lg border-none bg-background-light dark:bg-background-dark py-2 pl-10 pr-4 text-sm focus:ring-2 focus:ring-primary text-slate-900 dark:text-white placeholder-slate-500" placeholder="Search employees..." type="text"/>
+</div>
+<div class="flex gap-2">
+<button class="flex size-10 items-center justify-center rounded-lg bg-background-light dark:bg-background-dark text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="flex size-10 items-center justify-center rounded-lg bg-background-light dark:bg-background-dark text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+<span class="material-symbols-outlined">help</span>
+</button>
+</div>
+<div class="h-10 w-10 rounded-full bg-cover bg-center border-2 border-white dark:border-slate-700 shadow-sm" data-alt="User profile picture showing a professional looking person" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCp3UGnhKzsLpgwbWLHNRfz2cHDA1zLBbNtgZpQuDm0D3inijCbNi9F3Ij6lOQzC3k0FPmZtWQvKZDK4l002Z52wm1stC0jcvpgBQj9W8IeOsByVD5PEaU7buetdyxYVJOuDbrRqxFFjPgbclkodF2AjZq207jiglD8ftuk4QLE4VrDfL3s0MTRZuBKuL-_v1r0mtA9dsAcNh1UC6w3Np4GZo-ZSAB_Ps11DtjULogtty48bIEbibkUAyF66NspaZriZ_iwLF1E5w");'></div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex-1 p-6 lg:px-12">
+<div class="mx-auto max-w-[1400px] space-y-6">
+<!-- Page Heading & Actions -->
+<div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+<div>
+<h1 class="text-3xl font-black tracking-tight text-slate-900 dark:text-white">Shift Scheduler</h1>
+<p class="mt-1 text-base text-slate-500 dark:text-slate-400">Manage weekly assignments, geofencing zones, and coverage.</p>
+</div>
+<div class="flex gap-3">
+<button class="flex items-center gap-2 rounded-lg bg-white dark:bg-surface-dark px-4 py-2.5 text-sm font-semibold text-slate-700 dark:text-slate-200 shadow-sm border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700">
+<span class="material-symbols-outlined text-[20px]">file_download</span>
+                            Export
+                        </button>
+<button class="flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-md hover:bg-blue-600 transition-colors">
+<span class="material-symbols-outlined text-[20px]">publish</span>
+                            Publish Schedule
+                        </button>
+</div>
+</div>
+<!-- Filters & Controls Bar -->
+<div class="rounded-xl bg-surface-light dark:bg-surface-dark p-4 shadow-sm border border-border-light dark:border-border-dark flex flex-col lg:flex-row gap-4 justify-between items-center">
+<!-- Chips/Filters -->
+<div class="flex gap-2 overflow-x-auto pb-2 lg:pb-0 no-scrollbar w-full lg:w-auto">
+<button class="flex h-9 shrink-0 items-center gap-2 rounded-lg bg-slate-100 dark:bg-slate-700 px-3 text-sm font-medium text-slate-900 dark:text-slate-100 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors">
+<span class="material-symbols-outlined text-[18px]">filter_list</span>
+                            All Departments
+                        </button>
+<button class="flex h-9 shrink-0 items-center gap-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-transparent px-3 text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                            Sales Team
+                        </button>
+<button class="flex h-9 shrink-0 items-center gap-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-transparent px-3 text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                            Engineering
+                        </button>
+<button class="flex h-9 shrink-0 items-center gap-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-transparent px-3 text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                            Support
+                        </button>
+</div>
+<!-- Date Navigation -->
+<div class="flex items-center gap-4 bg-background-light dark:bg-background-dark rounded-lg p-1">
+<button class="flex size-8 items-center justify-center rounded-md text-slate-500 hover:bg-white dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-white shadow-sm transition-all">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<div class="flex items-center gap-2 px-2">
+<span class="material-symbols-outlined text-slate-400">calendar_month</span>
+<span class="text-sm font-bold text-slate-900 dark:text-white whitespace-nowrap">Oct 16 - Oct 22, 2023</span>
+</div>
+<button class="flex size-8 items-center justify-center rounded-md text-slate-500 hover:bg-white dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-white shadow-sm transition-all">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+<!-- View Toggle -->
+<div class="flex rounded-lg bg-background-light dark:bg-background-dark p-1">
+<button class="rounded-md bg-white dark:bg-slate-600 px-3 py-1.5 text-xs font-bold shadow-sm text-slate-900 dark:text-white">Week</button>
+<button class="rounded-md px-3 py-1.5 text-xs font-medium text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">Month</button>
+</div>
+</div>
+<!-- Calendar Strip (Optional / Condensed) -->
+<div class="grid grid-cols-8 gap-px bg-slate-200 dark:bg-slate-700 rounded-t-xl overflow-hidden border-b border-slate-200 dark:border-slate-700">
+<div class="bg-surface-light dark:bg-surface-dark p-3 text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center">
+                        Employee
+                    </div>
+<div class="bg-surface-light dark:bg-surface-dark p-3 text-center">
+<p class="text-xs font-bold text-slate-400 uppercase">Mon</p>
+<p class="text-sm font-bold text-slate-900 dark:text-white">16</p>
+</div>
+<div class="bg-surface-light dark:bg-surface-dark p-3 text-center bg-blue-50/50 dark:bg-blue-900/10">
+<p class="text-xs font-bold text-primary uppercase">Tue</p>
+<p class="text-sm font-bold text-primary">17</p>
+<div class="mx-auto mt-1 size-1 rounded-full bg-primary"></div>
+</div>
+<div class="bg-surface-light dark:bg-surface-dark p-3 text-center">
+<p class="text-xs font-bold text-slate-400 uppercase">Wed</p>
+<p class="text-sm font-bold text-slate-900 dark:text-white">18</p>
+</div>
+<div class="bg-surface-light dark:bg-surface-dark p-3 text-center">
+<p class="text-xs font-bold text-slate-400 uppercase">Thu</p>
+<p class="text-sm font-bold text-slate-900 dark:text-white">19</p>
+</div>
+<div class="bg-surface-light dark:bg-surface-dark p-3 text-center">
+<p class="text-xs font-bold text-slate-400 uppercase">Fri</p>
+<p class="text-sm font-bold text-slate-900 dark:text-white">20</p>
+</div>
+<div class="bg-surface-light dark:bg-surface-dark p-3 text-center bg-slate-50 dark:bg-slate-800/50">
+<p class="text-xs font-bold text-slate-400 uppercase">Sat</p>
+<p class="text-sm font-bold text-slate-500 dark:text-slate-400">21</p>
+</div>
+<div class="bg-surface-light dark:bg-surface-dark p-3 text-center bg-slate-50 dark:bg-slate-800/50">
+<p class="text-xs font-bold text-slate-400 uppercase">Sun</p>
+<p class="text-sm font-bold text-slate-500 dark:text-slate-400">22</p>
+</div>
+</div>
+<!-- Main Scheduler Grid -->
+<div class="rounded-b-xl border border-t-0 border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark overflow-hidden shadow-sm -mt-6 relative z-0">
+<div class="overflow-x-auto">
+<div class="min-w-[1000px]">
+<!-- Row 1: John Doe -->
+<div class="grid grid-cols-8 gap-px bg-slate-100 dark:bg-slate-800 border-b border-slate-100 dark:border-slate-700">
+<!-- Employee Cell -->
+<div class="bg-surface-light dark:bg-surface-dark p-3 flex items-center gap-3 relative group hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+<div class="size-9 rounded-full bg-cover bg-center" data-alt="John Doe profile" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAJVfOi_fSdqgE0iXun7LaKknsgUzz1RTYU1_mYehCHGhTFZ-EH7frlBMUcY8zOppnK7Uyd6cR1ie6ebL6psetADZTjiaWHdbAobu7M4XDqDJmDEZhnBzUljPvTtZVkdbeXFSogldMgCyZiPApqJoNz1soKh9B_qrBoOCL68XECgWQidJASKnKy9TTIQMxWV57Gk_5VcN9nHVfORALpjI3NEjGWcqowIt-1cRf7W4TKOrdk229sPJ4fZ3GfWM-CWZMc9xSeSVpvNA");'></div>
+<div class="flex flex-col">
+<p class="text-sm font-bold text-slate-900 dark:text-white">John Doe</p>
+<p class="text-xs text-slate-500">Sales Assoc.</p>
+</div>
+<div class="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="text-slate-400 hover:text-primary"><span class="material-symbols-outlined text-[18px]">more_vert</span></button>
+</div>
+</div>
+<!-- Mon -->
+<div class="bg-surface-light dark:bg-surface-dark p-1.5 h-24 flex flex-col justify-center">
+<div class="flex h-full w-full cursor-grab active:cursor-grabbing flex-col justify-between rounded border-l-4 border-blue-500 bg-blue-50 dark:bg-blue-900/30 p-2 hover:shadow-md transition-shadow group">
+<div class="flex justify-between items-start">
+<span class="text-[10px] font-bold uppercase text-blue-700 dark:text-blue-300">Morning</span>
+<span class="material-symbols-outlined text-[14px] text-blue-400 opacity-0 group-hover:opacity-100">drag_indicator</span>
+</div>
+<div class="text-xs font-semibold text-slate-700 dark:text-slate-200">09:00 - 17:00</div>
+</div>
+</div>
+<!-- Tue -->
+<div class="bg-surface-light dark:bg-surface-dark p-1.5 h-24 flex flex-col justify-center">
+<div class="flex h-full w-full cursor-grab active:cursor-grabbing flex-col justify-between rounded border-l-4 border-blue-500 bg-blue-50 dark:bg-blue-900/30 p-2 hover:shadow-md transition-shadow group">
+<div class="flex justify-between items-start">
+<span class="text-[10px] font-bold uppercase text-blue-700 dark:text-blue-300">Morning</span>
+<span class="material-symbols-outlined text-[14px] text-blue-400 opacity-0 group-hover:opacity-100">drag_indicator</span>
+</div>
+<div class="text-xs font-semibold text-slate-700 dark:text-slate-200">09:00 - 17:00</div>
+</div>
+</div>
+<!-- Wed -->
+<div class="bg-surface-light dark:bg-surface-dark p-1.5 h-24 flex flex-col justify-center">
+<div class="flex h-full w-full cursor-grab active:cursor-grabbing flex-col justify-between rounded border-l-4 border-orange-500 bg-orange-50 dark:bg-orange-900/30 p-2 hover:shadow-md transition-shadow group">
+<div class="flex justify-between items-start">
+<span class="text-[10px] font-bold uppercase text-orange-700 dark:text-orange-300">Afternoon</span>
+<span class="material-symbols-outlined text-[14px] text-orange-400 opacity-0 group-hover:opacity-100">drag_indicator</span>
+</div>
+<div class="text-xs font-semibold text-slate-700 dark:text-slate-200">13:00 - 21:00</div>
+</div>
+</div>
+<!-- Thu -->
+<div class="bg-surface-light dark:bg-surface-dark p-1.5 h-24 flex flex-col justify-center">
+<div class="flex h-full w-full items-center justify-center rounded border border-dashed border-slate-300 dark:border-slate-600 bg-transparent text-slate-400 hover:border-primary hover:text-primary hover:bg-slate-50 dark:hover:bg-slate-800 transition-all cursor-pointer">
+<span class="material-symbols-outlined text-[20px]">add</span>
+</div>
+</div>
+<!-- Fri -->
+<div class="bg-surface-light dark:bg-surface-dark p-1.5 h-24 flex flex-col justify-center">
+<div class="flex h-full w-full cursor-grab active:cursor-grabbing flex-col justify-between rounded border-l-4 border-blue-500 bg-blue-50 dark:bg-blue-900/30 p-2 hover:shadow-md transition-shadow group">
+<div class="flex justify-between items-start">
+<span class="text-[10px] font-bold uppercase text-blue-700 dark:text-blue-300">Morning</span>
+<span class="material-symbols-outlined text-[14px] text-blue-400 opacity-0 group-hover:opacity-100">drag_indicator</span>
+</div>
+<div class="text-xs font-semibold text-slate-700 dark:text-slate-200">09:00 - 17:00</div>
+</div>
+</div>
+<!-- Sat -->
+<div class="bg-slate-50 dark:bg-slate-800/50 p-1.5 h-24 flex flex-col justify-center">
+<div class="flex h-full w-full items-center justify-center">
+<span class="text-xs font-medium text-slate-400">OFF</span>
+</div>
+</div>
+<!-- Sun -->
+<div class="bg-slate-50 dark:bg-slate-800/50 p-1.5 h-24 flex flex-col justify-center">
+<div class="flex h-full w-full items-center justify-center">
+<span class="text-xs font-medium text-slate-400">OFF</span>
+</div>
+</div>
+</div>
+<!-- Row 2: Sarah Miller -->
+<div class="grid grid-cols-8 gap-px bg-slate-100 dark:bg-slate-800 border-b border-slate-100 dark:border-slate-700">
+<!-- Employee -->
+<div class="bg-surface-light dark:bg-surface-dark p-3 flex items-center gap-3 relative group hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+<div class="size-9 rounded-full bg-cover bg-center" data-alt="Sarah Miller profile" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCiguJ5VWy0eFjPwJC85XqoYdEU4OusrQudS1lCwQkP8lGEZA_VG_vEpOZFzv6HejZz68arOMLy_ERa3ZDkVQ3RTjq3h-xHFKb04CVfLCboTvkfMs5346UCUZ9vnvuv2_FeqvQP5WJ2rXFHANpwQW0N-_G1WqfGYJKy0mItsZJdQgIMSGM-PME0opgW28Z-Nj7JbwXOPCikM789EutINaOElfI2vGkDA9RdSy2ouYI86ue5Z_H8_2H6cAvNANhmsl-LvtYDr8Wh8Q");'></div>
+<div class="flex flex-col">
+<p class="text-sm font-bold text-slate-900 dark:text-white">Sarah Miller</p>
+<p class="text-xs text-slate-500">Lead Support</p>
+</div>
+<div class="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="text-slate-400 hover:text-primary"><span class="material-symbols-outlined text-[18px]">more_vert</span></button>
+</div>
+</div>
+<!-- Mon -->
+<div class="bg-surface-light dark:bg-surface-dark p-1.5 h-24 flex flex-col justify-center">
+<div class="flex h-full w-full cursor-grab active:cursor-grabbing flex-col justify-between rounded border-l-4 border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30 p-2 hover:shadow-md transition-shadow group">
+<div class="flex justify-between items-start">
+<span class="text-[10px] font-bold uppercase text-indigo-700 dark:text-indigo-300">Night</span>
+<span class="material-symbols-outlined text-[14px] text-indigo-400 opacity-0 group-hover:opacity-100">drag_indicator</span>
+</div>
+<div class="text-xs font-semibold text-slate-700 dark:text-slate-200">21:00 - 05:00</div>
+</div>
+</div>
+<!-- Tue -->
+<div class="bg-surface-light dark:bg-surface-dark p-1.5 h-24 flex flex-col justify-center">
+<div class="flex h-full w-full cursor-grab active:cursor-grabbing flex-col justify-between rounded border-l-4 border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30 p-2 hover:shadow-md transition-shadow group">
+<div class="flex justify-between items-start">
+<span class="text-[10px] font-bold uppercase text-indigo-700 dark:text-indigo-300">Night</span>
+<span class="material-symbols-outlined text-[14px] text-indigo-400 opacity-0 group-hover:opacity-100">drag_indicator</span>
+</div>
+<div class="text-xs font-semibold text-slate-700 dark:text-slate-200">21:00 - 05:00</div>
+</div>
+</div>
+<!-- Wed -->
+<div class="bg-surface-light dark:bg-surface-dark p-1.5 h-24 flex flex-col justify-center">
+<div class="flex h-full w-full items-center justify-center rounded border border-dashed border-slate-300 dark:border-slate-600 bg-transparent text-slate-400 hover:border-primary hover:text-primary hover:bg-slate-50 dark:hover:bg-slate-800 transition-all cursor-pointer">
+<span class="material-symbols-outlined text-[20px]">add</span>
+</div>
+</div>
+<!-- Thu -->
+<div class="bg-surface-light dark:bg-surface-dark p-1.5 h-24 flex flex-col justify-center">
+<div class="flex h-full w-full cursor-grab active:cursor-grabbing flex-col justify-between rounded border-l-4 border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30 p-2 hover:shadow-md transition-shadow group">
+<div class="flex justify-between items-start">
+<span class="text-[10px] font-bold uppercase text-indigo-700 dark:text-indigo-300">Night</span>
+<span class="material-symbols-outlined text-[14px] text-indigo-400 opacity-0 group-hover:opacity-100">drag_indicator</span>
+</div>
+<div class="text-xs font-semibold text-slate-700 dark:text-slate-200">21:00 - 05:00</div>
+</div>
+</div>
+<!-- Fri -->
+<div class="bg-surface-light dark:bg-surface-dark p-1.5 h-24 flex flex-col justify-center">
+<div class="flex h-full w-full cursor-grab active:cursor-grabbing flex-col justify-between rounded border-l-4 border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30 p-2 hover:shadow-md transition-shadow group">
+<div class="flex justify-between items-start">
+<span class="text-[10px] font-bold uppercase text-indigo-700 dark:text-indigo-300">Night</span>
+<span class="material-symbols-outlined text-[14px] text-indigo-400 opacity-0 group-hover:opacity-100">drag_indicator</span>
+</div>
+<div class="text-xs font-semibold text-slate-700 dark:text-slate-200">21:00 - 05:00</div>
+</div>
+</div>
+<!-- Sat -->
+<div class="bg-slate-50 dark:bg-slate-800/50 p-1.5 h-24 flex flex-col justify-center">
+<div class="flex h-full w-full cursor-grab active:cursor-grabbing flex-col justify-between rounded border-l-4 border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30 p-2 hover:shadow-md transition-shadow group">
+<div class="flex justify-between items-start">
+<span class="text-[10px] font-bold uppercase text-indigo-700 dark:text-indigo-300">Night</span>
+<span class="material-symbols-outlined text-[14px] text-indigo-400 opacity-0 group-hover:opacity-100">drag_indicator</span>
+</div>
+<div class="text-xs font-semibold text-slate-700 dark:text-slate-200">21:00 - 05:00</div>
+</div>
+</div>
+<!-- Sun -->
+<div class="bg-slate-50 dark:bg-slate-800/50 p-1.5 h-24 flex flex-col justify-center">
+<div class="flex h-full w-full items-center justify-center">
+<span class="text-xs font-medium text-slate-400">OFF</span>
+</div>
+</div>
+</div>
+<!-- Row 3: Michael Chen -->
+<div class="grid grid-cols-8 gap-px bg-slate-100 dark:bg-slate-800 border-b border-slate-100 dark:border-slate-700">
+<!-- Employee -->
+<div class="bg-surface-light dark:bg-surface-dark p-3 flex items-center gap-3 relative group hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+<div class="size-9 rounded-full bg-cover bg-center" data-alt="Michael Chen profile" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBb_Qz8AYeSMmHSmBb6NJZYnPYWfRLlQWaiwUbwg8b5gzX1Ubyv9qmorYxSUxK1J1068NKE22So-zh5GAxn1BToxvwLtBxBr0dnqXuJ_X09dzpvwNmzsRncOvLwEbIL7O3Keapzy8eoAQUo4PzTY97yMzNGeMvaX3nbD6rqPUSagDup8yK4GfqfQeDzbUWbwYHz8l3Q0v3Z5d5T5QyzD8a8z_xe9hgJdC67f80DREOVNH5tlNs0I4_AKTz9Ph7xUNkhBx6jKcQb2A");'></div>
+<div class="flex flex-col">
+<p class="text-sm font-bold text-slate-900 dark:text-white">Michael Chen</p>
+<p class="text-xs text-slate-500">Engineering</p>
+</div>
+<div class="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="text-slate-400 hover:text-primary"><span class="material-symbols-outlined text-[18px]">more_vert</span></button>
+</div>
+</div>
+<!-- Mon -->
+<div class="bg-surface-light dark:bg-surface-dark p-1.5 h-24 flex flex-col justify-center">
+<div class="flex h-full w-full items-center justify-center rounded border border-dashed border-slate-300 dark:border-slate-600 bg-transparent text-slate-400 hover:border-primary hover:text-primary hover:bg-slate-50 dark:hover:bg-slate-800 transition-all cursor-pointer">
+<span class="material-symbols-outlined text-[20px]">add</span>
+</div>
+</div>
+<!-- Tue -->
+<div class="bg-surface-light dark:bg-surface-dark p-1.5 h-24 flex flex-col justify-center">
+<div class="flex h-full w-full cursor-grab active:cursor-grabbing flex-col justify-between rounded border-l-4 border-orange-500 bg-orange-50 dark:bg-orange-900/30 p-2 hover:shadow-md transition-shadow group">
+<div class="flex justify-between items-start">
+<span class="text-[10px] font-bold uppercase text-orange-700 dark:text-orange-300">Afternoon</span>
+<span class="material-symbols-outlined text-[14px] text-orange-400 opacity-0 group-hover:opacity-100">drag_indicator</span>
+</div>
+<div class="text-xs font-semibold text-slate-700 dark:text-slate-200">13:00 - 21:00</div>
+</div>
+</div>
+<!-- Wed -->
+<div class="bg-surface-light dark:bg-surface-dark p-1.5 h-24 flex flex-col justify-center">
+<div class="flex h-full w-full cursor-grab active:cursor-grabbing flex-col justify-between rounded border-l-4 border-orange-500 bg-orange-50 dark:bg-orange-900/30 p-2 hover:shadow-md transition-shadow group">
+<div class="flex justify-between items-start">
+<span class="text-[10px] font-bold uppercase text-orange-700 dark:text-orange-300">Afternoon</span>
+<span class="material-symbols-outlined text-[14px] text-orange-400 opacity-0 group-hover:opacity-100">drag_indicator</span>
+</div>
+<div class="text-xs font-semibold text-slate-700 dark:text-slate-200">13:00 - 21:00</div>
+</div>
+</div>
+<!-- Thu -->
+<div class="bg-surface-light dark:bg-surface-dark p-1.5 h-24 flex flex-col justify-center">
+<div class="flex h-full w-full cursor-grab active:cursor-grabbing flex-col justify-between rounded border-l-4 border-orange-500 bg-orange-50 dark:bg-orange-900/30 p-2 hover:shadow-md transition-shadow group">
+<div class="flex justify-between items-start">
+<span class="text-[10px] font-bold uppercase text-orange-700 dark:text-orange-300">Afternoon</span>
+<span class="material-symbols-outlined text-[14px] text-orange-400 opacity-0 group-hover:opacity-100">drag_indicator</span>
+</div>
+<div class="text-xs font-semibold text-slate-700 dark:text-slate-200">13:00 - 21:00</div>
+</div>
+</div>
+<!-- Fri -->
+<div class="bg-surface-light dark:bg-surface-dark p-1.5 h-24 flex flex-col justify-center">
+<div class="flex h-full w-full cursor-grab active:cursor-grabbing flex-col justify-between rounded border-l-4 border-orange-500 bg-orange-50 dark:bg-orange-900/30 p-2 hover:shadow-md transition-shadow group">
+<div class="flex justify-between items-start">
+<span class="text-[10px] font-bold uppercase text-orange-700 dark:text-orange-300">Afternoon</span>
+<span class="material-symbols-outlined text-[14px] text-orange-400 opacity-0 group-hover:opacity-100">drag_indicator</span>
+</div>
+<div class="text-xs font-semibold text-slate-700 dark:text-slate-200">13:00 - 21:00</div>
+</div>
+</div>
+<!-- Sat -->
+<div class="bg-slate-50 dark:bg-slate-800/50 p-1.5 h-24 flex flex-col justify-center">
+<div class="flex h-full w-full items-center justify-center">
+<span class="text-xs font-medium text-slate-400">OFF</span>
+</div>
+</div>
+<!-- Sun -->
+<div class="bg-slate-50 dark:bg-slate-800/50 p-1.5 h-24 flex flex-col justify-center">
+<div class="flex h-full w-full items-center justify-center">
+<span class="text-xs font-medium text-slate-400">OFF</span>
+</div>
+</div>
+</div>
+<!-- Row 4: Empty / Add New -->
+<div class="grid grid-cols-8 gap-px bg-slate-100 dark:bg-slate-800">
+<button class="col-span-8 p-3 text-sm font-medium text-primary hover:bg-slate-50 dark:hover:bg-slate-800 bg-surface-light dark:bg-surface-dark transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[20px]">add_circle</span>
+                                    Assign New Employee
+                                </button>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer Summary / Legend -->
+<div class="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark p-4 shadow-sm text-sm">
+<div class="flex flex-wrap items-center gap-6">
+<span class="font-bold text-slate-900 dark:text-white">Legend:</span>
+<div class="flex items-center gap-2">
+<div class="size-3 rounded-full bg-blue-500"></div>
+<span class="text-slate-600 dark:text-slate-400">Morning (09:00-17:00)</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="size-3 rounded-full bg-orange-500"></div>
+<span class="text-slate-600 dark:text-slate-400">Afternoon (13:00-21:00)</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="size-3 rounded-full bg-indigo-500"></div>
+<span class="text-slate-600 dark:text-slate-400">Night (21:00-05:00)</span>
+</div>
+</div>
+<div class="flex items-center gap-4 text-slate-500 dark:text-slate-400">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px]">schedule</span>
+<span>128 Hrs Scheduled</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px]">group</span>
+<span>3 Employees</span>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

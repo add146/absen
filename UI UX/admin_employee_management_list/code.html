@@ -1,0 +1,456 @@
+<html><head><script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<script>
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          primary: "#4F86ED", // Vibrant blue from the design
+          "primary-dark": "#3B6ECF", // Darker shade for hover
+          "background-light": "#F5F7FA", // Very light grey/blue background
+          "background-dark": "#1A202C", // Standard dark mode bg
+          "surface-light": "#FFFFFF",
+          "surface-dark": "#2D3748",
+          "text-main-light": "#2D3748",
+          "text-main-dark": "#E2E8F0",
+          "text-sub-light": "#718096",
+          "text-sub-dark": "#A0AEC0",
+          "border-light": "#E2E8F0",
+          "border-dark": "#4A5568",
+        },
+        fontFamily: {
+          display: ["Inter", "sans-serif"],
+        },
+        borderRadius: {
+          DEFAULT: "0.5rem",
+          xl: "1rem",
+          "2xl": "1.5rem",
+        },
+      },
+    },
+  };
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet"/>
+</head><body class="bg-background-light dark:bg-background-dark font-display text-text-main-light dark:text-text-main-dark antialiased transition-colors duration-200">
+<div class="flex h-screen overflow-hidden">
+<aside class="hidden w-64 flex-col bg-surface-light dark:bg-surface-dark border-r border-border-light dark:border-border-dark md:flex shadow-sm z-20">
+<div class="flex h-16 items-center justify-center border-b border-border-light dark:border-border-dark px-6">
+<div class="flex items-center gap-2">
+<div class="h-8 w-8 rounded-lg bg-primary flex items-center justify-center text-white font-bold text-lg shadow-md">S</div>
+<span class="text-lg font-bold text-gray-900 dark:text-white">Startup<span class="font-normal text-primary">Venture</span></span>
+</div>
+</div>
+<div class="flex flex-1 flex-col overflow-y-auto pt-5 pb-4">
+<nav class="mt-5 flex-1 space-y-1 px-3">
+<a class="group flex items-center rounded-md px-3 py-2.5 text-sm font-medium text-text-sub-light dark:text-text-sub-dark hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-primary dark:hover:text-white transition-all" href="#">
+<span class="material-icons-round mr-3 text-xl text-gray-400 group-hover:text-primary dark:text-gray-500 dark:group-hover:text-white">dashboard</span>
+            Overview
+          </a>
+<a class="group flex items-center rounded-md px-3 py-2.5 text-sm font-medium text-text-sub-light dark:text-text-sub-dark hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-primary dark:hover:text-white transition-all" href="#">
+<span class="material-icons-round mr-3 text-xl text-gray-400 group-hover:text-primary dark:text-gray-500 dark:group-hover:text-white">business</span>
+            Offices &amp; Locations
+          </a>
+<a class="group flex items-center rounded-md bg-primary/10 dark:bg-primary/20 px-3 py-2.5 text-sm font-medium text-primary dark:text-blue-300" href="#">
+<span class="material-icons-round mr-3 text-xl text-primary dark:text-blue-300">people</span>
+            Employees
+          </a>
+<a class="group flex items-center rounded-md px-3 py-2.5 text-sm font-medium text-text-sub-light dark:text-text-sub-dark hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-primary dark:hover:text-white transition-all" href="#">
+<span class="material-icons-round mr-3 text-xl text-gray-400 group-hover:text-primary dark:text-gray-500 dark:group-hover:text-white">groups</span>
+            Teams
+          </a>
+<a class="group flex items-center rounded-md px-3 py-2.5 text-sm font-medium text-text-sub-light dark:text-text-sub-dark hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-primary dark:hover:text-white transition-all" href="#">
+<span class="material-icons-round mr-3 text-xl text-gray-400 group-hover:text-primary dark:text-gray-500 dark:group-hover:text-white">event_note</span>
+            Leaves
+          </a>
+<a class="group flex items-center rounded-md px-3 py-2.5 text-sm font-medium text-text-sub-light dark:text-text-sub-dark hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-primary dark:hover:text-white transition-all" href="#">
+<span class="material-icons-round mr-3 text-xl text-gray-400 group-hover:text-primary dark:text-gray-500 dark:group-hover:text-white">settings</span>
+            Settings
+          </a>
+</nav>
+</div>
+<div class="border-t border-border-light dark:border-border-dark p-4">
+<a class="group flex items-center rounded-md px-3 py-2.5 text-sm font-medium text-text-sub-light dark:text-text-sub-dark hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 transition-all" href="#">
+<span class="material-icons-round mr-3 text-xl text-gray-400 group-hover:text-red-500 dark:text-gray-500 dark:group-hover:text-red-400">logout</span>
+            Logout
+        </a>
+<div class="mt-4 text-xs text-center text-gray-400 dark:text-gray-600">
+            © 2023 nockapp <br/> All rights reserved.
+        </div>
+</div>
+</aside>
+<main class="flex-1 overflow-y-auto focus:outline-none">
+<header class="bg-surface-light dark:bg-surface-dark shadow-sm border-b border-border-light dark:border-border-dark sticky top-0 z-10">
+<div class="flex h-16 justify-between items-center px-4 sm:px-6 lg:px-8">
+<div class="flex items-center">
+<button class="md:hidden mr-4 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+<span class="material-icons-round">menu</span>
+</button>
+<h1 class="text-xl font-semibold text-text-main-light dark:text-text-main-dark">Employee Management</h1>
+</div>
+<div class="flex items-center gap-4">
+<div class="hidden sm:flex text-xs text-text-sub-light dark:text-text-sub-dark text-right">
+<p>Last auto save</p>
+<p class="ml-1 font-medium">7:20:01 pm</p>
+</div>
+<div class="h-6 w-px bg-gray-200 dark:bg-gray-600 hidden sm:block"></div>
+<button class="relative rounded-full p-1 text-gray-400 hover:text-gray-500 dark:text-gray-400 dark:hover:text-gray-300">
+<span class="material-icons-round">notifications</span>
+<span class="absolute top-1 right-1 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white dark:ring-gray-800"></span>
+</button>
+<div class="flex items-center gap-3 pl-2">
+<div class="text-right hidden sm:block">
+<p class="text-sm font-medium text-gray-900 dark:text-white">Ahmad Hassan</p>
+<p class="text-xs text-gray-500 dark:text-gray-400">ahmad@nockapp.us</p>
+</div>
+<div class="h-9 w-9 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center text-sm font-medium text-white shadow-sm ring-2 ring-white dark:ring-gray-700">AH</div>
+</div>
+</div>
+</div>
+</header>
+<div class="py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+<div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+<div class="relative overflow-hidden rounded-xl bg-surface-light dark:bg-surface-dark p-5 shadow-sm border border-border-light dark:border-border-dark group hover:shadow-md transition-shadow">
+<dt>
+<div class="absolute rounded-md bg-blue-100 dark:bg-blue-900/30 p-3">
+<span class="material-icons-round text-primary text-xl">groups</span>
+</div>
+<p class="ml-16 truncate text-sm font-medium text-text-sub-light dark:text-text-sub-dark">Total Employees</p>
+</dt>
+<dd class="ml-16 flex items-baseline pb-1 sm:pb-2">
+<p class="text-2xl font-semibold text-text-main-light dark:text-text-main-dark">128</p>
+<p class="ml-2 flex items-baseline text-sm font-semibold text-green-600">
+<span class="material-icons-round text-base self-center">arrow_upward</span>
+<span class="sr-only">Increased by</span>
+                        12%
+                    </p>
+</dd>
+</div>
+<div class="relative overflow-hidden rounded-xl bg-surface-light dark:bg-surface-dark p-5 shadow-sm border border-border-light dark:border-border-dark group hover:shadow-md transition-shadow">
+<dt>
+<div class="absolute rounded-md bg-green-100 dark:bg-green-900/30 p-3">
+<span class="material-icons-round text-green-500 text-xl">check_circle</span>
+</div>
+<p class="ml-16 truncate text-sm font-medium text-text-sub-light dark:text-text-sub-dark">Active Today</p>
+</dt>
+<dd class="ml-16 flex items-baseline pb-1 sm:pb-2">
+<p class="text-2xl font-semibold text-text-main-light dark:text-text-main-dark">102</p>
+<p class="ml-2 flex items-baseline text-sm font-semibold text-green-600">
+                         94% Rate
+                    </p>
+</dd>
+</div>
+<div class="relative overflow-hidden rounded-xl bg-surface-light dark:bg-surface-dark p-5 shadow-sm border border-border-light dark:border-border-dark group hover:shadow-md transition-shadow">
+<dt>
+<div class="absolute rounded-md bg-orange-100 dark:bg-orange-900/30 p-3">
+<span class="material-icons-round text-orange-500 text-xl">beach_access</span>
+</div>
+<p class="ml-16 truncate text-sm font-medium text-text-sub-light dark:text-text-sub-dark">On Leave</p>
+</dt>
+<dd class="ml-16 flex items-baseline pb-1 sm:pb-2">
+<p class="text-2xl font-semibold text-text-main-light dark:text-text-main-dark">8</p>
+<p class="ml-2 flex items-baseline text-sm font-medium text-text-sub-light dark:text-text-sub-dark">
+                         Approved
+                    </p>
+</dd>
+</div>
+<div class="relative overflow-hidden rounded-xl bg-surface-light dark:bg-surface-dark p-5 shadow-sm border border-border-light dark:border-border-dark group hover:shadow-md transition-shadow">
+<dt>
+<div class="absolute rounded-md bg-purple-100 dark:bg-purple-900/30 p-3">
+<span class="material-icons-round text-purple-500 text-xl">stars</span>
+</div>
+<p class="ml-16 truncate text-sm font-medium text-text-sub-light dark:text-text-sub-dark">Total Points Awarded</p>
+</dt>
+<dd class="ml-16 flex items-baseline pb-1 sm:pb-2">
+<p class="text-2xl font-semibold text-text-main-light dark:text-text-main-dark">42,500</p>
+<p class="ml-2 flex items-baseline text-sm font-semibold text-purple-600">
+                        Top: Tech Team
+                    </p>
+</dd>
+</div>
+</div>
+<div class="mb-6 flex flex-col sm:flex-row justify-between gap-4 items-center bg-surface-light dark:bg-surface-dark p-4 rounded-xl border border-border-light dark:border-border-dark shadow-sm">
+<div class="w-full sm:w-1/2 lg:w-1/3 relative">
+<div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+<span class="material-icons-round text-gray-400">search</span>
+</div>
+<input class="block w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 py-2 pl-10 pr-3 text-sm placeholder-gray-500 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:text-white dark:placeholder-gray-400" placeholder="Search employees by name, ID or role..." type="text"/>
+</div>
+<div class="flex gap-2 w-full sm:w-auto overflow-x-auto pb-2 sm:pb-0">
+<select class="rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm py-2 pl-3 pr-8 focus:border-primary focus:ring-primary dark:text-white">
+<option>All Departments</option>
+<option>Engineering</option>
+<option>Design</option>
+<option>Marketing</option>
+<option>HR</option>
+</select>
+<select class="rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm py-2 pl-3 pr-8 focus:border-primary focus:ring-primary dark:text-white">
+<option>Status: Active</option>
+<option>Status: Inactive</option>
+<option>Status: On Leave</option>
+</select>
+<button class="inline-flex items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition-colors">
+<span class="material-icons-round text-sm mr-2">add</span>
+                    Add Employee
+                </button>
+</div>
+</div>
+<div class="overflow-hidden rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark shadow-sm">
+<div class="overflow-x-auto">
+<table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+<thead class="bg-gray-50 dark:bg-gray-800">
+<tr>
+<th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400" scope="col">
+<div class="flex items-center gap-2">
+<input class="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary dark:border-gray-600 dark:bg-gray-700" type="checkbox"/>
+                        Employee
+                      </div>
+</th>
+<th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400" scope="col">Department &amp; Role</th>
+<th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400" scope="col">Status</th>
+<th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400" scope="col">Location Status</th>
+<th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400" scope="col">Points</th>
+<th class="relative px-6 py-3" scope="col">
+<span class="sr-only">Actions</span>
+</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-gray-200 dark:divide-gray-700 bg-surface-light dark:bg-surface-dark">
+<tr class="group hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+<td class="whitespace-nowrap px-6 py-4">
+<div class="flex items-center">
+<input class="h-4 w-4 mr-4 rounded border-gray-300 text-primary focus:ring-primary dark:border-gray-600 dark:bg-gray-700 opacity-0 group-hover:opacity-100 transition-opacity" type="checkbox"/>
+<div class="h-10 w-10 flex-shrink-0">
+<img alt="Sarah Connor" class="h-10 w-10 rounded-full object-cover border border-gray-200 dark:border-gray-600" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCRcvyCbUI-8fjj3vWYXfOthwydhtDnxNPTvS1cV5BciN_zBWa19_sDy4A4Md5MU2Ypzt6v8M7GYACRoJvMw-jCFHo8El9evm6o5CoFPtryky1r9fyEhgs9l8-VkgtEy0fkkqQxCoPfedV0Z_d28hLwLHJVx8wxetDEvKKP-YCYoTcFA3G4XgP78RN6cacZs97FVMi4zRmuqrOkf-E_GDvS9lftlGnHYrAATrrDbzLlWQZEYgLnc0V7OeL_3qECHnkA-0m5uHRkWg"/>
+</div>
+<div class="ml-4">
+<div class="text-sm font-medium text-gray-900 dark:text-white">Sarah Connor</div>
+<div class="text-xs text-gray-500 dark:text-gray-400">sarah@nockapp.us</div>
+</div>
+</div>
+</td>
+<td class="whitespace-nowrap px-6 py-4">
+<div class="text-sm text-gray-900 dark:text-white">Product Design</div>
+<div class="text-xs text-gray-500 dark:text-gray-400">Senior Designer</div>
+</td>
+<td class="whitespace-nowrap px-6 py-4">
+<span class="inline-flex rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-semibold leading-5 text-green-800 dark:bg-green-900 dark:text-green-200">
+                        Active
+                      </span>
+</td>
+<td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
+<div class="flex items-center gap-1 text-green-600 dark:text-green-400 text-xs font-medium">
+<span class="material-icons-round text-sm">my_location</span>
+                            In Office Range
+                        </div>
+<div class="text-xs text-gray-400 pl-5">Since 9:12 AM</div>
+</td>
+<td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
+<div class="flex items-center">
+<span class="material-icons-round text-yellow-500 text-base mr-1">star</span>
+<span class="font-medium text-gray-900 dark:text-white">1,250</span>
+</div>
+</td>
+<td class="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
+<button class="text-gray-400 hover:text-primary dark:hover:text-white transition-colors">
+<span class="material-icons-round">more_vert</span>
+</button>
+</td>
+</tr>
+<tr class="group hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+<td class="whitespace-nowrap px-6 py-4">
+<div class="flex items-center">
+<input class="h-4 w-4 mr-4 rounded border-gray-300 text-primary focus:ring-primary dark:border-gray-600 dark:bg-gray-700 opacity-0 group-hover:opacity-100 transition-opacity" type="checkbox"/>
+<div class="h-10 w-10 flex-shrink-0">
+<img alt="Michael Foster" class="h-10 w-10 rounded-full object-cover border border-gray-200 dark:border-gray-600" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD3cpAldJav6kyLjhGxk3ijiREZ3vP49U2MMf41R9goAa1jeO4ZL-cxMVyoN3KinrcFgQGlNrdUytCPWrl7cLJygh4FRRZ9L7Kz5i1Mojrb63VH06u9xIAp-5MM7XZYBVOZpue4b8rWmgup4nrwVENbvputLl2T6DlXk2XwSvlma8KRS0E0IK-ZXsDXJdN3DRN99ClDNr1nrgzM5ffC5ho9KVfk64a57UrxAyHp_jWWvL8-eknWmtATQHzPLMoZ9ykkh3l4Dz7JmA"/>
+</div>
+<div class="ml-4">
+<div class="text-sm font-medium text-gray-900 dark:text-white">Michael Foster</div>
+<div class="text-xs text-gray-500 dark:text-gray-400">michael@nockapp.us</div>
+</div>
+</div>
+</td>
+<td class="whitespace-nowrap px-6 py-4">
+<div class="text-sm text-gray-900 dark:text-white">Engineering</div>
+<div class="text-xs text-gray-500 dark:text-gray-400">Backend Dev</div>
+</td>
+<td class="whitespace-nowrap px-6 py-4">
+<span class="inline-flex rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-semibold leading-5 text-green-800 dark:bg-green-900 dark:text-green-200">
+                        Active
+                      </span>
+</td>
+<td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
+<div class="flex items-center gap-1 text-blue-500 dark:text-blue-400 text-xs font-medium">
+<span class="material-icons-round text-sm">home_work</span>
+                            Remote
+                        </div>
+<div class="text-xs text-gray-400 pl-5">Checked in 8:45 AM</div>
+</td>
+<td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
+<div class="flex items-center">
+<span class="material-icons-round text-yellow-500 text-base mr-1">star</span>
+<span class="font-medium text-gray-900 dark:text-white">940</span>
+</div>
+</td>
+<td class="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
+<button class="text-gray-400 hover:text-primary dark:hover:text-white transition-colors">
+<span class="material-icons-round">more_vert</span>
+</button>
+</td>
+</tr>
+<tr class="group hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+<td class="whitespace-nowrap px-6 py-4">
+<div class="flex items-center">
+<input class="h-4 w-4 mr-4 rounded border-gray-300 text-primary focus:ring-primary dark:border-gray-600 dark:bg-gray-700 opacity-0 group-hover:opacity-100 transition-opacity" type="checkbox"/>
+<div class="h-10 w-10 flex-shrink-0 bg-purple-100 dark:bg-purple-900 rounded-full flex items-center justify-center text-purple-600 dark:text-purple-200 font-bold border border-purple-200 dark:border-purple-800">
+                             DL
+                         </div>
+<div class="ml-4">
+<div class="text-sm font-medium text-gray-900 dark:text-white">Dries Vincent</div>
+<div class="text-xs text-gray-500 dark:text-gray-400">dries@nockapp.us</div>
+</div>
+</div>
+</td>
+<td class="whitespace-nowrap px-6 py-4">
+<div class="text-sm text-gray-900 dark:text-white">Marketing</div>
+<div class="text-xs text-gray-500 dark:text-gray-400">Manager</div>
+</td>
+<td class="whitespace-nowrap px-6 py-4">
+<span class="inline-flex rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-semibold leading-5 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-200">
+                        On Leave
+                      </span>
+</td>
+<td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
+<div class="flex items-center gap-1 text-gray-400 text-xs font-medium">
+<span class="material-icons-round text-sm">location_off</span>
+                            Out of Range
+                        </div>
+</td>
+<td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
+<div class="flex items-center">
+<span class="material-icons-round text-yellow-500 text-base mr-1">star</span>
+<span class="font-medium text-gray-900 dark:text-white">2,100</span>
+</div>
+</td>
+<td class="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
+<button class="text-gray-400 hover:text-primary dark:hover:text-white transition-colors">
+<span class="material-icons-round">more_vert</span>
+</button>
+</td>
+</tr>
+<tr class="group hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+<td class="whitespace-nowrap px-6 py-4">
+<div class="flex items-center">
+<input class="h-4 w-4 mr-4 rounded border-gray-300 text-primary focus:ring-primary dark:border-gray-600 dark:bg-gray-700 opacity-0 group-hover:opacity-100 transition-opacity" type="checkbox"/>
+<div class="h-10 w-10 flex-shrink-0">
+<img alt="Lindsay Walton" class="h-10 w-10 rounded-full object-cover border border-gray-200 dark:border-gray-600" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAHMMn9vB4tm5aIFJVxQdwi-gdxGNRyy7lYf9iKpY0FTPXuzg6vphvf1ufyVCqJ-UpvSMnys-AY2K4bx97WQajLqqD2g_fnCgcTjfttXfRNbKkV7QnNw85VPxFauRA_zJKs81eX9Z3N_6SEz27E0uJA7-Wqs2rjPmjgMHdYQ5qwFqBzZ1h6m_RVfQMgqcvSJkOMIdxvaTvfvtU6hQfMt4Liv-6wVJJrrmTuDWVpsYMolO-y_6L37k6yGyVeJk_uctizDgvu3i7p9g"/>
+</div>
+<div class="ml-4">
+<div class="text-sm font-medium text-gray-900 dark:text-white">Lindsay Walton</div>
+<div class="text-xs text-gray-500 dark:text-gray-400">lindsay@nockapp.us</div>
+</div>
+</div>
+</td>
+<td class="whitespace-nowrap px-6 py-4">
+<div class="text-sm text-gray-900 dark:text-white">Engineering</div>
+<div class="text-xs text-gray-500 dark:text-gray-400">Front-end Dev</div>
+</td>
+<td class="whitespace-nowrap px-6 py-4">
+<span class="inline-flex rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-semibold leading-5 text-green-800 dark:bg-green-900 dark:text-green-200">
+                        Active
+                      </span>
+</td>
+<td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
+<div class="flex items-center gap-1 text-green-600 dark:text-green-400 text-xs font-medium">
+<span class="material-icons-round text-sm">my_location</span>
+                            In Office Range
+                        </div>
+<div class="text-xs text-gray-400 pl-5">Since 8:30 AM</div>
+</td>
+<td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
+<div class="flex items-center">
+<span class="material-icons-round text-yellow-500 text-base mr-1">star</span>
+<span class="font-medium text-gray-900 dark:text-white">1,850</span>
+</div>
+</td>
+<td class="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
+<button class="text-gray-400 hover:text-primary dark:hover:text-white transition-colors">
+<span class="material-icons-round">more_vert</span>
+</button>
+</td>
+</tr>
+<tr class="group hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+<td class="whitespace-nowrap px-6 py-4">
+<div class="flex items-center">
+<input class="h-4 w-4 mr-4 rounded border-gray-300 text-primary focus:ring-primary dark:border-gray-600 dark:bg-gray-700 opacity-0 group-hover:opacity-100 transition-opacity" type="checkbox"/>
+<div class="h-10 w-10 flex-shrink-0 bg-pink-100 dark:bg-pink-900 rounded-full flex items-center justify-center text-pink-600 dark:text-pink-200 font-bold border border-pink-200 dark:border-pink-800">
+                             CJ
+                         </div>
+<div class="ml-4">
+<div class="text-sm font-medium text-gray-900 dark:text-white">Courtney Henry</div>
+<div class="text-xs text-gray-500 dark:text-gray-400">courtney@nockapp.us</div>
+</div>
+</div>
+</td>
+<td class="whitespace-nowrap px-6 py-4">
+<div class="text-sm text-gray-900 dark:text-white">Design</div>
+<div class="text-xs text-gray-500 dark:text-gray-400">Designer</div>
+</td>
+<td class="whitespace-nowrap px-6 py-4">
+<span class="inline-flex rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-semibold leading-5 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
+                        Inactive
+                      </span>
+</td>
+<td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
+<div class="flex items-center gap-1 text-gray-400 text-xs font-medium">
+<span class="material-icons-round text-sm">location_off</span>
+                            Offline
+                        </div>
+<div class="text-xs text-gray-400 pl-5">Last seen 2d ago</div>
+</td>
+<td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
+<div class="flex items-center">
+<span class="material-icons-round text-yellow-500 text-base mr-1">star</span>
+<span class="font-medium text-gray-900 dark:text-white">540</span>
+</div>
+</td>
+<td class="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
+<button class="text-gray-400 hover:text-primary dark:hover:text-white transition-colors">
+<span class="material-icons-round">more_vert</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="bg-surface-light dark:bg-surface-dark px-4 py-3 flex items-center justify-between border-t border-border-light dark:border-border-dark sm:px-6">
+<div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+<div>
+<p class="text-sm text-gray-700 dark:text-gray-300">
+                            Showing <span class="font-medium">1</span> to <span class="font-medium">5</span> of <span class="font-medium">128</span> results
+                        </p>
+</div>
+<div>
+<nav aria-label="Pagination" class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+<a class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700" href="#">
+<span class="sr-only">Previous</span>
+<span class="material-icons-round text-lg">chevron_left</span>
+</a>
+<a aria-current="page" class="z-10 bg-primary/10 border-primary text-primary relative inline-flex items-center px-4 py-2 border text-sm font-medium" href="#">1</a>
+<a class="bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 relative inline-flex items-center px-4 py-2 border text-sm font-medium" href="#">2</a>
+<a class="bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 hidden md:inline-flex relative items-center px-4 py-2 border text-sm font-medium" href="#">3</a>
+<span class="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-700 dark:text-gray-300">...</span>
+<a class="bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 relative inline-flex items-center px-4 py-2 border text-sm font-medium" href="#">8</a>
+<a class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700" href="#">
+<span class="sr-only">Next</span>
+<span class="material-icons-round text-lg">chevron_right</span>
+</a>
+</nav>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Tenant Branding &amp; Settings</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0d59f2",
+                        "background-light": "#f5f6f8",
+                        "background-dark": "#101622",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        /* Custom scrollbar for webkit */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-[#111318] dark:text-white font-display antialiased overflow-hidden">
+<div class="flex h-screen w-full overflow-hidden">
+<!-- Sidebar -->
+<aside class="hidden md:flex flex-col w-64 bg-white dark:bg-[#1a202c] border-r border-[#f0f1f5] dark:border-gray-800 h-full">
+<div class="p-6 pb-2">
+<div class="flex items-center gap-3 mb-8">
+<div class="bg-center bg-no-repeat bg-cover rounded-lg size-10 shadow-sm" data-alt="Abstract blue geometric logo for HR software" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBmhiQVs1Qnvpx5iqx6BXXAH6sVOh77vkuJZhzugHGFDFlroj0L5tDUGGWg80NeInr8MeZB-xffRdY_D8piD245544ql9UH7-oeASczhmwT_VVBfPrqFmc3gcQuddeLZfhUi9RJUMbGoUUnbXOwSA2PSnkC-Jm_JssKzKLqI2EENm5IH3IcBxeYfnOrNtenXSM0FSE35vFEebUa08khujZiL6o1mvkZAsh1GjThbGD17WrL_h4_iVBDLidxtjR0uOzDEpJoL4vAIQ");'></div>
+<div class="flex flex-col">
+<h1 class="text-[#111318] dark:text-white text-base font-bold leading-normal">Acme HR</h1>
+<p class="text-[#606e8a] dark:text-gray-400 text-xs font-normal leading-normal">Admin Console</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 px-4 space-y-1 overflow-y-auto">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[#606e8a] dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 group transition-colors" href="#">
+<span aria-hidden="true" class="material-symbols-outlined text-[24px]">dashboard</span>
+<span class="text-sm font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[#606e8a] dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 group transition-colors" href="#">
+<span aria-hidden="true" class="material-symbols-outlined text-[24px]">group</span>
+<span class="text-sm font-medium">Employees</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[#606e8a] dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 group transition-colors" href="#">
+<span aria-hidden="true" class="material-symbols-outlined text-[24px]">location_on</span>
+<span class="text-sm font-medium">Attendance</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[#606e8a] dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 group transition-colors" href="#">
+<span aria-hidden="true" class="material-symbols-outlined text-[24px]">bar_chart</span>
+<span class="text-sm font-medium">Reports</span>
+</a>
+<div class="pt-4 pb-2">
+<p class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Configuration</p>
+</div>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary/10 text-primary dark:text-blue-400 group transition-colors" href="#">
+<span class="material-symbols-outlined text-[24px] fill-1">settings</span>
+<span class="text-sm font-bold">Settings</span>
+</a>
+</nav>
+<div class="p-4 border-t border-[#f0f1f5] dark:border-gray-800">
+<div class="flex items-center gap-3 px-2">
+<div class="bg-center bg-no-repeat bg-cover rounded-full size-9" data-alt="User profile picture of a woman smiling" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCxOKu6XiYGTG92_N0Po52FZUbSnrdx9QGBO3dW5EdkUX1oUGjOpS-K4bblUF222QDiAfnc8hdACQJUUnIYBlQ0rGXol8HZmV3NirGzCCs0fZt6yRYFPBhCW9KgpirvjGnvS3DxDk-a1mnExQcXdPuHNFebLfSwsZiSn9tsrU3BGdAZE7uz11nn8x-UvuwqDF9iVybghcq3kWleC4mV6u-4uWxUyVnuCjZBpWl-p-onwSrOlK85j1DhgKciVkEUblJco_xl7tWK1w");'></div>
+<div class="flex flex-col">
+<p class="text-sm font-medium text-[#111318] dark:text-white">Sarah Jenkins</p>
+<p class="text-xs text-[#606e8a] dark:text-gray-400">Super Admin</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 flex flex-col min-w-0 overflow-hidden bg-background-light dark:bg-background-dark">
+<!-- Top Navigation -->
+<header class="flex items-center justify-between border-b border-[#dbdfe6] dark:border-gray-800 bg-white dark:bg-[#1a202c] px-6 py-4">
+<div class="flex items-center gap-4 text-[#111318] dark:text-white">
+<button class="md:hidden text-gray-500 hover:text-gray-700">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<div class="flex items-center gap-2">
+<span class="text-gray-400">Organization</span>
+<span class="text-gray-300">/</span>
+<h2 class="text-lg font-bold leading-tight">Tenant Settings</h2>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="flex items-center justify-center size-10 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="flex items-center justify-center size-10 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 transition-colors">
+<span class="material-symbols-outlined">help</span>
+</button>
+</div>
+</header>
+<!-- Scrollable Content -->
+<div class="flex-1 overflow-y-auto p-6 md:p-10">
+<div class="max-w-[960px] mx-auto flex flex-col gap-8">
+<!-- Page Heading -->
+<div class="flex flex-col gap-2">
+<h1 class="text-[#111318] dark:text-white text-3xl font-black leading-tight tracking-[-0.033em]">Tenant Branding &amp; Settings</h1>
+<p class="text-[#606e8a] dark:text-gray-400 text-base font-normal">Customize your workspace appearance and default configurations for your organization.</p>
+</div>
+<!-- Tabs -->
+<div class="border-b border-[#dbdfe6] dark:border-gray-700">
+<nav aria-label="Tabs" class="flex gap-8">
+<a class="border-b-[3px] border-primary text-[#111318] dark:text-white pb-3 px-1" href="#">
+<span class="text-sm font-bold">General &amp; Branding</span>
+</a>
+<a class="border-b-[3px] border-transparent text-[#606e8a] dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 pb-3 px-1 transition-colors" href="#">
+<span class="text-sm font-bold">Modules</span>
+</a>
+<a class="border-b-[3px] border-transparent text-[#606e8a] dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 pb-3 px-1 transition-colors" href="#">
+<span class="text-sm font-bold">Notifications</span>
+</a>
+<a class="border-b-[3px] border-transparent text-[#606e8a] dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 pb-3 px-1 transition-colors" href="#">
+<span class="text-sm font-bold">Billing</span>
+</a>
+</nav>
+</div>
+<!-- Main Form Card -->
+<div class="bg-white dark:bg-[#1a202c] rounded-xl border border-[#dbdfe6] dark:border-gray-800 shadow-sm">
+<!-- Company Identity Section -->
+<div class="p-6 md:p-8 border-b border-[#f0f1f5] dark:border-gray-800">
+<h2 class="text-xl font-bold text-[#111318] dark:text-white mb-6">Company Identity</h2>
+<div class="flex flex-col gap-8">
+<!-- Logo Upload -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
+<div class="md:col-span-4">
+<label class="block text-sm font-semibold text-[#111318] dark:text-white mb-1">Company Logo</label>
+<p class="text-xs text-[#606e8a] dark:text-gray-400">This will be displayed on the login screen and top navigation.</p>
+</div>
+<div class="md:col-span-8 flex items-center gap-6">
+<div class="relative group shrink-0">
+<div class="size-20 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center border border-gray-200 dark:border-gray-600 overflow-hidden">
+<span class="material-symbols-outlined text-4xl text-gray-400 dark:text-gray-500">apartment</span>
+</div>
+<button class="absolute -bottom-1 -right-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-full p-1.5 shadow-sm text-gray-500 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-base">edit</span>
+</button>
+</div>
+<div class="flex flex-col gap-2">
+<div class="flex gap-3">
+<button class="px-4 py-2 bg-primary hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors shadow-sm">
+                                                    Upload new logo
+                                                </button>
+<button class="px-4 py-2 bg-white dark:bg-gray-800 border border-[#dbdfe6] dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-[#111318] dark:text-white text-sm font-medium rounded-lg transition-colors">
+                                                    Remove
+                                                </button>
+</div>
+<p class="text-xs text-[#606e8a] dark:text-gray-400">JPG, GIF or PNG. Max size of 800K.</p>
+</div>
+</div>
+</div>
+<!-- Brand Colors -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
+<div class="md:col-span-4">
+<label class="block text-sm font-semibold text-[#111318] dark:text-white mb-1">Brand Colors</label>
+<p class="text-xs text-[#606e8a] dark:text-gray-400">Select the primary and secondary colors for your employee portal.</p>
+</div>
+<div class="md:col-span-8 grid grid-cols-1 sm:grid-cols-2 gap-6">
+<div>
+<label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Primary Color</label>
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-lg border border-gray-200 shadow-inner cursor-pointer" style="background-color: #0d59f2;"></div>
+<input class="flex-1 bg-white dark:bg-gray-800 text-sm border-gray-300 dark:border-gray-600 rounded-lg focus:ring-primary focus:border-primary" type="text" value="#0D59F2"/>
+</div>
+</div>
+<div>
+<label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Secondary Color</label>
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-lg border border-gray-200 shadow-inner cursor-pointer" style="background-color: #101622;"></div>
+<input class="flex-1 bg-white dark:bg-gray-800 text-sm border-gray-300 dark:border-gray-600 rounded-lg focus:ring-primary focus:border-primary" type="text" value="#101622"/>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- General Settings Section -->
+<div class="p-6 md:p-8">
+<h2 class="text-xl font-bold text-[#111318] dark:text-white mb-6">Portal Configuration</h2>
+<div class="flex flex-col gap-8">
+<!-- Subdomain -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
+<div class="md:col-span-4">
+<label class="block text-sm font-semibold text-[#111318] dark:text-white mb-1">Workspace URL</label>
+<p class="text-xs text-[#606e8a] dark:text-gray-400">Your unique address for the employee portal.</p>
+</div>
+<div class="md:col-span-8">
+<div class="flex shadow-sm rounded-lg overflow-hidden">
+<span class="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-500 dark:text-gray-300 text-sm">
+                                                https://
+                                            </span>
+<input class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border-gray-300 dark:border-gray-600 dark:bg-gray-800 text-sm focus:ring-primary focus:border-primary" id="company-website" name="company-website" placeholder="your-company" type="text"/>
+<span class="inline-flex items-center px-3 rounded-r-lg border border-l-0 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-500 dark:text-gray-300 text-sm">
+                                                .acmehr.com
+                                            </span>
+</div>
+</div>
+</div>
+<!-- Regional Settings -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
+<div class="md:col-span-4">
+<label class="block text-sm font-semibold text-[#111318] dark:text-white mb-1">Regional Defaults</label>
+<p class="text-xs text-[#606e8a] dark:text-gray-400">Set the default timezone and currency for system reports and points.</p>
+</div>
+<div class="md:col-span-8 grid grid-cols-1 sm:grid-cols-2 gap-6">
+<div>
+<label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Default Timezone</label>
+<div class="relative">
+<select class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-gray-600 dark:bg-gray-800 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-lg">
+<option>(GMT-08:00) Pacific Time</option>
+<option selected="">(GMT-05:00) Eastern Time</option>
+<option>(GMT+00:00) UTC</option>
+<option>(GMT+01:00) Central European Time</option>
+</select>
+</div>
+</div>
+<div>
+<label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Points Currency</label>
+<div class="relative">
+<select class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-gray-600 dark:bg-gray-800 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-lg">
+<option selected="">USD - US Dollar ($)</option>
+<option>EUR - Euro (€)</option>
+<option>GBP - British Pound (£)</option>
+<option>CAD - Canadian Dollar ($)</option>
+</select>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Form Footer -->
+<div class="bg-gray-50 dark:bg-gray-800/50 px-6 py-4 rounded-b-xl border-t border-[#dbdfe6] dark:border-gray-800 flex justify-end gap-3">
+<button class="px-5 py-2.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 text-sm font-medium rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors shadow-sm">
+                                Cancel
+                            </button>
+<button class="px-5 py-2.5 bg-primary hover:bg-blue-700 text-white text-sm font-medium rounded-lg shadow-sm transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">save</span>
+                                Save Changes
+                            </button>
+</div>
+</div>
+<!-- Additional Help Card (Bottom spacer) -->
+<div class="bg-primary/5 border border-primary/20 rounded-lg p-4 flex items-start gap-3">
+<span class="material-symbols-outlined text-primary mt-0.5">info</span>
+<div>
+<h4 class="text-sm font-bold text-[#111318] dark:text-white">Need help with branding?</h4>
+<p class="text-sm text-[#606e8a] dark:text-gray-400 mt-1">Read our <a class="text-primary underline" href="#">documentation on customization</a> to learn how to create advanced themes for your organization.</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

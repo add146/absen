@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Employee Profile Detail</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0d59f2",
+                        "background-light": "#f5f6f8",
+                        "background-dark": "#101622",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-[#111318] dark:text-white min-h-screen flex flex-col overflow-x-hidden">
+<!-- TopNavBar -->
+<header class="sticky top-0 z-50 flex items-center justify-between whitespace-nowrap border-b border-solid border-[#f0f1f5] dark:border-[#2d3748] bg-white dark:bg-[#1a202c] px-4 py-3 sm:px-10">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-4">
+<div class="size-8 text-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-4xl">hexagon</span>
+</div>
+<h2 class="text-[#111318] dark:text-white text-lg font-bold leading-tight tracking-[-0.015em]">HR Portal</h2>
+</div>
+<nav class="hidden md:flex items-center gap-9">
+<a class="text-[#606e8a] dark:text-[#a0aec0] hover:text-primary dark:hover:text-primary text-sm font-medium leading-normal transition-colors" href="#">Dashboard</a>
+<a class="text-primary text-sm font-medium leading-normal" href="#">Employees</a>
+<a class="text-[#606e8a] dark:text-[#a0aec0] hover:text-primary dark:hover:text-primary text-sm font-medium leading-normal transition-colors" href="#">Reports</a>
+<a class="text-[#606e8a] dark:text-[#a0aec0] hover:text-primary dark:hover:text-primary text-sm font-medium leading-normal transition-colors" href="#">Settings</a>
+</nav>
+</div>
+<div class="flex flex-1 justify-end gap-4 sm:gap-8">
+<label class="hidden sm:flex flex-col min-w-40 h-10 max-w-64">
+<div class="flex w-full flex-1 items-stretch rounded-lg h-full">
+<div class="text-[#606e8a] dark:text-[#a0aec0] flex border-none bg-[#f0f1f5] dark:bg-[#2d3748] items-center justify-center pl-4 rounded-l-lg border-r-0">
+<span class="material-symbols-outlined text-[20px]">search</span>
+</div>
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-[#111318] dark:text-white focus:outline-0 focus:ring-0 border-none bg-[#f0f1f5] dark:bg-[#2d3748] focus:border-none h-full placeholder:text-[#606e8a] dark:placeholder:text-[#a0aec0] px-4 rounded-l-none border-l-0 pl-2 text-sm font-normal leading-normal" placeholder="Search employees..." value=""/>
+</div>
+</label>
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 ring-2 ring-white dark:ring-[#1a202c] cursor-pointer" data-alt="User avatar placeholder" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuA4HgiNLsyiG5etgjYgf7eM01UDcP3rb0s6VV9uNKovAC1b0hfIEtUs4k-o4LuS4rGa4E5mlD0y6suNPnm5G3pP7EUelRH8Z3m3KulhvPj1u-lsELxVMKOGU0twvCFyRA3-cJ7_bQsxfyLGt104h2OzqlZcMR_ksvlwSbREZbdify2hMSeZe3OYIXDo439nVd6LWgLbFLi1_8HXX7BTyu8kVjjyUQkMX2jx2q64VFbuieiR6Wfa1_CV5N5M7Ng-joCsklY73CPQmA");'></div>
+</div>
+</header>
+<div class="flex flex-1 w-full max-w-[1440px] mx-auto">
+<!-- SideNavBar -->
+<aside class="hidden lg:flex w-64 flex-col border-r border-[#f0f1f5] dark:border-[#2d3748] bg-white dark:bg-[#1a202c] min-h-[calc(100vh-65px)]">
+<div class="flex flex-col gap-4 p-4">
+<div class="flex gap-3 items-center p-2 rounded-lg hover:bg-background-light dark:hover:bg-[#2d3748] cursor-pointer transition-colors">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" data-alt="Admin avatar" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuD_dtTNIEpwfSia5QmiO_8rRFOVuUrmiGV0Prltn9URxR4tnZ-4ezZc6IxJWknJ2iMP7BpNM__zOYWaBI6PFPnEA6fglYd4M2yxsqr-5R6JtoOaZggExyVmKy_qPutvIVeobFIXgUdV72_D3l-OkN9-79pmyj5ixwGulS1cj4S1HVkSsR6R6YJ7_2PZREkbdDIvr6IU6qrLHCj8UtEDwuwyb-_f9v5u0hYyltqoCIeuBL2NIYYY9k2gHh8LVgr67kYWlPjwLWIjHA");'></div>
+<div class="flex flex-col">
+<h1 class="text-[#111318] dark:text-white text-sm font-semibold leading-normal">James Admin</h1>
+<p class="text-[#606e8a] dark:text-[#a0aec0] text-xs font-normal leading-normal">HR Manager</p>
+</div>
+</div>
+<div class="h-px bg-[#f0f1f5] dark:bg-[#2d3748] my-2"></div>
+<div class="flex flex-col gap-1">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[#606e8a] dark:text-[#a0aec0] hover:bg-background-light dark:hover:bg-[#2d3748] hover:text-[#111318] dark:hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<p class="text-sm font-medium leading-normal">Overview</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[#606e8a] dark:text-[#a0aec0] hover:bg-background-light dark:hover:bg-[#2d3748] hover:text-[#111318] dark:hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined">calendar_month</span>
+<p class="text-sm font-medium leading-normal">Attendance</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary/10 text-primary dark:text-primary" href="#">
+<span class="material-symbols-outlined fill-current">group</span>
+<p class="text-sm font-medium leading-normal">Directory</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[#606e8a] dark:text-[#a0aec0] hover:bg-background-light dark:hover:bg-[#2d3748] hover:text-[#111318] dark:hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined">trending_up</span>
+<p class="text-sm font-medium leading-normal">Performance</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[#606e8a] dark:text-[#a0aec0] hover:bg-background-light dark:hover:bg-[#2d3748] hover:text-[#111318] dark:hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined">medical_services</span>
+<p class="text-sm font-medium leading-normal">Benefits</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[#606e8a] dark:text-[#a0aec0] hover:bg-background-light dark:hover:bg-[#2d3748] hover:text-[#111318] dark:hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined">location_on</span>
+<p class="text-sm font-medium leading-normal">Geofencing</p>
+</a>
+</div>
+</div>
+<div class="mt-auto p-4 border-t border-[#f0f1f5] dark:border-[#2d3748]">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[#606e8a] dark:text-[#a0aec0] hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 transition-colors" href="#">
+<span class="material-symbols-outlined">logout</span>
+<p class="text-sm font-medium leading-normal">Logout</p>
+</a>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 flex flex-col min-w-0 bg-background-light dark:bg-background-dark">
+<div class="flex-1 px-4 sm:px-8 py-6 w-full max-w-[1200px] mx-auto">
+<!-- Breadcrumbs -->
+<nav class="flex flex-wrap items-center gap-2 mb-6 text-sm">
+<a class="text-[#606e8a] dark:text-[#a0aec0] hover:text-primary transition-colors" href="#">Home</a>
+<span class="material-symbols-outlined text-[#606e8a] dark:text-[#a0aec0] text-sm">chevron_right</span>
+<a class="text-[#606e8a] dark:text-[#a0aec0] hover:text-primary transition-colors" href="#">Directory</a>
+<span class="material-symbols-outlined text-[#606e8a] dark:text-[#a0aec0] text-sm">chevron_right</span>
+<span class="text-[#111318] dark:text-white font-medium">Sarah Jenkins</span>
+</nav>
+<!-- Page Heading -->
+<div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
+<div>
+<h1 class="text-[#111318] dark:text-white text-3xl sm:text-4xl font-black leading-tight tracking-[-0.033em]">Employee Profile</h1>
+<p class="text-[#606e8a] dark:text-[#a0aec0] mt-2 text-base font-normal leading-normal">View and manage employee personal details and work information.</p>
+</div>
+<div class="flex gap-3">
+<button class="flex items-center gap-2 px-4 py-2 bg-white dark:bg-[#1a202c] border border-[#f0f1f5] dark:border-[#2d3748] rounded-lg text-sm font-medium text-[#111318] dark:text-white hover:bg-gray-50 dark:hover:bg-[#2d3748] transition-colors">
+<span class="material-symbols-outlined text-[20px]">print</span>
+<span>Print</span>
+</button>
+</div>
+</div>
+<!-- Profile Header Card -->
+<div class="bg-white dark:bg-[#1a202c] rounded-xl border border-[#f0f1f5] dark:border-[#2d3748] overflow-hidden mb-6 shadow-sm">
+<div class="relative h-32 bg-gradient-to-r from-blue-600 to-indigo-600">
+<div class="absolute bottom-4 right-4 flex gap-2">
+<div class="px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-white text-xs font-medium border border-white/10 flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">location_on</span> San Francisco HQ
+                             </div>
+</div>
+</div>
+<div class="px-6 pb-6 pt-0">
+<div class="flex flex-col md:flex-row gap-6 items-start md:items-end -mt-12">
+<div class="relative">
+<div class="size-32 rounded-full border-4 border-white dark:border-[#1a202c] bg-white dark:bg-[#1a202c] overflow-hidden shadow-md">
+<div class="bg-center bg-no-repeat w-full h-full bg-cover" data-alt="Portrait of Sarah Jenkins" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAjv8WkcMBza9QdhlWL7XZF-KLqI-xWV2LPhtNdQnfKzat37_ODHo7vQYus1nDWP8D3LOYxFczlO4M53kp6YpQuGKB7Tu3nnPGZ4jn6XuEhXQyXE9SIims-qJ4s4Wha32rj_fQKErI7lbFKPanhQKab2Y60uWErqTn8674GoM2Dcmt4bXgrsVaY6M0OyWQ3BeU5Ua1CR_KwYVKlzc_MlwEC2M_axIFuYIlPOIFlLKYSAQLCqDOyFJUVy-96mctwndnY6qY5P0NMlA");'></div>
+</div>
+<div class="absolute bottom-1 right-1 size-8 bg-green-500 rounded-full border-4 border-white dark:border-[#1a202c] flex items-center justify-center" title="Active">
+<span class="material-symbols-outlined text-white text-[16px]">check</span>
+</div>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div>
+<h2 class="text-[#111318] dark:text-white text-2xl font-bold leading-tight">Sarah Jenkins</h2>
+<div class="flex flex-wrap items-center gap-x-4 gap-y-2 mt-1 text-[#606e8a] dark:text-[#a0aec0] text-sm">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[18px]">work</span> Senior Product Designer</span>
+<span class="hidden md:inline">•</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[18px]">apartment</span> Design Department</span>
+<span class="hidden md:inline">•</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[18px]">calendar_today</span> Joined March 15, 2020</span>
+</div>
+</div>
+<div class="flex gap-3">
+<button class="flex items-center justify-center px-4 h-10 rounded-lg bg-background-light dark:bg-[#2d3748] text-[#111318] dark:text-white text-sm font-semibold hover:bg-gray-200 dark:hover:bg-[#4a5568] transition-colors">
+                                            Message
+                                        </button>
+<button class="flex items-center justify-center gap-2 px-4 h-10 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-blue-700 transition-colors shadow-sm hover:shadow-md">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+<span>Edit Profile</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Info Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+<!-- Left Column (Contact & Emergency) -->
+<div class="lg:col-span-2 flex flex-col gap-6">
+<!-- Contact Information -->
+<div class="bg-white dark:bg-[#1a202c] rounded-xl border border-[#f0f1f5] dark:border-[#2d3748] p-6 shadow-sm">
+<div class="flex items-center justify-between mb-6">
+<h3 class="text-lg font-bold text-[#111318] dark:text-white flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">contact_mail</span>
+                                    Contact Information
+                                </h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-8">
+<div class="flex flex-col gap-1">
+<span class="text-xs font-medium text-[#606e8a] dark:text-[#a0aec0] uppercase tracking-wider">Work Email</span>
+<a class="text-[#111318] dark:text-white text-base font-medium hover:text-primary transition-colors truncate" href="mailto:sarah.j@company.com">sarah.j@company.com</a>
+</div>
+<div class="flex flex-col gap-1">
+<span class="text-xs font-medium text-[#606e8a] dark:text-[#a0aec0] uppercase tracking-wider">Phone Number</span>
+<a class="text-[#111318] dark:text-white text-base font-medium hover:text-primary transition-colors truncate" href="tel:+15550123">+1 (555) 012-3456</a>
+</div>
+<div class="flex flex-col gap-1 md:col-span-2">
+<span class="text-xs font-medium text-[#606e8a] dark:text-[#a0aec0] uppercase tracking-wider">Office Address</span>
+<p class="text-[#111318] dark:text-white text-base font-medium">456 Innovation Blvd, Floor 3, San Francisco, CA 94107, USA</p>
+</div>
+<div class="flex flex-col gap-1">
+<span class="text-xs font-medium text-[#606e8a] dark:text-[#a0aec0] uppercase tracking-wider">Timezone</span>
+<p class="text-[#111318] dark:text-white text-base font-medium">Pacific Standard Time (PST)</p>
+</div>
+<div class="flex flex-col gap-1">
+<span class="text-xs font-medium text-[#606e8a] dark:text-[#a0aec0] uppercase tracking-wider">Preferred Language</span>
+<p class="text-[#111318] dark:text-white text-base font-medium">English (US)</p>
+</div>
+</div>
+</div>
+<!-- Emergency Contact -->
+<div class="bg-white dark:bg-[#1a202c] rounded-xl border border-[#f0f1f5] dark:border-[#2d3748] p-6 shadow-sm">
+<div class="flex items-center justify-between mb-6">
+<h3 class="text-lg font-bold text-[#111318] dark:text-white flex items-center gap-2">
+<span class="material-symbols-outlined text-red-500">emergency</span>
+                                    Emergency Contact
+                                </h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-8">
+<div class="flex flex-col gap-1">
+<span class="text-xs font-medium text-[#606e8a] dark:text-[#a0aec0] uppercase tracking-wider">Full Name</span>
+<p class="text-[#111318] dark:text-white text-base font-medium">Michael Jenkins</p>
+</div>
+<div class="flex flex-col gap-1">
+<span class="text-xs font-medium text-[#606e8a] dark:text-[#a0aec0] uppercase tracking-wider">Relationship</span>
+<p class="text-[#111318] dark:text-white text-base font-medium">Spouse</p>
+</div>
+<div class="flex flex-col gap-1">
+<span class="text-xs font-medium text-[#606e8a] dark:text-[#a0aec0] uppercase tracking-wider">Phone Number</span>
+<a class="text-[#111318] dark:text-white text-base font-medium hover:text-primary transition-colors" href="tel:+15559876">+1 (555) 987-6543</a>
+</div>
+<div class="flex flex-col gap-1">
+<span class="text-xs font-medium text-[#606e8a] dark:text-[#a0aec0] uppercase tracking-wider">Address</span>
+<p class="text-[#111318] dark:text-white text-base font-medium">Same as employee</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column (Stats & Quick Actions) -->
+<div class="flex flex-col gap-6">
+<!-- Attendance Stats -->
+<div class="bg-white dark:bg-[#1a202c] rounded-xl border border-[#f0f1f5] dark:border-[#2d3748] p-6 shadow-sm">
+<h3 class="text-lg font-bold text-[#111318] dark:text-white mb-4">Attendance Overview</h3>
+<div class="space-y-4">
+<div class="flex items-center justify-between p-3 bg-background-light dark:bg-[#2d3748] rounded-lg">
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-green-600 dark:text-green-400">
+<span class="material-symbols-outlined">check_circle</span>
+</div>
+<div class="flex flex-col">
+<span class="text-sm font-medium text-[#111318] dark:text-white">Present Days</span>
+<span class="text-xs text-[#606e8a] dark:text-[#a0aec0]">This Month</span>
+</div>
+</div>
+<span class="text-xl font-bold text-[#111318] dark:text-white">22</span>
+</div>
+<div class="flex items-center justify-between p-3 bg-background-light dark:bg-[#2d3748] rounded-lg">
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-full bg-yellow-100 dark:bg-yellow-900/30 flex items-center justify-center text-yellow-600 dark:text-yellow-400">
+<span class="material-symbols-outlined">star</span>
+</div>
+<div class="flex flex-col">
+<span class="text-sm font-medium text-[#111318] dark:text-white">Reward Points</span>
+<span class="text-xs text-[#606e8a] dark:text-[#a0aec0]">Geofencing Bonus</span>
+</div>
+</div>
+<span class="text-xl font-bold text-[#111318] dark:text-white">450</span>
+</div>
+<div class="flex items-center justify-between p-3 bg-background-light dark:bg-[#2d3748] rounded-lg">
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400">
+<span class="material-symbols-outlined">schedule</span>
+</div>
+<div class="flex flex-col">
+<span class="text-sm font-medium text-[#111318] dark:text-white">Avg. Hours</span>
+<span class="text-xs text-[#606e8a] dark:text-[#a0aec0]">Per Day</span>
+</div>
+</div>
+<span class="text-xl font-bold text-[#111318] dark:text-white">8.2</span>
+</div>
+</div>
+<button class="w-full mt-4 py-2 text-sm font-medium text-primary hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors">View Full Attendance</button>
+</div>
+<!-- Team Members -->
+<div class="bg-white dark:bg-[#1a202c] rounded-xl border border-[#f0f1f5] dark:border-[#2d3748] p-6 shadow-sm">
+<h3 class="text-lg font-bold text-[#111318] dark:text-white mb-4">Team Members</h3>
+<div class="flex flex-col gap-3">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-full bg-cover bg-center" data-alt="Team member 1" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDsqUVaJ9IIAA656X3jbcUDyyeD2ZYPtQy7n7OzhNzzaM61Bpgdp26B7ax-ZgAJGCZgoEWMUSWbSXRLtfIk-VUN5E4MbKKjaflEp6fBdbXxJIrz89XUw36gvvRery_YWG2CJnBPGWKNjyGAQ4mopdf_9BIn5CB6Vi7BElpTYzqfboXGJH6NAKUO4lxRjvlPBCFOHFiLr6OQsHX59ZoSQo2nFXB5AJHX9CfnVTYBGLX7JcP8qPCpBwptdOAFkvaVovMPdxQrX1ZsPA");'></div>
+<div class="flex flex-col">
+<span class="text-sm font-medium text-[#111318] dark:text-white">David Kim</span>
+<span class="text-xs text-[#606e8a] dark:text-[#a0aec0]">Product Manager</span>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-full bg-cover bg-center" data-alt="Team member 2" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBJhc4GYgBCQTxmI2Wp5ttdYBMXleVlZHWrXCg97VCbm3FyCZQOCVvhDkO580o4yk29HCQfUQUYalu3Y5Vo6Otht8KWOjyxuRM8YRYIUE7pZknDuYxkzk7UxO-v-x6H8NFnHbmPxK0ggYji6XJsRxUt7BrJipkITtU5F7TO0tU_TaZrNVUEjDoq9VfwP0jNcC07IGTifoRDco85W0DX_9eQYUnX67_epg-D5eFkfEQMIEf3oNuhhUsal20X4uaq7OBGJ22NBYg6Vw");'></div>
+<div class="flex flex-col">
+<span class="text-sm font-medium text-[#111318] dark:text-white">Marcus Johnson</span>
+<span class="text-xs text-[#606e8a] dark:text-[#a0aec0]">UX Researcher</span>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-full bg-cover bg-center" data-alt="Team member 3" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDpViUD_5v8zW9DtiW6sPEc00DjuhyPKjw8kRGskxR4eaixIS9fCFn5BFjnbtU5Mtv5yDyi6RJueLlQ3uV8ER9LCQVjiXKAnUQW90qZtpihMzDtGOvjUNa3nH_MIfdE7px6Z5YTOJkkuCxZefd10zqbzDQnAQDzgUtZClrjI8INT0DvTOTOnlaj2dsaDUIsMgORAYwqOOYTUC6LRpRL_WuRkLsbQIjjk1hCP0Sp3WYJiwWF4mmAJYwAWwUVYPaOLavW7uXJ6ojRmA");'></div>
+<div class="flex flex-col">
+<span class="text-sm font-medium text-[#111318] dark:text-white">Emily Chen</span>
+<span class="text-xs text-[#606e8a] dark:text-[#a0aec0]">Frontend Dev</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

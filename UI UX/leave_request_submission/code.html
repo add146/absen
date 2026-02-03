@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Leave Request Submission</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0d59f2",
+                        "background-light": "#f5f6f8",
+                        "background-dark": "#101622",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white font-display overflow-hidden">
+<div class="flex h-screen w-full flex-row">
+<!-- SideNavBar -->
+<aside class="w-72 flex-none border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-[#111318] flex flex-col justify-between p-4 hidden lg:flex h-full overflow-y-auto">
+<div class="flex flex-col gap-4">
+<div class="flex gap-3 items-center px-2 py-2">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 bg-slate-200" data-alt="Profile picture of employee" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDypiKg6NVN74ghiFQ8Kw6EecLE4LcC57m7nGYNuQ1BAGZK0-GV-PFHRKbyZrpGi6BXG2I6ok5DwVm6Ti3sUnftdMW4hTGUaEvyPux_bhtg6RYKq0VaGTQW-jR-HK3j7Ka3D1K5c-FTI4csvPyYogVJW3N0HBfoWZwi-ZV6tsR4l8mZbyVOYWOK31XD1JFhH8t0xzoZUSRCeryBsG42scIfZU9Q96_0zpP-aqyocFus2Fmq1opt4Zw4l_cPv1OwxwWJbFiLiIeb7g");'></div>
+<div class="flex flex-col">
+<h1 class="text-slate-900 dark:text-white text-base font-medium leading-normal">Alex Morgan</h1>
+<p class="text-slate-500 dark:text-slate-400 text-sm font-normal leading-normal">Product Designer</p>
+</div>
+</div>
+<div class="h-px bg-slate-200 dark:bg-slate-800 w-full my-1"></div>
+<nav class="flex flex-col gap-2">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-[24px]">dashboard</span>
+<p class="text-sm font-medium leading-normal">Dashboard</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary/10 text-primary dark:text-blue-400" href="#">
+<span class="material-symbols-outlined text-[24px] fill-1">calendar_month</span>
+<p class="text-sm font-medium leading-normal">My Leave</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-[24px]">schedule</span>
+<p class="text-sm font-medium leading-normal">Attendance</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-[24px]">group</span>
+<p class="text-sm font-medium leading-normal">Team</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-[24px]">settings</span>
+<p class="text-sm font-medium leading-normal">Settings</p>
+</a>
+</nav>
+</div>
+<div class="px-3 py-2">
+<div class="p-4 rounded-xl bg-gradient-to-br from-primary to-blue-600 text-white">
+<div class="flex items-center gap-2 mb-2">
+<span class="material-symbols-outlined">loyalty</span>
+<span class="font-bold">Rewards</span>
+</div>
+<p class="text-sm opacity-90 mb-3">You have 1,250 points available to redeem.</p>
+<button class="w-full py-2 bg-white/20 hover:bg-white/30 rounded-lg text-sm font-medium transition-colors">View Rewards</button>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 h-full overflow-y-auto bg-background-light dark:bg-background-dark">
+<div class="max-w-[1000px] mx-auto p-6 md:p-10 flex flex-col gap-8">
+<!-- PageHeading -->
+<header class="flex flex-col gap-2">
+<div class="flex items-center gap-2 text-slate-500 text-sm mb-2">
+<span>My Leave</span>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+<span class="text-slate-900 dark:text-white font-medium">New Request</span>
+</div>
+<h1 class="text-slate-900 dark:text-white text-3xl md:text-4xl font-black leading-tight tracking-[-0.033em]">Submit Leave Request</h1>
+<p class="text-slate-500 dark:text-slate-400 text-base font-normal leading-normal max-w-2xl">Fill out the form below to request time off. Your request will be sent to your manager for approval.</p>
+</header>
+<!-- Stats -->
+<section class="grid grid-cols-1 md:grid-cols-3 gap-4">
+<div class="flex flex-col gap-2 rounded-xl p-6 bg-white dark:bg-[#1e2736] border border-slate-200 dark:border-slate-700 shadow-sm">
+<div class="flex items-center justify-between">
+<p class="text-slate-600 dark:text-slate-300 text-base font-medium leading-normal">Annual Leave</p>
+<span class="material-symbols-outlined text-green-500">check_circle</span>
+</div>
+<p class="text-slate-900 dark:text-white tracking-light text-3xl font-bold leading-tight">14 <span class="text-lg font-medium text-slate-400">Days</span></p>
+<div class="w-full bg-slate-100 dark:bg-slate-700 h-1.5 rounded-full mt-2">
+<div class="bg-primary h-1.5 rounded-full" style="width: 65%"></div>
+</div>
+</div>
+<div class="flex flex-col gap-2 rounded-xl p-6 bg-white dark:bg-[#1e2736] border border-slate-200 dark:border-slate-700 shadow-sm">
+<div class="flex items-center justify-between">
+<p class="text-slate-600 dark:text-slate-300 text-base font-medium leading-normal">Sick Leave</p>
+<span class="material-symbols-outlined text-amber-500">health_and_safety</span>
+</div>
+<p class="text-slate-900 dark:text-white tracking-light text-3xl font-bold leading-tight">5 <span class="text-lg font-medium text-slate-400">Days</span></p>
+<div class="w-full bg-slate-100 dark:bg-slate-700 h-1.5 rounded-full mt-2">
+<div class="bg-amber-500 h-1.5 rounded-full" style="width: 40%"></div>
+</div>
+</div>
+<div class="flex flex-col gap-2 rounded-xl p-6 bg-white dark:bg-[#1e2736] border border-slate-200 dark:border-slate-700 shadow-sm">
+<div class="flex items-center justify-between">
+<p class="text-slate-600 dark:text-slate-300 text-base font-medium leading-normal">Floating Holidays</p>
+<span class="material-symbols-outlined text-purple-500">celebration</span>
+</div>
+<p class="text-slate-900 dark:text-white tracking-light text-3xl font-bold leading-tight">2 <span class="text-lg font-medium text-slate-400">Days</span></p>
+<div class="w-full bg-slate-100 dark:bg-slate-700 h-1.5 rounded-full mt-2">
+<div class="bg-purple-500 h-1.5 rounded-full" style="width: 80%"></div>
+</div>
+</div>
+</section>
+<!-- Form Area -->
+<div class="bg-white dark:bg-[#1e2736] rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
+<div class="p-6 md:p-8 flex flex-col gap-8">
+<!-- Top Row: Type & Reason -->
+<div class="flex flex-col md:flex-row gap-6">
+<!-- Leave Type -->
+<div class="flex-1 min-w-[300px]">
+<label class="flex flex-col gap-2 w-full">
+<span class="text-slate-900 dark:text-white text-base font-medium leading-normal">Leave Type</span>
+<div class="relative">
+<select class="form-select w-full appearance-none rounded-lg text-slate-900 dark:text-white border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 h-12 px-4 pr-10 text-base focus:border-primary focus:ring-primary focus:ring-1">
+<option disabled="" value="">Select leave type</option>
+<option selected="" value="annual">Annual Leave</option>
+<option value="sick">Sick Leave</option>
+<option value="floating">Floating Holiday</option>
+<option value="unpaid">Unpaid Leave</option>
+</select>
+<div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-500">
+<span class="material-symbols-outlined">expand_more</span>
+</div>
+</div>
+<p class="text-xs text-slate-500">Select the category for your time off request.</p>
+</label>
+</div>
+<!-- Attachment Placeholder (Simplified) -->
+<div class="flex-1">
+<label class="flex flex-col gap-2 w-full">
+<span class="text-slate-900 dark:text-white text-base font-medium leading-normal">Attachment (Optional)</span>
+<div class="flex w-full items-center justify-center rounded-lg border-2 border-dashed border-slate-200 dark:border-slate-600 px-6 py-3 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer group">
+<div class="text-center">
+<div class="flex items-center justify-center gap-2 text-slate-500 group-hover:text-primary transition-colors">
+<span class="material-symbols-outlined">cloud_upload</span>
+<span class="text-sm font-medium">Click to upload</span>
+</div>
+<p class="text-xs text-slate-400 mt-1">PDF, IMG up to 5MB</p>
+</div>
+</div>
+</label>
+</div>
+</div>
+<!-- Date Selection -->
+<div class="flex flex-col gap-2">
+<div class="flex items-center justify-between mb-2">
+<span class="text-slate-900 dark:text-white text-base font-medium leading-normal">Select Dates</span>
+<div class="flex items-center gap-2 text-sm">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary font-medium">
+<span class="material-symbols-outlined text-[16px]">calendar_today</span>
+                                        Nov 7 - Nov 10
+                                    </span>
+<span class="text-slate-400">|</span>
+<span class="text-slate-600 dark:text-slate-300">4 Days Total</span>
+</div>
+</div>
+<!-- Calendar Wrapper -->
+<div class="border border-slate-200 dark:border-slate-600 rounded-xl p-4 bg-slate-50/50 dark:bg-slate-800/30">
+<div class="flex flex-wrap lg:flex-nowrap justify-center gap-8">
+<!-- Month 1: October -->
+<div class="flex-1 min-w-[300px] max-w-[360px] flex flex-col gap-2">
+<div class="flex items-center justify-between px-2">
+<button class="p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full transition-colors">
+<span class="material-symbols-outlined text-slate-900 dark:text-white">chevron_left</span>
+</button>
+<p class="text-slate-900 dark:text-white text-base font-bold">October 2023</p>
+<div class="w-8"></div> <!-- Spacer for center alignment -->
+</div>
+<!-- Grid Header -->
+<div class="grid grid-cols-7 mb-2">
+<span class="text-center text-xs font-semibold text-slate-400 py-2">S</span>
+<span class="text-center text-xs font-semibold text-slate-400 py-2">M</span>
+<span class="text-center text-xs font-semibold text-slate-400 py-2">T</span>
+<span class="text-center text-xs font-semibold text-slate-400 py-2">W</span>
+<span class="text-center text-xs font-semibold text-slate-400 py-2">T</span>
+<span class="text-center text-xs font-semibold text-slate-400 py-2">F</span>
+<span class="text-center text-xs font-semibold text-slate-400 py-2">S</span>
+</div>
+<!-- Days -->
+<div class="grid grid-cols-7 gap-y-1">
+<!-- Empty Days -->
+<div></div><div></div><div></div>
+<!-- Days 1-31 -->
+<button class="h-10 w-full flex items-center justify-center text-sm text-slate-700 dark:text-slate-300 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">1</button>
+<button class="h-10 w-full flex items-center justify-center text-sm text-slate-700 dark:text-slate-300 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">2</button>
+<button class="h-10 w-full flex items-center justify-center text-sm text-slate-700 dark:text-slate-300 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">3</button>
+<button class="h-10 w-full flex items-center justify-center text-sm text-slate-700 dark:text-slate-300 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">4</button>
+<button class="h-10 w-full flex items-center justify-center text-sm text-slate-700 dark:text-slate-300 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">5</button>
+<button class="h-10 w-full flex items-center justify-center text-sm text-slate-700 dark:text-slate-300 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">6</button>
+<button class="h-10 w-full flex items-center justify-center text-sm text-slate-700 dark:text-slate-300 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">7</button>
+<button class="h-10 w-full flex items-center justify-center text-sm text-slate-700 dark:text-slate-300 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">8</button>
+<button class="h-10 w-full flex items-center justify-center text-sm text-slate-700 dark:text-slate-300 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">9</button>
+<button class="h-10 w-full flex items-center justify-center text-sm text-slate-700 dark:text-slate-300 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">10</button>
+<button class="h-10 w-full flex items-center justify-center text-sm text-slate-700 dark:text-slate-300 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">11</button>
+<button class="h-10 w-full flex items-center justify-center text-sm text-slate-700 dark:text-slate-300 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">12</button>
+<button class="h-10 w-full flex items-center justify-center text-sm text-slate-700 dark:text-slate-300 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">13</button>
+<button class="h-10 w-full flex items-center justify-center text-sm text-slate-700 dark:text-slate-300 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">14</button>
+<button class="h-10 w-full flex items-center justify-center text-sm text-slate-700 dark:text-slate-300 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">15</button>
+<button class="h-10 w-full flex items-center justify-center text-sm text-slate-700 dark:text-slate-300 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">16</button>
+<button class="h-10 w-full flex items-center justify-center text-sm text-slate-700 dark:text-slate-300 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">17</button>
+<button class="h-10 w-full flex items-center justify-center text-sm text-slate-700 dark:text-slate-300 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">18</button>
+<button class="h-10 w-full flex items-center justify-center text-sm text-slate-700 dark:text-slate-300 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">19</button>
+<button class="h-10 w-full flex items-center justify-center text-sm text-slate-700 dark:text-slate-300 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">20</button>
+<button class="h-10 w-full flex items-center justify-center text-sm text-slate-700 dark:text-slate-300 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">21</button>
+<button class="h-10 w-full flex items-center justify-center text-sm text-slate-700 dark:text-slate-300 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">22</button>
+<button class="h-10 w-full flex items-center justify-center text-sm text-slate-700 dark:text-slate-300 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">23</button>
+<button class="h-10 w-full flex items-center justify-center text-sm text-slate-700 dark:text-slate-300 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">24</button>
+<button class="h-10 w-full flex items-center justify-center text-sm text-slate-700 dark:text-slate-300 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">25</button>
+<button class="h-10 w-full flex items-center justify-center text-sm text-slate-700 dark:text-slate-300 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">26</button>
+<button class="h-10 w-full flex items-center justify-center text-sm text-slate-700 dark:text-slate-300 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">27</button>
+<button class="h-10 w-full flex items-center justify-center text-sm text-slate-700 dark:text-slate-300 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">28</button>
+<button class="h-10 w-full flex items-center justify-center text-sm text-slate-700 dark:text-slate-300 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">29</button>
+<button class="h-10 w-full flex items-center justify-center text-sm text-slate-700 dark:text-slate-300 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">30</button>
+<button class="h-10 w-full flex items-center justify-center text-sm text-slate-700 dark:text-slate-300 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">31</button>
+</div>
+</div>
+<!-- Divider -->
+<div class="hidden lg:block w-px bg-slate-200 dark:bg-slate-700"></div>
+<!-- Month 2: November (Active Selection) -->
+<div class="flex-1 min-w-[300px] max-w-[360px] flex flex-col gap-2">
+<div class="flex items-center justify-between px-2">
+<div class="w-8"></div>
+<p class="text-slate-900 dark:text-white text-base font-bold">November 2023</p>
+<button class="p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full transition-colors">
+<span class="material-symbols-outlined text-slate-900 dark:text-white">chevron_right</span>
+</button>
+</div>
+<!-- Grid Header -->
+<div class="grid grid-cols-7 mb-2">
+<span class="text-center text-xs font-semibold text-slate-400 py-2">S</span>
+<span class="text-center text-xs font-semibold text-slate-400 py-2">M</span>
+<span class="text-center text-xs font-semibold text-slate-400 py-2">T</span>
+<span class="text-center text-xs font-semibold text-slate-400 py-2">W</span>
+<span class="text-center text-xs font-semibold text-slate-400 py-2">T</span>
+<span class="text-center text-xs font-semibold text-slate-400 py-2">F</span>
+<span class="text-center text-xs font-semibold text-slate-400 py-2">S</span>
+</div>
+<!-- Days -->
+<div class="grid grid-cols-7 gap-y-1">
+<!-- Empty Days -->
+<div></div><div></div><div></div>
+<!-- Days 1-6 -->
+<button class="h-10 w-full flex items-center justify-center text-sm text-slate-700 dark:text-slate-300 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">1</button>
+<button class="h-10 w-full flex items-center justify-center text-sm text-slate-700 dark:text-slate-300 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">2</button>
+<button class="h-10 w-full flex items-center justify-center text-sm text-slate-700 dark:text-slate-300 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">3</button>
+<button class="h-10 w-full flex items-center justify-center text-sm text-slate-700 dark:text-slate-300 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">4</button>
+<button class="h-10 w-full flex items-center justify-center text-sm text-slate-700 dark:text-slate-300 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">5</button>
+<button class="h-10 w-full flex items-center justify-center text-sm text-slate-700 dark:text-slate-300 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">6</button>
+<!-- SELECTION START -->
+<button class="h-10 w-full flex items-center justify-center bg-primary/20 rounded-l-full relative">
+<span class="flex items-center justify-center w-8 h-8 rounded-full bg-primary text-white text-sm font-medium">7</span>
+</button>
+<!-- SELECTION MIDDLE -->
+<button class="h-10 w-full flex items-center justify-center bg-primary/20">
+<span class="text-sm font-medium text-primary">8</span>
+</button>
+<button class="h-10 w-full flex items-center justify-center bg-primary/20">
+<span class="text-sm font-medium text-primary">9</span>
+</button>
+<!-- SELECTION END -->
+<button class="h-10 w-full flex items-center justify-center bg-primary/20 rounded-r-full relative">
+<span class="flex items-center justify-center w-8 h-8 rounded-full bg-primary text-white text-sm font-medium">10</span>
+</button>
+<!-- Rest of month -->
+<button class="h-10 w-full flex items-center justify-center text-sm text-slate-700 dark:text-slate-300 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">11</button>
+<button class="h-10 w-full flex items-center justify-center text-sm text-slate-700 dark:text-slate-300 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">12</button>
+<button class="h-10 w-full flex items-center justify-center text-sm text-slate-700 dark:text-slate-300 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">13</button>
+<button class="h-10 w-full flex items-center justify-center text-sm text-slate-700 dark:text-slate-300 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">14</button>
+<button class="h-10 w-full flex items-center justify-center text-sm text-slate-700 dark:text-slate-300 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">15</button>
+<button class="h-10 w-full flex items-center justify-center text-sm text-slate-700 dark:text-slate-300 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">16</button>
+<button class="h-10 w-full flex items-center justify-center text-sm text-slate-700 dark:text-slate-300 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">17</button>
+<button class="h-10 w-full flex items-center justify-center text-sm text-slate-700 dark:text-slate-300 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">18</button>
+<button class="h-10 w-full flex items-center justify-center text-sm text-slate-700 dark:text-slate-300 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">19</button>
+<button class="h-10 w-full flex items-center justify-center text-sm text-slate-700 dark:text-slate-300 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">20</button>
+<button class="h-10 w-full flex items-center justify-center text-sm text-slate-700 dark:text-slate-300 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">21</button>
+<button class="h-10 w-full flex items-center justify-center text-sm text-slate-700 dark:text-slate-300 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">22</button>
+<button class="h-10 w-full flex items-center justify-center text-sm text-slate-700 dark:text-slate-300 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">23</button>
+<button class="h-10 w-full flex items-center justify-center text-sm text-slate-700 dark:text-slate-300 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">24</button>
+<button class="h-10 w-full flex items-center justify-center text-sm text-slate-700 dark:text-slate-300 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">25</button>
+<button class="h-10 w-full flex items-center justify-center text-sm text-slate-700 dark:text-slate-300 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">26</button>
+<button class="h-10 w-full flex items-center justify-center text-sm text-slate-700 dark:text-slate-300 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">27</button>
+<button class="h-10 w-full flex items-center justify-center text-sm text-slate-700 dark:text-slate-300 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">28</button>
+<button class="h-10 w-full flex items-center justify-center text-sm text-slate-700 dark:text-slate-300 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">29</button>
+<button class="h-10 w-full flex items-center justify-center text-sm text-slate-700 dark:text-slate-300 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">30</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Reason -->
+<div class="flex-1">
+<label class="flex flex-col gap-2 w-full">
+<span class="text-slate-900 dark:text-white text-base font-medium leading-normal">Reason</span>
+<textarea class="form-textarea w-full rounded-lg text-slate-900 dark:text-white border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 p-4 text-base focus:border-primary focus:ring-primary focus:ring-1 min-h-[120px]" placeholder="Please describe the reason for your leave request..."></textarea>
+</label>
+</div>
+<div class="h-px bg-slate-200 dark:bg-slate-700 w-full"></div>
+<!-- Actions -->
+<div class="flex flex-col-reverse md:flex-row justify-end gap-4">
+<button class="px-6 py-3 rounded-lg border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-white font-medium hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">Cancel</button>
+<button class="px-8 py-3 rounded-lg bg-primary text-white font-bold hover:bg-blue-700 transition-colors shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2">
+<span class="material-symbols-outlined">send</span>
+                                Submit Request
+                            </button>
+</div>
+</div>
+</div>
+<footer class="text-center text-slate-400 dark:text-slate-500 text-sm py-4">
+                    © 2023 HR Portal. All rights reserved.
+                </footer>
+</div>
+</main>
+</div>
+</body></html>

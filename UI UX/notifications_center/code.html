@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>HR Connect - Notifications</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Theme Configuration -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0d59f2",
+                        "background-light": "#f5f6f8",
+                        "background-dark": "#101622",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings:
+            'FILL' 0,
+            'wght' 400,
+            'GRAD' 0,
+            'opsz' 24
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white antialiased min-h-screen flex flex-col font-display">
+<!-- Top Navigation -->
+<header class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 sticky top-0 z-50">
+<div class="px-4 md:px-10 py-3 flex items-center justify-between gap-4">
+<div class="flex items-center gap-8">
+<!-- Logo -->
+<div class="flex items-center gap-3 text-slate-900 dark:text-white">
+<div class="size-8 text-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-3xl">hr_resting</span>
+</div>
+<h2 class="text-xl font-bold leading-tight tracking-tight">HR Connect</h2>
+</div>
+<!-- Nav Links -->
+<nav class="hidden lg:flex items-center gap-6">
+<a class="text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary text-sm font-medium transition-colors" href="#">Dashboard</a>
+<a class="text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary text-sm font-medium transition-colors" href="#">Attendance</a>
+<a class="text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary text-sm font-medium transition-colors" href="#">Rewards</a>
+<a class="text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary text-sm font-medium transition-colors" href="#">Profile</a>
+</nav>
+</div>
+<!-- Right Actions -->
+<div class="flex flex-1 justify-end items-center gap-4 md:gap-6">
+<!-- Search -->
+<div class="hidden md:flex max-w-xs w-full">
+<div class="relative w-full text-slate-500 focus-within:text-primary">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-[20px]">search</span>
+</div>
+<input class="block w-full pl-10 pr-3 py-2 border-none rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-slate-400 focus:ring-2 focus:ring-primary/50 text-sm transition-all" placeholder="Search..." type="text"/>
+</div>
+</div>
+<!-- Icons -->
+<div class="flex items-center gap-2">
+<button class="flex items-center justify-center size-10 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 relative transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2.5 right-2.5 size-2 bg-red-500 rounded-full border-2 border-white dark:border-slate-800"></span>
+</button>
+<button class="flex items-center justify-center size-10 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</div>
+<!-- Avatar -->
+<div class="size-10 rounded-full bg-cover bg-center ring-2 ring-white dark:ring-slate-700 cursor-pointer" data-alt="User profile picture showing a professional headshot" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDgpZAd_MJ6IzPUGMoef_b8-UC8Pxl1LJ2X8Tlcl8HDfd8yw6pVlA44goIjfOnBXSfZaiQIPIICkzRdH-5Iex5C7DYxxg9nkXqR0NDRaOzMesetc24-BdtWHIJmAUhornisfk61gNEwne7DyRBtec8ptMsDJpHxdsK3h_taCaGzX44r6d98RoxyI8a7hniLzcBs2ymxWMnKd15yxLgWJQPQwxxwc8ommK4GouTaTS28lloihfQYjgE80vaXNmJW5ZKHoZtNAykLpQ");'>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex-grow w-full max-w-[1024px] mx-auto px-4 md:px-8 py-8">
+<!-- Page Header -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+<div class="flex flex-col gap-2">
+<h1 class="text-3xl md:text-4xl font-black tracking-tight text-slate-900 dark:text-white">Notifications</h1>
+<p class="text-slate-500 dark:text-slate-400 text-base">Stay updated with your latest activities, rewards, and HR announcements.</p>
+</div>
+<button class="flex items-center gap-2 px-4 py-2.5 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 text-sm font-semibold rounded-lg transition-colors whitespace-nowrap">
+<span class="material-symbols-outlined text-[18px]">done_all</span>
+<span>Mark all as read</span>
+</button>
+</div>
+<!-- Filter Tabs (Optional Enhancement for Cleanliness) -->
+<div class="flex gap-2 mb-6 overflow-x-auto pb-2 scrollbar-hide">
+<button class="px-4 py-2 bg-primary text-white rounded-full text-sm font-medium shadow-sm shadow-primary/30">All</button>
+<button class="px-4 py-2 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded-full text-sm font-medium transition-colors">Unread</button>
+<button class="px-4 py-2 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded-full text-sm font-medium transition-colors">Announcements</button>
+<button class="px-4 py-2 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded-full text-sm font-medium transition-colors">Alerts</button>
+</div>
+<!-- Notification List -->
+<div class="flex flex-col gap-3">
+<!-- Today Section Header -->
+<h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mt-2 mb-1 pl-1">Today</h3>
+<!-- Item 1: Success/Clock-in -->
+<div class="group relative flex items-start gap-4 p-4 rounded-xl bg-white dark:bg-slate-800 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 shadow-sm hover:shadow-md transition-all cursor-pointer">
+<!-- Unread Indicator -->
+<span class="absolute top-4 right-4 size-2.5 bg-primary rounded-full"></span>
+<div class="flex items-center justify-center shrink-0 size-12 rounded-full bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400">
+<span class="material-symbols-outlined">location_on</span>
+</div>
+<div class="flex flex-col flex-grow min-w-0 gap-1">
+<div class="flex justify-between items-start pr-4">
+<p class="text-slate-900 dark:text-white text-base font-semibold truncate">Clock-in Successful</p>
+<p class="text-slate-400 text-xs font-medium whitespace-nowrap">2m ago</p>
+</div>
+<p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed line-clamp-2">
+                        You successfully clocked in at <span class="font-medium text-slate-700 dark:text-slate-300">09:00 AM</span> from the Headquarters geofence zone.
+                    </p>
+</div>
+</div>
+<!-- Item 2: Rewards -->
+<div class="group relative flex items-start gap-4 p-4 rounded-xl bg-white dark:bg-slate-800 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 shadow-sm hover:shadow-md transition-all cursor-pointer">
+<!-- Unread Indicator -->
+<span class="absolute top-4 right-4 size-2.5 bg-primary rounded-full"></span>
+<div class="flex items-center justify-center shrink-0 size-12 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400">
+<span class="material-symbols-outlined">stars</span>
+</div>
+<div class="flex flex-col flex-grow min-w-0 gap-1">
+<div class="flex justify-between items-start pr-4">
+<p class="text-slate-900 dark:text-white text-base font-semibold truncate">Reward Points Earned</p>
+<p class="text-slate-400 text-xs font-medium whitespace-nowrap">45m ago</p>
+</div>
+<p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed line-clamp-2">
+                        Congratulations! You've earned <span class="font-bold text-primary">50 points</span> for maintaining 100% attendance this week.
+                    </p>
+</div>
+</div>
+<!-- Item 3: Announcement -->
+<div class="group relative flex items-start gap-4 p-4 rounded-xl bg-white dark:bg-slate-800 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 shadow-sm hover:shadow-md transition-all cursor-pointer">
+<div class="flex items-center justify-center shrink-0 size-12 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400">
+<span class="material-symbols-outlined">campaign</span>
+</div>
+<div class="flex flex-col flex-grow min-w-0 gap-1">
+<div class="flex justify-between items-start pr-4">
+<p class="text-slate-900 dark:text-white text-base font-semibold truncate">New HR Announcement</p>
+<p class="text-slate-400 text-xs font-medium whitespace-nowrap">2h ago</p>
+</div>
+<p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed line-clamp-2">
+                        The holiday calendar for 2025 has been updated. Please review the new dates in your dashboard under Resources.
+                    </p>
+</div>
+</div>
+<!-- Yesterday Section Header -->
+<h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mt-6 mb-1 pl-1">Yesterday</h3>
+<!-- Item 4: Leave Approved -->
+<div class="group relative flex items-start gap-4 p-4 rounded-xl bg-white dark:bg-slate-800 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 shadow-sm hover:shadow-md transition-all cursor-pointer">
+<div class="flex items-center justify-center shrink-0 size-12 rounded-full bg-teal-100 dark:bg-teal-900/30 text-teal-600 dark:text-teal-400">
+<span class="material-symbols-outlined">check_circle</span>
+</div>
+<div class="flex flex-col flex-grow min-w-0 gap-1">
+<div class="flex justify-between items-start pr-4">
+<p class="text-slate-900 dark:text-white text-base font-semibold truncate">Leave Request Approved</p>
+<p class="text-slate-400 text-xs font-medium whitespace-nowrap">1d ago</p>
+</div>
+<p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed line-clamp-2">
+                        Your leave request for <span class="font-medium text-slate-700 dark:text-slate-300">Dec 24 - Dec 26</span> has been approved by your manager.
+                    </p>
+</div>
+</div>
+<!-- Item 5: Alert/Warning -->
+<div class="group relative flex items-start gap-4 p-4 rounded-xl bg-white dark:bg-slate-800 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 shadow-sm hover:shadow-md transition-all cursor-pointer">
+<div class="flex items-center justify-center shrink-0 size-12 rounded-full bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400">
+<span class="material-symbols-outlined">warning</span>
+</div>
+<div class="flex flex-col flex-grow min-w-0 gap-1">
+<div class="flex justify-between items-start pr-4">
+<p class="text-slate-900 dark:text-white text-base font-semibold truncate">Timesheet Reminder</p>
+<p class="text-slate-400 text-xs font-medium whitespace-nowrap">1d ago</p>
+</div>
+<p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed line-clamp-2">
+                        You have not submitted your timesheet for the week of Nov 12. Please submit it before EOD to avoid payroll delays.
+                    </p>
+</div>
+</div>
+</div>
+<!-- Pagination / Load More -->
+<div class="mt-8 flex justify-center">
+<button class="text-sm font-medium text-slate-500 hover:text-primary dark:text-slate-400 dark:hover:text-primary transition-colors flex items-center gap-1">
+                Load older notifications
+                <span class="material-symbols-outlined text-sm">expand_more</span>
+</button>
+</div>
+</main>
+</body></html>

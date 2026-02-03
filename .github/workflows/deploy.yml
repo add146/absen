@@ -44,6 +44,8 @@ jobs:
           cd frontend
           npm ci
           npm run build
+        env:
+          VITE_API_URL: ${{ secrets.VITE_API_URL }}
       
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/pages-action@v1

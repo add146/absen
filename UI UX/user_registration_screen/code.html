@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Employee Registration - HR System</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#4F46E5", // Indigo-600, common in the screenshots
+                        "primary-hover": "#4338CA", // Indigo-700
+                        "background-light": "#F3F4F6", // Gray-100
+                        "background-dark": "#111827", // Gray-900
+                        "surface-light": "#FFFFFF",
+                        "surface-dark": "#1F2937", // Gray-800
+                        "text-light": "#1F2937", // Gray-800
+                        "text-dark": "#F9FAFB", // Gray-50
+                        "muted-light": "#6B7280", // Gray-500
+                        "muted-dark": "#9CA3AF", // Gray-400
+                        "border-light": "#E5E7EB", // Gray-200
+                        "border-dark": "#374151", // Gray-700
+                    },
+                    fontFamily: {
+                        display: ["Inter", "sans-serif"],
+                        body: ["Inter", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.5rem",
+                        xl: "1rem",
+                        "2xl": "1.5rem",
+                    },
+                    backgroundImage: {
+                        'gradient-primary': 'linear-gradient(135deg, #6366F1 0%, #A855F7 100%)', // Blue to Purple gradient seen in screenshots
+                    }
+                },
+            },
+        };
+    </script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet"/>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 20px;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background-color: #4b5563;
+        }@keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0px); }
+        }
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+        .animate-float-delayed {
+            animation: float 8s ease-in-out infinite;
+            animation-delay: 2s;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark min-h-screen flex items-center justify-center relative overflow-hidden transition-colors duration-300">
+<div class="absolute top-10 right-10 w-32 h-32 rounded-full bg-gradient-to-br from-blue-400 to-indigo-600 opacity-20 blur-xl animate-float pointer-events-none"></div>
+<div class="absolute bottom-20 left-10 w-48 h-48 rounded-full bg-gradient-to-tr from-purple-400 to-pink-500 opacity-20 blur-2xl animate-float-delayed pointer-events-none"></div>
+<div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-indigo-50 dark:bg-indigo-900/10 rounded-full blur-3xl -z-10 pointer-events-none"></div>
+<div class="w-full max-w-6xl mx-auto p-4 md:p-8 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
+<div class="hidden lg:flex lg:col-span-7 flex-col justify-center space-y-8 pr-8">
+<div class="bg-surface-light dark:bg-surface-dark p-1 rounded-2xl shadow-xl transform rotate-[-2deg] hover:rotate-0 transition-transform duration-500 border border-border-light dark:border-border-dark w-3/4 mx-auto">
+<img alt="Team collaboration dashboard" class="rounded-xl w-full h-auto object-cover opacity-90 dark:opacity-80" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDcz_SY8ot8ufrAkMjxZZydHdf1niA2DTurEgUMoSLCGS3bOPp_AkzRSHcaH4oarr16jRnGBEIk_0EJFUYEph_WjwvgtR4lgm1bdVYBVmfc18Y2wIyna79bxJlnATH7w8xMtgvbkHAJTNaWAnOqABBAxqmlby_TpQ4pFfdqsf3-DuXF2GUtpfCwCtk9seDmc05yxIXTZ1U8u4XOzEnL0PE7WqjTxLEtCsp-nuxOff0OujnJngEOa7PcyD3BlqgTYjKN9rNRqaHDZA"/>
+</div>
+<div class="text-center lg:text-left space-y-4 max-w-lg mx-auto lg:mx-0 pl-8">
+<h1 class="text-4xl font-bold text-text-light dark:text-text-dark leading-tight">
+                    Smart HR Management <br/>
+<span class="text-transparent bg-clip-text bg-gradient-primary">Simplified for Everyone.</span>
+</h1>
+<p class="text-muted-light dark:text-muted-dark text-lg">
+                    Join the team to track attendance, manage leaves, and earn rewards effortlessly with our geofencing technology.
+                </p>
+<div class="flex items-center space-x-4 pt-4">
+<div class="flex -space-x-3">
+<img alt="User avatar" class="w-10 h-10 rounded-full border-2 border-white dark:border-gray-800" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBCywEet-w-qzxZWf4dO9O_lYlGdpieiRcooAd2N45E6IqHh43NpKUH9mUSbKyhgvQ8hVpmJW4ZUi4r-J6huANKzLwTYArAlbg-7taEbjLbd2n-A6_EIDL58CvtluM8uuQcjyFWrKiF7Ct7XMqwAT2u1orUlto1ricGBGHezOAv5Q_bH2wmGYz6VfM08nlTukumdssq2EIJG9MrXWEB-dSDgw9p1pMEZrx4ZDaJ_x9VcIT-9kDXNzP0knHqxv1gXMq8JqNn8eAqDg"/>
+<img alt="User avatar" class="w-10 h-10 rounded-full border-2 border-white dark:border-gray-800" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBxEVy9UTg4v9Ea8sppvRh8Q1jECF8wze09cPv06swXw7qSVnMX4n6Xkstel-OPkDcSIMy7A5Gh4DFFsHjG2YV4r0MUtTR1tTNfSzg6XWRRzmVXZgXRIEOxJRnUhkr8I5SoCtCDxi-PkFV_KD-tM76Be2wZTe_NPwViVL1Iibzbar2FLohxQuTLeBLic5Vr-cOEvngRvMzCcfKxXaYh8ubpUn5F3sGuiee0X6ubf1m8y2ZjRHjrqJhvguw2dH1PCYGd43aejir7cg"/>
+<img alt="User avatar" class="w-10 h-10 rounded-full border-2 border-white dark:border-gray-800" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDVfzkUdmqX2zWEs6cZK5hRCc1aKrZVb7KLH6pjOQyez_-ErAo5Jqwe1IQZIGl5486gYTBtrAsaxnZgo7VfknS5eNhU1G0odt-X8pcoXSyU1W4k_-gYiuz1RGoTdTCH2Ib_Akj0AdBGE-b-j0WvxNSf8JYeeJYZNlOI7uPU2x0AWCQVcR6mNMTJKWZ66-eFOCugc0fSG-oEf2IK1sYDd6d9wFOryYtls4_rqGCWC6T7Dfr2O6lGzYneD4KV022LpjU9YcwdEK8gmA"/>
+<div class="w-10 h-10 rounded-full border-2 border-white dark:border-gray-800 bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-xs font-medium text-gray-500 dark:text-gray-300">+2k</div>
+</div>
+<span class="text-sm font-medium text-muted-light dark:text-muted-dark">Employees onboarded</span>
+</div>
+</div>
+</div>
+<div class="col-span-1 lg:col-span-5 w-full">
+<div class="bg-surface-light dark:bg-surface-dark rounded-2xl shadow-2xl p-8 md:p-10 border border-border-light dark:border-border-dark backdrop-blur-sm bg-opacity-95 dark:bg-opacity-95 relative overflow-hidden">
+<div class="absolute top-0 left-0 w-full h-2 bg-gradient-primary"></div>
+<div class="mb-8 text-center">
+<div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-indigo-50 dark:bg-indigo-900/30 mb-4">
+<span class="material-icons-round text-3xl text-primary">person_add</span>
+</div>
+<h2 class="text-2xl font-bold text-text-light dark:text-text-dark">Create Account</h2>
+<p class="text-muted-light dark:text-muted-dark mt-2 text-sm">Get started with your employee portal</p>
+</div>
+<form action="#" class="space-y-5" method="POST">
+<div>
+<label class="block text-sm font-medium text-text-light dark:text-text-dark mb-1" for="fullname">Full Name</label>
+<div class="relative">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="material-icons-round text-gray-400 text-xl">badge</span>
+</div>
+<input class="pl-10 block w-full rounded-lg border-border-light dark:border-border-dark bg-gray-50 dark:bg-gray-800 text-text-light dark:text-text-dark shadow-sm focus:border-primary focus:ring-primary sm:text-sm h-11 transition-colors" id="fullname" name="fullname" placeholder="John Doe" required="" type="text"/>
+</div>
+</div>
+<div>
+<label class="block text-sm font-medium text-text-light dark:text-text-dark mb-1" for="email">Work Email</label>
+<div class="relative">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="material-icons-round text-gray-400 text-xl">mail</span>
+</div>
+<input class="pl-10 block w-full rounded-lg border-border-light dark:border-border-dark bg-gray-50 dark:bg-gray-800 text-text-light dark:text-text-dark shadow-sm focus:border-primary focus:ring-primary sm:text-sm h-11 transition-colors" id="email" name="email" placeholder="john@company.com" required="" type="email"/>
+</div>
+</div>
+<div>
+<label class="block text-sm font-medium text-text-light dark:text-text-dark mb-1" for="employee_id">Employee ID</label>
+<div class="relative">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="material-icons-round text-gray-400 text-xl">fingerprint</span>
+</div>
+<input class="pl-10 block w-full rounded-lg border-border-light dark:border-border-dark bg-gray-50 dark:bg-gray-800 text-text-light dark:text-text-dark shadow-sm focus:border-primary focus:ring-primary sm:text-sm h-11 transition-colors" id="employee_id" name="employee_id" placeholder="EMP-0000" required="" type="text"/>
+</div>
+</div>
+<div>
+<label class="block text-sm font-medium text-text-light dark:text-text-dark mb-1" for="department">Department</label>
+<div class="relative">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="material-icons-round text-gray-400 text-xl">business</span>
+</div>
+<select class="pl-10 block w-full rounded-lg border-border-light dark:border-border-dark bg-gray-50 dark:bg-gray-800 text-text-light dark:text-text-dark shadow-sm focus:border-primary focus:ring-primary sm:text-sm h-11 transition-colors appearance-none" id="department" name="department">
+<option disabled="" selected="" value="">Select your department</option>
+<option value="hr">Human Resources</option>
+<option value="eng">Engineering</option>
+<option value="sales">Sales &amp; Marketing</option>
+<option value="design">Product Design</option>
+<option value="ops">Operations</option>
+</select>
+<div class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+<span class="material-icons-round text-gray-400 text-xl">expand_more</span>
+</div>
+</div>
+</div>
+<div>
+<label class="block text-sm font-medium text-text-light dark:text-text-dark mb-1" for="password">Password</label>
+<div class="relative">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="material-icons-round text-gray-400 text-xl">lock</span>
+</div>
+<input class="pl-10 block w-full rounded-lg border-border-light dark:border-border-dark bg-gray-50 dark:bg-gray-800 text-text-light dark:text-text-dark shadow-sm focus:border-primary focus:ring-primary sm:text-sm h-11 transition-colors" id="password" name="password" placeholder="••••••••" required="" type="password"/>
+</div>
+<p class="mt-1 text-xs text-muted-light dark:text-muted-dark flex items-center">
+<span class="material-icons-round text-[14px] mr-1 text-green-500">check_circle</span>
+                            Must be at least 8 characters
+                        </p>
+</div>
+<div class="flex items-start">
+<div class="flex items-center h-5">
+<input class="focus:ring-primary h-4 w-4 text-primary border-gray-300 rounded dark:border-gray-600 dark:bg-gray-700" id="terms" name="terms" type="checkbox"/>
+</div>
+<div class="ml-3 text-sm">
+<label class="font-medium text-text-light dark:text-text-dark" for="terms">I agree to the <a class="text-primary hover:text-primary-hover underline decoration-dotted" href="#">Terms of Service</a> and <a class="text-primary hover:text-primary-hover underline decoration-dotted" href="#">Privacy Policy</a></label>
+</div>
+</div>
+<div>
+<button class="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-gradient-primary hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transform transition hover:-translate-y-0.5" type="submit">
+                            Register Account
+                        </button>
+</div>
+</form>
+<div class="mt-6">
+<div class="relative">
+<div class="absolute inset-0 flex items-center">
+<div class="w-full border-t border-border-light dark:border-border-dark"></div>
+</div>
+<div class="relative flex justify-center text-sm">
+<span class="px-2 bg-surface-light dark:bg-surface-dark text-muted-light dark:text-muted-dark">
+                                Already have an account?
+                            </span>
+</div>
+</div>
+<div class="mt-6 text-center">
+<a class="font-medium text-primary hover:text-primary-hover" href="#">Sign in here</a>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="fixed bottom-6 right-6 z-50">
+<button class="p-3 bg-white dark:bg-gray-800 rounded-full shadow-lg border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors" onclick="document.documentElement.classList.toggle('dark')">
+<span class="material-icons-round block dark:hidden">dark_mode</span>
+<span class="material-icons-round hidden dark:block">light_mode</span>
+</button>
+</div>
+
+</body></html>
