@@ -4,6 +4,7 @@ import auth from './routes/auth'
 import attendance from './routes/attendance'
 import admin from './routes/admin'
 import shop from './routes/shop'
+import leaves from './routes/leaves'
 
 export type Bindings = {
     DB: D1Database
@@ -22,5 +23,6 @@ app.route('/auth', auth)
 app.route('/attendance', attendance)
 app.route('/admin', admin)
 app.route('/shop', shop)
+app.route('/leaves', leaves)
 
 export default app

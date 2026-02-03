@@ -3,12 +3,13 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import AttendanceHistory from './pages/AttendanceHistory';
-import Leaves from './pages/Leaves';
 import Rewards from './pages/Rewards';
+import LeaveRequest from './pages/LeaveRequest';
 import AdminDashboard from './pages/admin/Dashboard';
 import EmployeeManagement from './pages/admin/EmployeeManagement';
 import LocationSettings from './pages/admin/LocationSettings';
 import AttendanceReports from './pages/admin/AttendanceReports';
+import LeaveApproval from './pages/admin/LeaveApproval';
 import AdminRoute from './components/AdminRoute';
 import AdminLayout from './layouts/AdminLayout';
 
@@ -29,8 +30,9 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
         <Route path="/attendance" element={<ProtectedRoute><AttendanceHistory /></ProtectedRoute>} />
-        <Route path="/leaves" element={<ProtectedRoute><Leaves /></ProtectedRoute>} />
+        <Route path="/attendance" element={<ProtectedRoute><AttendanceHistory /></ProtectedRoute>} />
         <Route path="/rewards" element={<ProtectedRoute><Rewards /></ProtectedRoute>} />
+        <Route path="/leaves" element={<ProtectedRoute><LeaveRequest /></ProtectedRoute>} />
 
         {/* Admin Routes */}
         <Route path="/admin" element={<AdminRoute />}>
@@ -38,6 +40,7 @@ function App() {
             <Route path="dashboard" element={<AdminDashboard />} />
             <Route path="employees" element={<EmployeeManagement />} />
             <Route path="locations" element={<LocationSettings />} />
+            <Route path="approvals" element={<LeaveApproval />} />
             <Route path="reports" element={<AttendanceReports />} />
             <Route index element={<Navigate to="/admin/dashboard" replace />} />
           </Route>

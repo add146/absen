@@ -1,5 +1,5 @@
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
-import { MdDashboard, MdPeople, MdLocationOn, MdAssessment, MdLogout, MdArrowBack } from 'react-icons/md';
+import { MdDashboard, MdPeople, MdLocationOn, MdAssessment, MdLogout, MdArrowBack, MdCheckCircle } from 'react-icons/md';
 
 const AdminLayout = () => {
     const navigate = useNavigate();
@@ -15,6 +15,7 @@ const AdminLayout = () => {
         { path: '/admin/dashboard', icon: <MdDashboard size={20} />, label: 'Dashboard' },
         { path: '/admin/employees', icon: <MdPeople size={20} />, label: 'Employees' },
         { path: '/admin/locations', icon: <MdLocationOn size={20} />, label: 'Locations' },
+        { path: '/admin/approvals', icon: <MdCheckCircle size={20} />, label: 'Approvals' },
         { path: '/admin/reports', icon: <MdAssessment size={20} />, label: 'Reports' },
     ];
 
