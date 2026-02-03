@@ -10,6 +10,8 @@ import EmployeeManagement from './pages/admin/EmployeeManagement';
 import LocationSettings from './pages/admin/LocationSettings';
 import AttendanceReports from './pages/admin/AttendanceReports';
 import LeaveApproval from './pages/admin/LeaveApproval';
+import ProductManagement from './pages/admin/ProductManagement';
+import OrderManagement from './pages/admin/OrderManagement';
 import AdminRoute from './components/AdminRoute';
 import AdminLayout from './layouts/AdminLayout';
 
@@ -30,7 +32,6 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
         <Route path="/attendance" element={<ProtectedRoute><AttendanceHistory /></ProtectedRoute>} />
-        <Route path="/attendance" element={<ProtectedRoute><AttendanceHistory /></ProtectedRoute>} />
         <Route path="/rewards" element={<ProtectedRoute><Rewards /></ProtectedRoute>} />
         <Route path="/leaves" element={<ProtectedRoute><LeaveRequest /></ProtectedRoute>} />
 
@@ -42,6 +43,8 @@ function App() {
             <Route path="locations" element={<LocationSettings />} />
             <Route path="approvals" element={<LeaveApproval />} />
             <Route path="reports" element={<AttendanceReports />} />
+            <Route path="products" element={<ProductManagement />} />
+            <Route path="orders" element={<OrderManagement />} />
             <Route index element={<Navigate to="/admin/dashboard" replace />} />
           </Route>
         </Route>
