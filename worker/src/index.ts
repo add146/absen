@@ -2,6 +2,7 @@ import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import auth from './routes/auth'
 import attendance from './routes/attendance'
+import admin from './routes/admin'
 
 type Bindings = {
     DB: D1Database
@@ -18,5 +19,6 @@ app.get('/', (c) => {
 
 app.route('/auth', auth)
 app.route('/attendance', attendance)
+app.route('/admin', admin)
 
 export default app

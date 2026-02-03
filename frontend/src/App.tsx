@@ -5,6 +5,12 @@ import Dashboard from './pages/Dashboard';
 import AttendanceHistory from './pages/AttendanceHistory';
 import Leaves from './pages/Leaves';
 import Rewards from './pages/Rewards';
+import AdminDashboard from './pages/admin/Dashboard';
+import EmployeeManagement from './pages/admin/EmployeeManagement';
+import LocationSettings from './pages/admin/LocationSettings';
+import AttendanceReports from './pages/admin/AttendanceReports';
+import AdminRoute from './components/AdminRoute';
+import AdminLayout from './layouts/AdminLayout';
 
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -25,6 +31,17 @@ function App() {
         <Route path="/attendance" element={<ProtectedRoute><AttendanceHistory /></ProtectedRoute>} />
         <Route path="/leaves" element={<ProtectedRoute><Leaves /></ProtectedRoute>} />
         <Route path="/rewards" element={<ProtectedRoute><Rewards /></ProtectedRoute>} />
+
+        {/* Admin Routes */}
+        <Route path="/admin" element={<AdminRoute />}>
+          <Route element={<AdminLayout />}>
+            <Route path="dashboard" element={<AdminDashboard />} />
+            <Route path="employees" element={<EmployeeManagement />} />
+            <Route path="locations" element={<LocationSettings />} />
+            <Route path="reports" element={<AttendanceReports />} />
+            <Route index element={<Navigate to="/admin/dashboard" replace />} />
+          </Route>
+        </Route>
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>

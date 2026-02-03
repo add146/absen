@@ -16,3 +16,12 @@ export const authMiddleware = async (c: Context, next: Next) => {
         return c.json({ error: 'Invalid token' }, 401)
     }
 }
+
+export const adminAuthMiddleware = async (c: Context, next: Next) => {
+    const user = c.get('user')
+    if (!user || user.role !== 'admin') {
+        // Strict check: Must be authenticated AND have 'admin' role
+        return c.json({ error: 'Forbidden: Admin access required' }, 403)
+    }
+    await next()
+}
