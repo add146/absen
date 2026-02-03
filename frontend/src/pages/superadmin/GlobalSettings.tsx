@@ -89,7 +89,6 @@ const GlobalSettings: React.FC = () => {
                                         <div className="flex items-center justify-between mb-2">
                                             <div>
                                                 <div className="font-semibold text-gray-800">{setting.description}</div>
-                                                <div className="text-xs text-gray-400 font-mono mt-0.5">{setting.setting_key}</div>
                                             </div>
                                             {setting.is_sensitive && (
                                                 <span className="px-2 py-1 bg-yellow-100 text-yellow-700 text-xs rounded">Sensitive</span>
