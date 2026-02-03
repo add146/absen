@@ -49,14 +49,14 @@ app.get('/', (c) => {
 
 // Public routes (no auth required)
 app.route('/auth', auth)
-app.route('/tenants', tenants) // Tenant creation is public
-
 // Webhook endpoints (public but should verify signature)
 app.route('/subscriptions', subscriptions) // Some endpoints are public (webhook)
 
 // Protected routes (require authentication + tenant context)
 app.use('/*', tenantContext) // Apply tenant middleware to all routes below
 app.use('/*', rateLimiter)   // Apply rate limiting based on plan
+
+app.route('/tenants', tenants) // Moved here to use tenant middleware (create is whitelisted)
 
 app.route('/attendance', attendance)
 app.route('/admin', admin)
