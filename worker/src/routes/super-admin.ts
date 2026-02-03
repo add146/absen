@@ -129,7 +129,7 @@ superadmin.post('/tenants', async (c) => {
             VALUES (?, ?, ?, ?, ?, ?, ?)
         `).bind(
             crypto.randomUUID(),
-            user.userId,
+            user.sub,
             'CREATE_TENANT',
             'tenant',
             tenantId,
@@ -180,7 +180,7 @@ superadmin.put('/tenants/:id', async (c) => {
             VALUES (?, ?, ?, ?, ?, ?, ?)
         `).bind(
             crypto.randomUUID(),
-            user.userId,
+            user.sub,
             'UPDATE_TENANT',
             'tenant',
             tenantId,
@@ -217,7 +217,7 @@ superadmin.delete('/tenants/:id', async (c) => {
             VALUES (?, ?, ?, ?, ?, ?, ?)
         `).bind(
             crypto.randomUUID(),
-            user.userId,
+            user.sub,
             hard_delete === 'true' ? 'DELETE_TENANT' : 'SUSPEND_TENANT',
             'tenant',
             tenantId,
@@ -291,7 +291,7 @@ superadmin.put('/settings/:key', async (c) => {
             UPDATE global_settings 
             SET setting_value = ?, updated_by = ?, updated_at = ?
             WHERE setting_key = ?
-        `).bind(value, user.userId, now, key).run();
+        `).bind(value, user.sub, now, key).run();
 
         // Log audit
         await db.prepare(`
@@ -299,7 +299,7 @@ superadmin.put('/settings/:key', async (c) => {
             VALUES (?, ?, ?, ?, ?, ?, ?)
         `).bind(
             crypto.randomUUID(),
-            user.userId,
+            user.sub,
             'UPDATE_SETTING',
             'global_setting',
             key,
@@ -358,7 +358,7 @@ superadmin.put('/plans/:id', async (c) => {
             VALUES (?, ?, ?, ?, ?, ?, ?)
         `).bind(
             crypto.randomUUID(),
-            user.userId,
+            user.sub,
             'UPDATE_PLAN',
             'subscription_plan',
             planId,
@@ -509,7 +509,7 @@ superadmin.get('/profile', async (c) => {
         SELECT id, email, name, role, is_super_admin, created_at, updated_at
         FROM users 
         WHERE id = ?
-    `).bind(user.userId).first();
+    `).bind(user.sub).first();
 
     return c.json(profile);
 });
@@ -528,20 +528,19 @@ superadmin.put('/profile', async (c) => {
             }
 
             const currentUser = await db.prepare('SELECT password_hash FROM users WHERE id = ?')
-                .bind(user.userId).first() as any;
+                .bind(user.sub).first() as any;
 
-            // Verify current password (assuming Argon2 or bcrypt)
-            // In production, use proper password verification
-            // const isValid = await verifyPassword(current_password, currentUser.password_hash);
-            // if (!isValid) {
-            //     return c.json({ error: 'Current password is incorrect' }, 401);
-            // }
+            // Verify current password
+            const isValid = await import('bcryptjs').then(b => b.compare(current_password, currentUser.password_hash));
+            if (!isValid) {
+                return c.json({ error: 'Current password is incorrect' }, 401);
+            }
 
             // Hash new password
-            // const hashedPassword = await hashPassword(new_password);
+            const hashedPassword = await import('bcryptjs').then(b => b.hash(new_password, 10));
 
             await db.prepare('UPDATE users SET password_hash = ?, updated_at = ? WHERE id = ?')
-                .bind(new_password, new Date().toISOString(), user.userId).run();
+                .bind(hashedPassword, new Date().toISOString(), user.sub).run();
         }
 
         // Update name and email
@@ -561,7 +560,7 @@ superadmin.put('/profile', async (c) => {
         if (updates.length > 0) {
             updates.push('updated_at = ?');
             params.push(new Date().toISOString());
-            params.push(user.userId);
+            params.push(user.sub);
 
             await db.prepare(`UPDATE users SET ${updates.join(', ')} WHERE id = ?`).bind(...params).run();
         }
@@ -607,7 +606,7 @@ superadmin.post('/users/cleanup', async (c) => {
             VALUES (?, ?, ?, ?, ?, ?, ?)
         `).bind(
             crypto.randomUUID(),
-            user.userId,
+            user.sub,
             'CLEANUP_USERS',
             'user',
             null,
@@ -647,7 +646,7 @@ superadmin.post('/users/bulk-delete', async (c) => {
             VALUES (?, ?, ?, ?, ?, ?, ?)
         `).bind(
             crypto.randomUUID(),
-            user.userId,
+            user.sub,
             'BULK_DELETE_USERS',
             'user',
             null,
