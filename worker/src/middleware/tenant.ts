@@ -29,7 +29,7 @@ export const tenantContext = async (c: Context<{ Bindings: Bindings }>, next: Ne
 
     try {
         // Verify JWT
-        const payload: any = await verify(token, c.env.JWT_SECRET || 'dev_secret', 'HS256')
+        const payload: any = await verify(token, 'HARDCODED_DEBUG_SECRET_123', 'HS256')
 
         if (!payload.tenant_id) {
             // BACKWARD COMPATIBILITY: Support legacy users without tenant_id

@@ -66,7 +66,7 @@ auth.post('/login', async (c) => {
         exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 7 // 7 days
     }
 
-    const token = await sign(payload, c.env.JWT_SECRET || 'dev_secret', 'HS256')
+    const token = await sign(payload, 'HARDCODED_DEBUG_SECRET_123', 'HS256')
 
     return c.json({
         access_token: token,

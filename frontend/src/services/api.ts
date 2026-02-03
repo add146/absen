@@ -30,7 +30,7 @@ api.interceptors.response.use(
             localStorage.removeItem('user_data');
             // TEMPORARY: Commented out to debug loop
             // window.location.href = '/login';
-            console.error('API 401 Unauthorized - Token invalid or expired');
+            console.error('API 401 Debug:', error.response?.data);
         }
         return Promise.reject(error);
     }
