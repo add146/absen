@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import {
     Building2,
@@ -38,6 +38,7 @@ interface TenantData {
 }
 
 const TenantDashboard: React.FC = () => {
+    const navigate = useNavigate();
     const [tenant, setTenant] = useState<TenantData | null>(null);
     const [stats, setStats] = useState<TenantStats | null>(null);
     const [subscription, setSubscription] = useState<SubscriptionInfo | null>(null);
@@ -45,6 +46,17 @@ const TenantDashboard: React.FC = () => {
     const [error, setError] = useState('');
 
     useEffect(() => {
+        // Redirect non-owners to employee dashboard
+        try {
+            const userData = JSON.parse(localStorage.getItem('user_data') || '{}');
+            if (userData && userData.role !== 'owner' && userData.role !== 'super_admin') {
+                navigate('/dashboard', { replace: true });
+                return;
+            }
+        } catch (e) {
+            console.error('Error parsing user data', e);
+        }
+
         fetchTenantData();
     }, []);
 

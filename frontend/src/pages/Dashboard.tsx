@@ -51,6 +51,16 @@ const Dashboard: React.FC = () => {
         fetchTodayAttendance();
         fetchLeavesData();
         fetchWeeklyData();
+
+        // Redirect owners to tenant dashboard
+        try {
+            const userData = JSON.parse(localStorage.getItem('user_data') || '{}');
+            if (userData.role === 'owner' || userData.role === 'super_admin') {
+                navigate('/tenant/dashboard', { replace: true });
+            }
+        } catch (e) {
+            console.error('Error parsing user data', e);
+        }
     }, []);
 
     // Camera Logic
