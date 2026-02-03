@@ -272,12 +272,13 @@ const Dashboard: React.FC = () => {
                             <span className="text-xs font-medium bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 px-2 py-1 rounded">On Track</span>
                         </div>
                         <div className="flex items-end justify-between h-32 gap-2 mb-2">
-                            {[60, 85, 40, 0, 0].map((h, i) => (
+                            {weeklyHours.map((h, i) => (
                                 <div key={i} className="w-full bg-gray-100 dark:bg-gray-700 rounded-t-lg relative group overflow-hidden">
                                     {h > 0 && (
                                         <div
                                             className={`absolute bottom-0 w-full rounded-t-lg transition-all group-hover:opacity-90 ${i === 2 ? 'bg-gradient-to-t from-primary to-secondary' : 'bg-primary/60'}`}
-                                            style={{ height: `${h}%` }}
+                                            // Visualize as percentage (assuming 10h is 100% for now)
+                                            style={{ height: `${Math.min((h / 10) * 100, 100)}%` }}
                                         ></div>
                                     )}
                                 </div>
