@@ -123,6 +123,32 @@ admin.post('/locations', async (c) => {
     return c.json({ message: 'Location created', id })
 })
 
+// PUT /locations/:id - Update location
+admin.put('/locations/:id', async (c) => {
+    const id = c.req.param('id')
+    const { name, latitude, longitude, radius_meters = 100 } = await c.req.json()
+
+    if (!name || !latitude || !longitude) {
+        return c.json({ error: 'Missing required fields' }, 400)
+    }
+
+    await c.env.DB.prepare(
+        'UPDATE locations SET name = ?, latitude = ?, longitude = ?, radius_meters = ? WHERE id = ?'
+    ).bind(name, latitude, longitude, radius_meters, id).run()
+
+    return c.json({ message: 'Location updated' })
+})
+
+// DELETE /locations/:id - Delete location
+admin.delete('/locations/:id', async (c) => {
+    const id = c.req.param('id')
+
+    await c.env.DB.prepare('DELETE FROM locations WHERE id = ?').bind(id).run()
+
+    return c.json({ message: 'Location deleted' })
+})
+
+
 // GET /stats - Dashboard Analytics
 admin.get('/stats', async (c) => {
     // 1. Total Employees

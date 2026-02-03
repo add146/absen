@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import api from '../../services/api';
-import { MdAdd, MdLocationOn } from 'react-icons/md';
+import { MdAdd, MdLocationOn, MdEdit, MdDelete } from 'react-icons/md';
 import { APIProvider, Map, Marker, InfoWindow } from '@vis.gl/react-google-maps';
 
 const GOOGLE_MAPS_API_KEY = 'AIzaSyCsIPdS9shnKfJb2SVlOuWUbLq0ZC5ov3E';
@@ -79,6 +79,7 @@ const LocationSettings = () => {
 
     // Form State
     const [showForm, setShowForm] = useState(false);
+    const [editingId, setEditingId] = useState<string | null>(null);
     const [formData, setFormData] = useState({
         name: '',
         latitude: '',
@@ -109,24 +110,70 @@ const LocationSettings = () => {
         });
     };
 
+    const handleEdit = (location: any) => {
+        setEditingId(location.id);
+        setFormData({
+            name: location.name,
+            latitude: location.latitude.toString(),
+            longitude: location.longitude.toString(),
+            radius_meters: location.radius_meters.toString()
+        });
+        setShowForm(true);
+    };
+
+    const handleDelete = async (id: string, name: string) => {
+        if (!confirm(`Are you sure you want to delete "${name}"?`)) {
+            return;
+        }
+
+        try {
+            await api.delete(`/admin/locations/${id}`);
+            fetchLocations();
+            alert('Location deleted successfully');
+        } catch (error: any) {
+            console.error('Failed to delete location', error);
+            const errorMessage = error.response?.data?.error || error.message || 'Failed to delete location';
+            alert(errorMessage);
+        }
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            await api.post('/admin/locations', {
-                name: formData.name,
-                latitude: parseFloat(formData.latitude),
-                longitude: parseFloat(formData.longitude),
-                radius_meters: parseInt(formData.radius_meters)
-            });
+            if (editingId) {
+                // Update existing location
+                await api.put(`/admin/locations/${editingId}`, {
+                    name: formData.name,
+                    latitude: parseFloat(formData.latitude),
+                    longitude: parseFloat(formData.longitude),
+                    radius_meters: parseInt(formData.radius_meters)
+                });
+                alert('Location updated successfully');
+            } else {
+                // Create new location
+                await api.post('/admin/locations', {
+                    name: formData.name,
+                    latitude: parseFloat(formData.latitude),
+                    longitude: parseFloat(formData.longitude),
+                    radius_meters: parseInt(formData.radius_meters)
+                });
+                alert('Location added successfully');
+            }
             setShowForm(false);
+            setEditingId(null);
             setFormData({ name: '', latitude: '', longitude: '', radius_meters: '100' });
             fetchLocations();
-            alert('Location added successfully');
         } catch (error: any) {
-            console.error('Failed to add location', error);
-            const errorMessage = error.response?.data?.error || error.message || 'Failed to add location';
+            console.error('Failed to save location', error);
+            const errorMessage = error.response?.data?.error || error.message || 'Failed to save location';
             alert(errorMessage);
         }
+    };
+
+    const handleCancelEdit = () => {
+        setShowForm(false);
+        setEditingId(null);
+        setFormData({ name: '', latitude: '', longitude: '', radius_meters: '100' });
     };
 
     return (
@@ -134,7 +181,11 @@ const LocationSettings = () => {
             <div className="flex justify-between items-center">
                 <h2 className="text-2xl font-bold text-gray-800">Location Settings</h2>
                 <button
-                    onClick={() => setShowForm(!showForm)}
+                    onClick={() => {
+                        setEditingId(null);
+                        setFormData({ name: '', latitude: '', longitude: '', radius_meters: '100' });
+                        setShowForm(!showForm);
+                    }}
                     className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
                 >
                     <MdAdd size={20} />
@@ -165,10 +216,12 @@ const LocationSettings = () => {
                 )}
             </div>
 
-            {/* Add Location Form */}
+            {/* Add/Edit Location Form */}
             {showForm && (
                 <div className="bg-white p-6 rounded-xl shadow-sm border border-blue-100">
-                    <h3 className="text-lg font-semibold mb-4">Add New Office Location</h3>
+                    <h3 className="text-lg font-semibold mb-4">
+                        {editingId ? 'Edit Office Location' : 'Add New Office Location'}
+                    </h3>
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div>
                             <label className="block text-sm font-medium text-gray-700">Location Name</label>
@@ -216,10 +269,7 @@ const LocationSettings = () => {
                         <div className="flex justify-end space-x-3">
                             <button
                                 type="button"
-                                onClick={() => {
-                                    setShowForm(false);
-                                    setFormData({ name: '', latitude: '', longitude: '', radius_meters: '100' });
-                                }}
+                                onClick={handleCancelEdit}
                                 className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition"
                             >
                                 Cancel
@@ -228,7 +278,7 @@ const LocationSettings = () => {
                                 type="submit"
                                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
                             >
-                                Save Location
+                                {editingId ? 'Update Location' : 'Save Location'}
                             </button>
                         </div>
                     </form>
@@ -241,18 +291,38 @@ const LocationSettings = () => {
                     <h3 className="text-lg font-semibold mb-4 text-gray-800">Saved Locations</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {locations.map(loc => (
-                            <div key={loc.id} className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-start space-x-4">
-                                <div className="p-3 bg-blue-50 text-blue-600 rounded-lg">
-                                    <MdLocationOn size={24} />
-                                </div>
-                                <div>
-                                    <h3 className="font-bold text-gray-800">{loc.name}</h3>
-                                    <p className="text-sm text-gray-500 mt-1">
-                                        Lat: {loc.latitude}<br />
-                                        Lng: {loc.longitude}
-                                    </p>
-                                    <div className="mt-3 inline-block px-3 py-1 bg-green-50 text-green-700 text-xs font-semibold rounded-full">
-                                        Radius: {loc.radius_meters}m
+                            <div key={loc.id} className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                                <div className="flex items-start justify-between">
+                                    <div className="flex items-start space-x-4 flex-1">
+                                        <div className="p-3 bg-blue-50 text-blue-600 rounded-lg">
+                                            <MdLocationOn size={24} />
+                                        </div>
+                                        <div className="flex-1">
+                                            <h3 className="font-bold text-gray-800">{loc.name}</h3>
+                                            <p className="text-sm text-gray-500 mt-1">
+                                                Lat: {loc.latitude}<br />
+                                                Lng: {loc.longitude}
+                                            </p>
+                                            <div className="mt-3 inline-block px-3 py-1 bg-green-50 text-green-700 text-xs font-semibold rounded-full">
+                                                Radius: {loc.radius_meters}m
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="flex space-x-2 ml-4">
+                                        <button
+                                            onClick={() => handleEdit(loc)}
+                                            className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition"
+                                            title="Edit location"
+                                        >
+                                            <MdEdit size={20} />
+                                        </button>
+                                        <button
+                                            onClick={() => handleDelete(loc.id, loc.name)}
+                                            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition"
+                                            title="Delete location"
+                                        >
+                                            <MdDelete size={20} />
+                                        </button>
                                     </div>
                                 </div>
                             </div>
