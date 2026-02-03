@@ -22,7 +22,7 @@ import AdminRoute from './components/AdminRoute';
 import AdminLayout from './layouts/AdminLayout';
 import TenantOnboarding from './pages/TenantOnboarding';
 import Subscription from './pages/Subscription';
-import TenantDashboard from './pages/TenantDashboard';
+// import TenantDashboard from './pages/TenantDashboard';
 import SuperAdminLayout from './layouts/SuperAdminLayout';
 import SuperAdminDashboard from './pages/superadmin/Dashboard';
 import SuperAdminProfile from './pages/superadmin/Profile';
@@ -55,7 +55,7 @@ function App() {
         <Route path="/leaves" element={<ProtectedRoute><LeaveRequest /></ProtectedRoute>} />
         <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
         <Route path="/subscription" element={<ProtectedRoute><Subscription /></ProtectedRoute>} />
-        <Route path="/tenant/dashboard" element={<ProtectedRoute><TenantDashboard /></ProtectedRoute>} />
+        <Route path="/tenant/dashboard" element={<Navigate to="/admin/dashboard" replace />} />
 
         {/* Admin Routes */}
         <Route path="/admin" element={<AdminRoute />}>

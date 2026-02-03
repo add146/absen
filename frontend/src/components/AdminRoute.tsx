@@ -9,8 +9,8 @@ const AdminRoute = () => {
         return <Navigate to="/login" replace />;
     }
 
-    if (user?.role !== 'admin') {
-        // Redirect non-admin users to employee dashboard
+    if (user?.role !== 'admin' && user?.role !== 'owner' && user?.role !== 'super_admin') {
+        // Redirect non-admin/non-owner users to employee dashboard
         return <Navigate to="/dashboard" replace />;
     }
 
