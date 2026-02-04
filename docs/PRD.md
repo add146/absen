@@ -744,3 +744,29 @@ Sistem **Super Admin** telah diimplementasikan sepenuhnya dengan fitur:
 #### Camera Features
 - **Switch Camera**: Dukungan tombol flip kamera untuk berganti antara kamera depan dan belakang.
 - **Face Verification**: Integrasi foto selfie wajib saat check-in.
+
+### 7.5 Project Hardening & PWA (04 Februari 2026)
+Fase penguatan sistem (hardening) dan implementasi fitur Progressive Web App telah selesai dilakukan.
+
+#### Infrastructure & DevOps
+- **Automated Testing**: Implementasi unit testing menggunakan `Vitest` untuk Backend (Workers) dan Frontend (React).
+- **CI/CD Pipelines**: Otomatisasi testing dan deployment menggunakan GitHub Actions.
+    - `test.yml`: Running test suite pada setiap Pull Request/Push.
+    - `deploy.yml`: Auto-deploy ke Cloudflare Workers & Pages saat merge ke main.
+
+#### Advanced Security
+- **Rate Limiting**: Proteksi endpoint API menggunakan IP-based rate limiting (20 req/min untuk auth) dan Tenant-based limits.
+- **Security Headers**: Implementasi header keamanan global (HSTS, XSS Protection, No-Sniff) pada level Worker middleware.
+
+#### Monitoring & Observability
+- **Health Check Endpoint**: `/health` endpoint untuk memantau status koneksi database dan latency.
+- **Structured Logging**: Utility logging terstandarisasi untuk debugging yang lebih efektif.
+
+#### Progressive Web App (PWA)
+- **Offline Capability**: Penambahan `offline.html` sebagai fallback page yang branded saat tidak ada koneksi internet.
+- **Smart Caching**: Service Worker dikonfigurasi untuk caching asset statis dan halaman offline.
+- **Installable**: Memenuhi kriteria installable (Manifest lengkap, hi-res icons) untuk Android, iOS, dan Desktop.
+
+#### User Experience
+- **Real-time Dashboard**: Super Admin Dashboard kini melakukan polling data otomatis setiap 30 detik untuk visualisasi metrics yang up-to-date.
+- **Accessibility (A11y)**: Perbaikan label ARIA pada komponen interaktif (tombol tema, ikon statistik) untuk mendukung screen readers.
