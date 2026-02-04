@@ -337,7 +337,7 @@ const Dashboard: React.FC = () => {
         return () => navigator.geolocation.clearWatch(geoId);
     }, [officeLocations]);
 
-    const verifyLocationStatus = (locations: any[]) => {
+    const verifyLocationStatus = (_locations: any[]) => {
         // Handled by useEffect watcher now
         setStats(prev => ({ ...prev, location: 'Mencari lokasi...' }));
     }
