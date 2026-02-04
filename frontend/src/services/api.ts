@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8787';
+const API_URL = import.meta.env.VITE_API_URL || 'https://absen-api.khibroh.workers.dev';
 
 const api = axios.create({
     baseURL: API_URL,

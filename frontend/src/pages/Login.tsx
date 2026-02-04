@@ -36,7 +36,8 @@ const Login: React.FC = () => {
         setError('');
 
         try {
-            const res = await api.post('/auth/login', formData);
+            // TEMPORARY: Using emergency-login to bypass KV quota issue
+            const res = await api.post('/emergency-login', formData);
             localStorage.setItem('access_token', res.data.access_token);
             localStorage.setItem('user_data', JSON.stringify(res.data.user));
 

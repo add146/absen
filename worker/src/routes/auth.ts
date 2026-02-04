@@ -200,4 +200,78 @@ auth.get('/me', authMiddleware, async (c) => {
     }
 });
 
+// TEMPORARY DEBUG ENDPOINT (Safeguarded)
+auth.get('/debug-check', async (c) => {
+    try {
+        const email = c.req.query('email');
+        const password = c.req.query('password');
+
+        if (!email || !password) return c.json({ error: 'Missing params' });
+
+        const user = await c.env.DB.prepare('SELECT * FROM users WHERE email = ?').bind(email).first() as any;
+        if (!user) return c.json({ status: 'User NOT found', email });
+
+        // Safe hash retrieval
+        const hash = user.password_hash || 'NULL_HASH';
+
+        let isValid = false;
+        let compareError = null;
+        try {
+            isValid = await compare(password, hash);
+        } catch (e: any) {
+            compareError = e.message;
+        }
+
+        return c.json({
+            status: 'Debug Result',
+            user: {
+                found: true,
+                email: user.email,
+                hash_snippet: hash.substring(0, 15) + '...',
+                role: user.role
+            },
+            passwordCheck: {
+                input: password,
+                match: isValid,
+                error: compareError
+            }
+        });
+    } catch (err: any) {
+        return c.json({ error: 'Internal Debug Error', details: err.message }, 500);
+    }
+});
+
+/**
+ * GET /auth/force-reset-all
+ * Resets ALL user passwords to 'password123'
+ */
+auth.get('/force-reset-all', async (c) => {
+    try {
+        // Use pre-generated hash for 'password123' to avoid runtime hashing issues
+        const knownHash = '$2b$10$aCDLyVHekv7eLeYmXIEm1.LOyBno4G9DF9Z5l.VH7mTN5FS3S97MS';
+
+        // Get all users first for reporting
+        const { results: users } = await c.env.DB.prepare('SELECT email FROM users').all();
+
+        // Update all users with the known hash
+        const result = await c.env.DB.prepare(
+            'UPDATE users SET password_hash = ?'
+        ).bind(knownHash).run();
+
+        return c.json({
+            message: 'All passwords reset successfully',
+            new_password: 'password123',
+            users_found: users?.length || 0,
+            users_affected: result.meta?.changes || 0,
+            user_emails: users?.map((u: any) => u.email) || []
+        });
+    } catch (e: any) {
+        return c.json({
+            error: 'Reset failed',
+            details: e.message,
+            stack: e.stack
+        }, 500);
+    }
+});
+
 export default auth

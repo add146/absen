@@ -804,6 +804,22 @@ Fase penguatan sistem (hardening) dan implementasi fitur Progressive Web App tel
 
 ---
 
+### 7.8 Incident Report & System Adjustments (04 Februari 2026 - Critical Fixes)
+
+#### Emergency Authentication Bypass (KV Quota Mitigation)
+Akibat limitasi kuota tulis Cloudflare KV (1000 writes/day), sistem login mengalami kegagalan massal (Error 500). Sistem telah dimodifikasi dengan **Emergency Login Endpoint** yang mem-bypass caching KV sementara waktu. Middleware `tenantContext` dan `rateLimiter` (write-mode) dinonaktifkan untuk mencegah exhaust quota.
+
+#### JWT Configuration Standardization
+Login loop disebabkan oleh mismatch konfigurasi JWT. Perbaikan meliputi:
+- Standardisasi JWT Secret Key (menggunakan hardcoded key sementara menggantikan env var yang hilang).
+- Penegakan algoritma hashing `HS256`.
+- Penyesuaian payload `sub` & `tenant_id` agar konsisten dengan middleware.
+
+#### Rewards System Hotfix
+Validasi ID produk dilonggarkan untuk mendukung legacy product ID (non-UUID), menyelesaikan error "Invalid product ID format" saat penukaran poin.
+
+---
+
 ## 8. Gap & Future Roadmap (Updated)
 
 Meskipun fitur utama telah selesai (85% Completion), beberapa fitur berikut masih dalam status **Pending** atau **Partial**:

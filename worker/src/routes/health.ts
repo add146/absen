@@ -9,8 +9,14 @@ app.get('/', async (c) => {
 
     try {
         // Simple query to check DB connectivity
-        await c.env.DB.prepare('SELECT 1').first()
-        dbStatus = 'connected'
+        const { user_count } = await c.env.DB.prepare('SELECT COUNT(*) as user_count FROM users').first() as any || { user_count: 0 }
+        const { tenant_count } = await c.env.DB.prepare('SELECT COUNT(*) as tenant_count FROM tenants').first() as any || { tenant_count: 0 }
+
+        dbStatus = `connected (Users: ${user_count}, Tenants: ${tenant_count})`
+
+        // Also check specific user existence if needed
+        // const testUser = await c.env.DB.prepare("SELECT email FROM users WHERE email='test@example.com'").first();
+        // if (testUser) dbStatus += ` | Found test@example.com`
     } catch (e: any) {
         dbStatus = 'error: ' + e.message
     }

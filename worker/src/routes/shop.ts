@@ -86,13 +86,7 @@ app.post('/redeem', authMiddleware, async (c) => {
         }, 400);
     }
 
-    if (!isValidUUID(product_id)) {
-        return c.json({
-            success: false,
-            error: 'Invalid product ID format',
-            code: 'INVALID_PRODUCT_ID'
-        }, 400);
-    }
+
 
     if (typeof quantity !== 'number' || quantity <= 0 || !Number.isInteger(quantity)) {
         return c.json({

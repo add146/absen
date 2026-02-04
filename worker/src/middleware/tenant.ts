@@ -83,11 +83,12 @@ export const tenantContext = async (c: Context<{ Bindings: Bindings }>, next: Ne
 
             // Cache tenant info for 1 hour
             if (c.env.CACHE) {
-                await c.env.CACHE.put(
-                    `tenant:${payload.tenant_id}`,
-                    JSON.stringify(tenant),
-                    { expirationTtl: 3600 }
-                )
+                // TEMPORARY: Disabled due to KV quota exhausted
+                // await c.env.CACHE.put(
+                //    `tenant:${payload.tenant_id}`,
+                //    JSON.stringify(tenant),
+                //    { expirationTtl: 3600 }
+                // )
             }
         }
 
@@ -117,6 +118,10 @@ export const tenantContext = async (c: Context<{ Bindings: Bindings }>, next: Ne
  * Enforces rate limits based on tenant plan
  */
 export const rateLimiter = async (c: Context<{ Bindings: Bindings }>, next: Next) => {
+    // TEMPORARY: Fully disabled
+    return next()
+
+    /* 
     if (!c.env.CACHE) {
         // No KV namespace, skip rate limiting
         return next()
@@ -165,6 +170,7 @@ export const rateLimiter = async (c: Context<{ Bindings: Bindings }>, next: Next
     c.header('X-RateLimit-Reset', (Math.floor(Date.now() / 60000) + 1).toString())
 
     await next()
+    */
 }
 
 /**
@@ -233,9 +239,12 @@ export const customDomainRouter = async (c: Context<{ Bindings: Bindings }>, nex
     if (domain) {
         // Cache the mapping for 24 hours
         if (c.env.CACHE) {
+            // TEMPORARY: Disabled due to KV quota exhausted
+            /*
             await c.env.CACHE.put(`domain:${host}`, domain.tenant_id as string, {
                 expirationTtl: 86400 // 24 hours
             })
+            */
         }
 
         c.set('customDomain', host)

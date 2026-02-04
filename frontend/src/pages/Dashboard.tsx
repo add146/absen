@@ -242,60 +242,104 @@ const Dashboard: React.FC = () => {
         }
     };
 
-    const verifyLocationStatus = (locations: any[]) => {
-        if (!locations || locations.length === 0) return;
+    // Real-time Location Monitor
+    useEffect(() => {
+        if (!officeLocations || officeLocations.length === 0) return;
 
-        setStats(prev => ({ ...prev, location: 'Memeriksa lokasi...' }));
+        const geoId = navigator.geolocation.watchPosition(
+            (position) => {
+                const { latitude, longitude } = position.coords;
+                setLocationCoords({ latitude, longitude });
 
-        navigator.geolocation.getCurrentPosition((position) => {
-            const { latitude, longitude } = position.coords;
-            setLocationCoords({ latitude, longitude });
+                let closestLoc = null;
+                let minDist = Infinity;
+                let isInsideAny = false;
 
-            let minDistance = Infinity;
-            let isInside = false;
-            let validId = 'default';
-            let validName = 'Kantor';
+                // Find closest location
+                for (const loc of officeLocations) {
+                    let dist = Infinity;
+                    let inside = false;
 
-            for (const loc of locations) {
-                // Check if Polygon Mode
-                if (loc.polygon_coords && loc.polygon_coords.length > 0) {
-                    let polygon = loc.polygon_coords;
-                    if (typeof polygon === 'string') {
-                        try { polygon = JSON.parse(polygon); } catch (e) { }
+                    // Polygon Mode
+                    if (loc.polygon_coords && loc.polygon_coords.length > 0) {
+                        let polygon = loc.polygon_coords;
+                        if (typeof polygon === 'string') {
+                            try { polygon = JSON.parse(polygon); } catch (e) { }
+                        }
+                        if (isPointInPolygon({ lat: latitude, lng: longitude }, polygon)) {
+                            inside = true;
+                            dist = 0;
+                        } else {
+                            dist = calculateDistance(latitude, longitude, loc.latitude, loc.longitude);
+                        }
+                    } else {
+                        // Radius Mode
+                        dist = calculateDistance(latitude, longitude, loc.latitude, loc.longitude);
+                        if (dist <= (loc.radius_meters || 100) + 50) {
+                            inside = true;
+                        }
                     }
 
-                    if (isPointInPolygon({ lat: latitude, lng: longitude }, polygon)) {
-                        isInside = true;
-                        validId = loc.id;
-                        validName = loc.name;
-                        // For polygon, distance is 0 (inside) for sorting purposes, or calculate distance to centroid if needed
-                        minDistance = 0;
-                        break;
+                    if (dist < minDist) {
+                        minDist = dist;
+                        closestLoc = loc;
                     }
-                } else {
-                    // Radius Mode
-                    const distance = calculateDistance(latitude, longitude, loc.latitude, loc.longitude);
-                    if (distance <= (loc.radius_meters || 100) + 50) {
-                        isInside = true;
-                        validId = loc.id;
-                        validName = loc.name;
-                        break;
-                    }
-                    if (distance < minDistance) minDistance = distance;
+
+                    if (inside) isInsideAny = true;
                 }
-            }
 
-            if (isInside) {
-                setSelectedLocationId(validId);
-                setStats(prev => ({ ...prev, location: validName || 'Kantor' }));
-            } else {
-                setStats(prev => ({ ...prev, location: `Terlalu Jauh (${Math.round(minDistance)}m)` }));
-            }
+                if (closestLoc) {
+                    // Re-verify if we are inside the CLOSEST one (handling overlapping)
+                    // Users want 'otomatis estimasi jarak' -> Show distance
+                    if (isInsideAny) {
+                        // Logic: If inside ANY, just pick the closest one that we are inside
+                        const insideLoc = officeLocations.find(loc => {
+                            if (loc.polygon_coords && loc.polygon_coords.length > 0) {
+                                let p = loc.polygon_coords;
+                                if (typeof p === 'string') try { p = JSON.parse(p) } catch (e) { }
+                                return isPointInPolygon({ lat: latitude, lng: longitude }, p);
+                            }
+                            const d = calculateDistance(latitude, longitude, loc.latitude, loc.longitude);
+                            return d <= (loc.radius_meters || 100) + 50;
+                        });
 
-        }, (err) => {
-            console.error('Location check failed', err);
-            setStats(prev => ({ ...prev, location: 'Lokasi Tidak Diketahui' }));
-        }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 });
+                        if (insideLoc) {
+                            setSelectedLocationId(insideLoc.id);
+                            setStats(prev => ({
+                                ...prev,
+                                location: `${insideLoc.name} (Terverifikasi)`
+                            }));
+                        } else {
+                            // Fallback
+                            setSelectedLocationId(closestLoc.id);
+                            setStats(prev => ({
+                                ...prev,
+                                location: `${closestLoc.name} (Terverifikasi)`
+                            }));
+                        }
+                    } else {
+                        // Not inside any
+                        // Show: Terlalu Jauh (X m)
+                        setStats(prev => ({
+                            ...prev,
+                            location: `Terlalu Jauh (${Math.round(minDist)}m) - ${closestLoc.name}`
+                        }));
+                    }
+                }
+            },
+            (err) => {
+                console.error('Location watch error', err);
+                setStats(prev => ({ ...prev, location: 'Lokasi Tidak Diketahui' }));
+            },
+            { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
+        );
+
+        return () => navigator.geolocation.clearWatch(geoId);
+    }, [officeLocations]);
+
+    const verifyLocationStatus = (locations: any[]) => {
+        // Handled by useEffect watcher now
+        setStats(prev => ({ ...prev, location: 'Mencari lokasi...' }));
     }
 
     // Ray-Casting Algorithm for Point in Polygon
@@ -561,22 +605,7 @@ const Dashboard: React.FC = () => {
                                 </button>
                             </div>
 
-                            {/* Checkout Location Selector */}
-                            {clockedIn && officeLocations.length > 0 && (
-                                <div className="mb-6 relative z-20">
-                                    <select
-                                        value={selectedLocationId}
-                                        onChange={(e) => setSelectedLocationId(e.target.value)}
-                                        onClick={(e) => e.stopPropagation()}
-                                        className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 text-sm rounded-full px-4 py-2 focus:ring-2 focus:ring-indigo-500 outline-none shadow-sm cursor-pointer hover:bg-white dark:hover:bg-gray-700 transition"
-                                    >
-                                        <option value="default" disabled>Pilih Lokasi...</option>
-                                        {officeLocations.map(loc => (
-                                            <option key={loc.id} value={loc.id}>📍 {loc.name}</option>
-                                        ))}
-                                    </select>
-                                </div>
-                            )}
+
 
                             <div className={`flex items-center justify-center px-6 py-3 rounded-xl border transition-all duration-300 ${stats.location === 'Tidak ada kantor dikonfigurasi' || stats.location.startsWith('Terlalu Jauh')
                                 ? 'bg-red-50 border-red-100 text-red-600 dark:bg-red-900/20 dark:border-red-800 dark:text-red-300'
