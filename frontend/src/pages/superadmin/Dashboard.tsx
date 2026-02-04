@@ -26,7 +26,7 @@ const SuperAdminDashboard: React.FC = () => {
         }
     };
 
-    if (loading) return <div className="text-center py-8" role="status" aria-live="polite">Loading platform analytics...</div>;
+    if (loading) return <div className="text-center py-8" role="status" aria-live="polite">Memuat analitik platform...</div>;
 
     const formatCurrency = (amount: number) => {
         return new Intl.NumberFormat('id-ID', {
@@ -38,31 +38,31 @@ const SuperAdminDashboard: React.FC = () => {
 
     return (
         <div>
-            <h1 className="text-3xl font-bold mb-6">Platform Overview</h1>
+            <h1 className="text-3xl font-bold mb-6">Ringkasan Platform</h1>
 
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 <StatCard
                     icon={<MdBusiness className="text-3xl text-blue-600" aria-hidden="true" />}
-                    label="Total Tenants"
+                    label="Total Penyewa"
                     value={analytics?.tenantStats?.reduce((sum: number, s: any) => sum + (s.count || 0), 0) || 0}
                     bgColor="bg-blue-50"
                 />
                 <StatCard
                     icon={<MdPeople className="text-3xl text-green-600" aria-hidden="true" />}
-                    label="Total Users"
+                    label="Total Pengguna"
                     value={analytics?.totalUsers || 0}
                     bgColor="bg-green-50"
                 />
                 <StatCard
                     icon={<MdAttachMoney className="text-3xl text-purple-600" aria-hidden="true" />}
-                    label="MRR"
+                    label="Pendapatan Bulanan (MRR)"
                     value={formatCurrency(analytics?.mrr || 0)}
                     bgColor="bg-purple-50"
                 />
                 <StatCard
                     icon={<MdTrendingUp className="text-3xl text-orange-600" aria-hidden="true" />}
-                    label="New Signups (30d)"
+                    label="Pendaftar Baru (30h)"
                     value={analytics?.recentSignups || 0}
                     bgColor="bg-orange-50"
                 />
@@ -70,7 +70,7 @@ const SuperAdminDashboard: React.FC = () => {
 
             {/* Tenant Status Breakdown */}
             <div className="bg-white rounded-lg shadow p-6">
-                <h2 className="text-xl font-bold mb-4">Tenant Status</h2>
+                <h2 className="text-xl font-bold mb-4">Status Penyewa</h2>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     {analytics?.tenantStats?.map((stat: any) => (
                         <div key={stat.status} className="text-center p-4 bg-gray-50 rounded-lg">

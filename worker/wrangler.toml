@@ -24,3 +24,6 @@ id = "b9f7c774a5bf4b649abaeee07169f563"
 ENVIRONMENT = "production"
 # JWT_SECRET should be set via: npx wrangler secret put JWT_SECRET
 # MIDTRANS keys should be set via wrangler secrets for security
+
+[triggers]
+crons = ["0 0 * * *"] # Run daily at midnight UTC

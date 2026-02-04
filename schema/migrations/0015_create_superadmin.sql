@@ -30,7 +30,7 @@ VALUES (
 );
 
 -- Step 2: Create Super Admin user
-INSERT INTO users (
+INSERT OR IGNORE INTO users (
     id,
     tenant_id,
     email,

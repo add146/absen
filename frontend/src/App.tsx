@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
+import FieldWorkerDashboard from './pages/FieldWorkerDashboard';
 import AttendanceHistory from './pages/AttendanceHistory';
 import Rewards from './pages/Rewards';
 import LeaveRequest from './pages/LeaveRequest';
@@ -16,8 +17,9 @@ import OrderManagement from './pages/admin/OrderManagement';
 import AnalyticsDashboard from './pages/admin/AnalyticsDashboard';
 import PointRulesManagement from './pages/admin/PointRulesManagement';
 import FraudDetection from './pages/admin/FraudDetection';
-import Settings from './pages/admin/Settings';
+import FieldWorkerVisits from './pages/admin/FieldWorkerVisits';
 import SystemHealth from './pages/admin/SystemHealth';
+import InvoiceHistory from './pages/admin/InvoiceHistory';
 import AdminRoute from './components/AdminRoute';
 import AdminLayout from './layouts/AdminLayout';
 import TenantOnboarding from './pages/TenantOnboarding';
@@ -51,6 +53,7 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/onboarding" element={<TenantOnboarding />} />
         <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+        <Route path="/field-worker-dashboard" element={<ProtectedRoute><FieldWorkerDashboard /></ProtectedRoute>} />
         <Route path="/attendance" element={<ProtectedRoute><AttendanceHistory /></ProtectedRoute>} />
         <Route path="/rewards" element={<ProtectedRoute><Rewards /></ProtectedRoute>} />
         <Route path="/leaves" element={<ProtectedRoute><LeaveRequest /></ProtectedRoute>} />
@@ -71,7 +74,8 @@ function App() {
             <Route path="analytics" element={<AnalyticsDashboard />} />
             <Route path="point-rules" element={<PointRulesManagement />} />
             <Route path="fraud-detection" element={<FraudDetection />} />
-            <Route path="settings" element={<Settings />} />
+            <Route path="field-worker-visits" element={<FieldWorkerVisits />} />
+            <Route path="invoices" element={<InvoiceHistory />} />
             <Route index element={<Navigate to="/admin/dashboard" replace />} />
           </Route>
         </Route>

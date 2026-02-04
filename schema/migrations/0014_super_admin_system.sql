@@ -18,14 +18,14 @@ CREATE INDEX IF NOT EXISTS idx_global_settings_key ON global_settings(setting_ke
 CREATE INDEX IF NOT EXISTS idx_global_settings_sensitive ON global_settings(is_sensitive);
 
 -- Add is_super_admin flag to users table
-ALTER TABLE users ADD COLUMN is_super_admin INTEGER DEFAULT 0;
+-- ALTER TABLE users ADD COLUMN is_super_admin INTEGER DEFAULT 0; -- ALREADY EXISTS in remote
 CREATE INDEX IF NOT EXISTS idx_users_is_super_admin ON users(is_super_admin);
 
 -- Migrate owner → admin role
 UPDATE users SET role = 'admin' WHERE role = 'owner';
 
 -- Insert default global settings (API keys placeholders)
-INSERT INTO global_settings (id, setting_key, setting_value, setting_type, description, is_sensitive) VALUES
+INSERT OR IGNORE INTO global_settings (id, setting_key, setting_value, setting_type, description, is_sensitive) VALUES
     -- WhatsApp Gateway (WAHA)
     ('gs_waha_url', 'waha_api_url', '', 'string', 'WAHA WhatsApp Gateway URL', 0),
     ('gs_waha_key', 'waha_api_key', '', 'encrypted', 'WAHA API Key', 1),

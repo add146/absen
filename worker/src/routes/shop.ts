@@ -674,5 +674,27 @@ app.get('/admin/orders/stats', authMiddleware, adminAuthMiddleware, async (c) =>
     }
 });
 
+// Get Points History (Authenticated users only)
+app.get('/history', authMiddleware, async (c) => {
+    const user = c.get('user');
+    try {
+        const { results } = await c.env.DB.prepare(
+            "SELECT * FROM points_ledger WHERE user_id = ? ORDER BY created_at DESC LIMIT 50"
+        ).bind(user.sub).all();
+
+        return c.json({
+            success: true,
+            data: results
+        });
+    } catch (error) {
+        console.error('Fetch points history error:', error);
+        return c.json({
+            success: false,
+            error: 'Failed to fetch points history',
+            code: 'FETCH_HISTORY_ERROR'
+        }, 500);
+    }
+});
+
 export default app;
 

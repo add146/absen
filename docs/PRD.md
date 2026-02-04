@@ -770,3 +770,47 @@ Fase penguatan sistem (hardening) dan implementasi fitur Progressive Web App tel
 #### User Experience
 - **Real-time Dashboard**: Super Admin Dashboard kini melakukan polling data otomatis setiap 30 detik untuk visualisasi metrics yang up-to-date.
 - **Accessibility (A11y)**: Perbaikan label ARIA pada komponen interaktif (tombol tema, ikon statistik) untuk mendukung screen readers.
+
+### 7.6 Update Implementasi (04 Februari 2026 - Part 2)
+
+#### Point Rules Engine (Loyalty System)
+- **Dynamic Rules Engine**: Implementasi mesin aturan poin yang fleksibel, menggantikan sistem hardcoded.
+- **Rule Types**:
+  - `check_in`: Poin dasar kehadiran.
+  - `on_time`: Bonus poin untuk ketepatan waktu (sebelum jam 09:00).
+  - `full_day`: Bonus poin untuk durasi kerja penuh (> 8 jam).
+  - `streak`: Bonus untuk kehadiran berturut-turut (Coming Soon).
+- **Timezone Aware**: Kalkulasi waktu check-in menyesuaikan dengan format waktu lokal (Asia/Jakarta) untuk akurasi rule `on_time`.
+
+#### Reporting & Billing
+- **Export Data**: Fitur download laporan kehadiran dalam format CSV via backend streaming untuk performa dataset besar.
+- **Invoice History UI**: Halaman baru bagi Admin untuk melihat riwayat tagihan berlangganan, status pembayaran, dan download invoice (PDF).
+
+#### QA & Reliability
+- **Unit Testing**: Penambahan coverage test untuk `PointsEngine` menggunakan Vitest, memastikan logika pemberian poin akurat dalam berbagai skenario (tepat waktu vs terlambat).
+
+### 7.7 Update Implementasi (04 Februari 2026 - Part 3)
+
+#### Full Localization (Bahasa Indonesia)
+- **Admin & Super Admin Interfaces**: Seluruh antarmuka administrator telah diterjemahkan sepenuhnya ke dalam Bahasa Indonesia untuk kemudahan penggunaan lokal.
+  - Termasuk dashboard, manajemen karyawan, pengaturan lokasi, dan laporan.
+  - Status attendance (Masuk, Keluar, Terlambat) dan pesan error juga telah terlokalisasi.
+
+#### Feature Completion
+- **Invoice History UI**: Implementasi penuh halaman riwayat tagihan (`InvoiceHistory.tsx`) yang memungkinkan admin melihat status pembayaran dan mengunduh invoice.
+- **Order Management Polish**: UI manajemen pesanan toko yang lengkap dengan filter status (Pending, Completed, Cancelled) dan fitur ekspor CSV.
+- **System Health Monitoring**: Halaman pemantauan kesehatan sistem (`SystemHealth.tsx`) yang menampilkan status real-time dari API Gateway dan Database.
+- **Fraud Detection UI Refinement**: Visualisasi indikator kecurangan yang lebih jelas (Mock GPS, Impossible Travel) dengan badge risiko (Rendah, Sedang, Tinggi).
+
+---
+
+## 8. Gap & Future Roadmap (Updated)
+
+Meskipun fitur utama telah selesai (85% Completion), beberapa fitur berikut masih dalam status **Pending** atau **Partial**:
+
+1.  **Custom Domain Strategy**: Menggunakan fitur native **Cloudflare for SaaS (Custom Hostnames)**. Pengaturan dilakukan via Cloudflare Dashboard atau simplifikasi UI di masa depan, mengurangi kebutuhan build UI kompleks di awal.
+2.  **Advanced Testing**: Unit test ada, namun End-to-End (E2E) testing dengan Playwright belum disetup.
+3.  **Disaster Recovery**: Rencana pemulihan bencana formal belum didokumentasikan sepenuhnya.
+4.  **Background Sync**: Fitur advanced PWA untuk antrian offline sync belum aktif sepenuhnya.
+
+*Catatan: Fitur Email Notifications telah dihapus dari roadmap sesuai keputusan bisnis 04 Feb 2026. Fokus notifikasi sepenuhnya pada WhatsApp (WAHA).*

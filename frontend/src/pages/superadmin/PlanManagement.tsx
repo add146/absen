@@ -43,7 +43,7 @@ const PlanManagement: React.FC = () => {
             setEditing(null);
             fetchPlans();
         } catch (error: any) {
-            setMessage(error.response?.data?.error || 'Failed to update plan');
+            setMessage(error.response?.data?.error || 'Gagal memperbarui paket');
         }
         setTimeout(() => setMessage(''), 3000);
     };
@@ -56,11 +56,11 @@ const PlanManagement: React.FC = () => {
         }).format(price);
     };
 
-    if (loading) return <div className="text-center py-8">Loading...</div>;
+    if (loading) return <div className="text-center py-8">Memuat...</div>;
 
     return (
         <div>
-            <h1 className="text-3xl font-bold mb-6">Subscription Plans</h1>
+            <h1 className="text-3xl font-bold mb-6">Paket Langganan</h1>
 
             {message && (
                 <div className={`mb-4 p-4 rounded-lg ${message.includes('success') ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
@@ -79,7 +79,7 @@ const PlanManagement: React.FC = () => {
                             {plan.slug === 'premium' && (
                                 <div className="text-center mb-2">
                                     <span className="px-3 py-1 bg-indigo-100 text-indigo-700 text-xs font-bold rounded-full">
-                                        POPULAR
+                                        POPULER
                                     </span>
                                 </div>
                             )}
@@ -107,13 +107,13 @@ const PlanManagement: React.FC = () => {
                             </div>
 
                             <div className="space-y-3 mb-6">
-                                <FeatureItem feature="Max Users" value={features.maxUsers === -1 ? 'Unlimited' : features.maxUsers} />
+                                <FeatureItem feature="Maks Pengguna" value={features.maxUsers === -1 ? 'Tak Terbatas' : features.maxUsers} />
                                 <FeatureItem feature="Geofencing" value={features.geofencing ? '✓' : '✗'} />
-                                <FeatureItem feature="Reports" value={features.reports} />
-                                <FeatureItem feature="Custom Branding" value={features.customBranding ? '✓' : '✗'} />
-                                <FeatureItem feature="API Access" value={features.apiAccess ? '✓' : '✗'} />
-                                <FeatureItem feature="Custom Domain" value={features.customDomain ? '✓' : '✗'} />
-                                <FeatureItem feature="Support" value={features.support} />
+                                <FeatureItem feature="Laporan" value={features.reports} />
+                                <FeatureItem feature="Branding Kustom" value={features.customBranding ? '✓' : '✗'} />
+                                <FeatureItem feature="Akses API" value={features.apiAccess ? '✓' : '✗'} />
+                                <FeatureItem feature="Domain Kustom" value={features.customDomain ? '✓' : '✗'} />
+                                <FeatureItem feature="Dukungan" value={features.support} />
                             </div>
 
                             <div className="pt-4 border-t">
@@ -128,20 +128,20 @@ const PlanManagement: React.FC = () => {
                                                     [plan.id]: { ...editData, is_active: e.target.checked ? 1 : 0 }
                                                 })}
                                             />
-                                            <span className="text-sm">Active</span>
+                                            <span className="text-sm">Aktif</span>
                                         </label>
                                         <button
                                             onClick={() => handleSave(plan.id)}
                                             className="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center justify-center gap-2"
                                         >
                                             <MdSave />
-                                            Save Changes
+                                            Simpan Perubahan
                                         </button>
                                         <button
                                             onClick={() => setEditing(null)}
                                             className="w-full px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
                                         >
-                                            Cancel
+                                            Batal
                                         </button>
                                     </div>
                                 ) : (
@@ -149,7 +149,7 @@ const PlanManagement: React.FC = () => {
                                         <div className="mb-2 text-center">
                                             <span className={`px-2 py-1 rounded text-xs font-semibold ${plan.is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
                                                 }`}>
-                                                {plan.is_active ? 'Active' : 'Inactive'}
+                                                {plan.is_active ? 'Aktif' : 'Tidak Aktif'}
                                             </span>
                                         </div>
                                         <button
@@ -157,7 +157,7 @@ const PlanManagement: React.FC = () => {
                                             className="w-full px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center justify-center gap-2"
                                         >
                                             <MdEdit />
-                                            Edit Plan
+                                            Edit Paket
                                         </button>
                                     </>
                                 )}
@@ -169,7 +169,7 @@ const PlanManagement: React.FC = () => {
 
             <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                 <p className="text-sm text-blue-800">
-                    <strong>💡 Note:</strong> Price changes will affect new subscriptions only. Existing subscriptions will continue at their current rate.
+                    <strong>💡 Catatan:</strong> Perubahan harga hanya akan mempengaruhi langganan baru. Langganan yang ada akan berlanjut dengan tarif saat ini.
                 </p>
             </div>
         </div>

@@ -38,13 +38,13 @@ const LeaveApproval = () => {
     return (
         <div className="space-y-6">
             <header className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                <h1 className="text-2xl font-bold text-gray-800">Leave Approvals</h1>
-                <p className="text-gray-500">Manage employee leave requests.</p>
+                <h1 className="text-2xl font-bold text-gray-800">Persetujuan Cuti</h1>
+                <p className="text-gray-500">Kelola permohonan cuti karyawan.</p>
             </header>
 
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
                 {loading ? (
-                    <div className="p-12 text-center text-gray-500">Loading requests...</div>
+                    <div className="p-12 text-center text-gray-500">Memuat permohonan...</div>
                 ) : leaves.length === 0 ? (
                     <div className="p-12 text-center text-gray-500">Tidak ada permohonan pending.</div>
                 ) : (
@@ -57,7 +57,7 @@ const LeaveApproval = () => {
                                     </div>
                                     <div>
                                         <h3 className="text-lg font-bold text-gray-800">{leave.user_name}</h3>
-                                        <p className="text-sm text-gray-500 capitalize">{leave.user_role} • <span className="font-medium text-gray-700 capitalize">{leave.type} Leave</span></p>
+                                        <p className="text-sm text-gray-500 capitalize">{leave.user_role} • <span className="font-medium text-gray-700 capitalize">Cuti {leave.type}</span></p>
 
                                         <div className="mt-2 space-y-1">
                                             <p className="text-sm text-gray-600">
@@ -75,13 +75,13 @@ const LeaveApproval = () => {
                                         onClick={() => handleApproval(leave.id, 'approved')}
                                         className="px-4 py-2 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 font-medium flex items-center gap-2 transition-colors"
                                     >
-                                        <MdCheckCircle /> Approve
+                                        <MdCheckCircle /> Setujui
                                     </button>
                                     <button
                                         onClick={() => handleApproval(leave.id, 'rejected')}
                                         className="px-4 py-2 bg-red-50 text-red-700 rounded-lg hover:bg-red-100 font-medium flex items-center gap-2 transition-colors"
                                     >
-                                        <MdCancel /> Reject
+                                        <MdCancel /> Tolak
                                     </button>
                                 </div>
                             </div>

@@ -61,7 +61,7 @@ const PointRulesManagement: React.FC = () => {
             fetchRules();
         } catch (error) {
             console.error('Failed to save rule:', error);
-            alert('Failed to save point rule');
+            alert('Gagal menyimpan aturan poin');
         }
     };
 
@@ -80,7 +80,7 @@ const PointRulesManagement: React.FC = () => {
     };
 
     const deleteRule = async (id: string) => {
-        if (!confirm('Are you sure you want to delete this rule?')) return;
+        if (!confirm('Apakah Anda yakin ingin menghapus aturan ini?')) return;
 
         try {
             const token = localStorage.getItem('access_token');
@@ -103,8 +103,8 @@ const PointRulesManagement: React.FC = () => {
         <div className="p-6 max-w-6xl mx-auto">
             <div className="flex justify-between items-center mb-6">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900">Point Rules Management</h1>
-                    <p className="text-gray-600 mt-1">Configure dynamic point earning rules</p>
+                    <h1 className="text-3xl font-bold text-gray-900">Manajemen Aturan Poin</h1>
+                    <p className="text-gray-600 mt-1">Konfigurasi aturan perolehan poin dinamis</p>
                 </div>
                 <button
                     onClick={() => {
@@ -115,7 +115,7 @@ const PointRulesManagement: React.FC = () => {
                     className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700"
                 >
                     <MdAdd size={20} />
-                    Add Rule
+                    Tambah Aturan
                 </button>
             </div>
 
@@ -123,11 +123,11 @@ const PointRulesManagement: React.FC = () => {
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                         <tr>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Points</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nama</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tipe</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Poin</th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
+                            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Aksi</th>
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
@@ -144,7 +144,7 @@ const PointRulesManagement: React.FC = () => {
                                         className={`flex items-center gap-1 ${rule.is_active ? 'text-green-600' : 'text-gray-400'}`}
                                     >
                                         {rule.is_active ? <MdToggleOn size={24} /> : <MdToggleOff size={24} />}
-                                        <span className="text-sm">{rule.is_active ? 'Active' : 'Inactive'}</span>
+                                        <span className="text-sm">{rule.is_active ? 'Aktif' : 'Tidak Aktif'}</span>
                                     </button>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -180,10 +180,10 @@ const PointRulesManagement: React.FC = () => {
             {showModal && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                     <div className="bg-white rounded-lg p-6 w-full max-w-md">
-                        <h2 className="text-2xl font-bold mb-4">{editingRule ? 'Edit' : 'Add'} Point Rule</h2>
+                        <h2 className="text-2xl font-bold mb-4">{editingRule ? 'Edit' : 'Tambah'} Aturan Poin</h2>
                         <form onSubmit={handleSubmit}>
                             <div className="mb-4">
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Nama Aturan</label>
                                 <input
                                     type="text"
                                     value={formData.name}
@@ -193,20 +193,20 @@ const PointRulesManagement: React.FC = () => {
                                 />
                             </div>
                             <div className="mb-4">
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Rule Type</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Tipe Aturan</label>
                                 <select
                                     value={formData.rule_type}
                                     onChange={(e) => setFormData({ ...formData, rule_type: e.target.value })}
                                     className="w-full border rounded-lg px-3 py-2"
                                 >
                                     <option value="check_in">Check-in</option>
-                                    <option value="on_time">On-Time Bonus</option>
-                                    <option value="streak">Streak Bonus</option>
-                                    <option value="full_day">Full Day Bonus</option>
+                                    <option value="on_time">Bonus Tepat Waktu</option>
+                                    <option value="streak">Bonus Streak</option>
+                                    <option value="full_day">Bonus Hari Penuh</option>
                                 </select>
                             </div>
                             <div className="mb-4">
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Points Amount</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Jumlah Poin</label>
                                 <input
                                     type="number"
                                     value={formData.points_amount}
@@ -217,14 +217,14 @@ const PointRulesManagement: React.FC = () => {
                             </div>
                             <div className="flex gap-2">
                                 <button type="submit" className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700">
-                                    Save
+                                    Simpan
                                 </button>
                                 <button
                                     type="button"
                                     onClick={() => setShowModal(false)}
                                     className="flex-1 bg-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-300"
                                 >
-                                    Cancel
+                                    Batal
                                 </button>
                             </div>
                         </form>

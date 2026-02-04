@@ -13,7 +13,8 @@ import {
     MdDarkMode,
     MdLightMode,
     MdMenu,
-    MdPerson
+    MdPerson,
+    MdReceipt
 } from 'react-icons/md';
 
 interface DashboardLayoutProps {
@@ -39,25 +40,26 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
 
     const user = JSON.parse(localStorage.getItem('user_data') || '{}');
 
-    const navItems = [
-        { name: 'Dashboard', icon: <MdDashboard />, path: '/dashboard' },
-        { name: 'Attendance', icon: <MdSchedule />, path: '/attendance' },
-        { name: 'Leaves', icon: <MdFlightTakeoff />, path: '/leaves' },
-        { name: 'Team', icon: <MdGroup />, path: '/team' },
-        { name: 'Rewards', icon: <MdLeaderboard />, path: '/rewards', badge: '120 pts' },
-        { name: 'Profile', icon: <MdPerson />, path: '/profile' },
-        { name: 'Settings', icon: <MdSettings />, path: '/settings' },
+    const navItems: { name: string; icon: React.ReactNode; path: string; badge?: string }[] = [
+        { name: 'Dasbor', icon: <MdDashboard />, path: '/dashboard' },
+        { name: 'Kehadiran', icon: <MdSchedule />, path: '/attendance' },
+        { name: 'Cuti', icon: <MdFlightTakeoff />, path: '/leaves' },
+        { name: 'Tim', icon: <MdGroup />, path: '/team' },
+        { name: 'Hadiah', icon: <MdLeaderboard />, path: '/rewards' },
+        { name: 'Profil', icon: <MdPerson />, path: '/profile' },
+        { name: 'Pengaturan', icon: <MdSettings />, path: '/settings' },
     ];
 
-    if (user.role === 'admin') {
-        navItems.push({ name: 'Admin Panel', icon: <MdToken />, path: '/admin/dashboard', badge: 'New' });
+    if (user.role === 'admin' || user.role === 'owner') {
+        navItems.push({ name: 'Panel Admin', icon: <MdToken />, path: '/admin/dashboard', badge: 'Baru' });
+        navItems.push({ name: 'Faktur', icon: <MdReceipt />, path: '/admin/invoices' });
     }
 
     return (
         <div className={`flex h-screen overflow-hidden bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-200 font-display ${darkMode ? 'dark' : ''}`}>
 
-            {/* Sidebar - Desktop */}
-            <aside className="hidden md:flex flex-col w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 h-full fixed left-0 top-0 z-20">
+            {/* Sidebar - Responsive */}
+            <aside className={`flex flex-col w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 h-full fixed left-0 top-0 z-50 transition-transform duration-300 ease-in-out md:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
                 <div className="flex items-center justify-center h-20 border-b border-gray-200 dark:border-gray-700">
                     <div className="flex items-center space-x-2">
                         <MdToken className="text-primary text-3xl" />
@@ -101,7 +103,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
                         <button
                             onClick={handleLogout}
                             className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
-                            title="Logout"
+                            title="Keluar"
                         >
                             <MdLogout className="text-xl" />
                         </button>
@@ -112,7 +114,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
                         <span>v1.0.1</span>
                         <button
                             onClick={() => {
-                                if (window.confirm('Reload app to get latest updates?')) {
+                                if (window.confirm('Muat ulang aplikasi untuk mendapatkan pembaruan terbaru?')) {
                                     if ('serviceWorker' in navigator) {
                                         navigator.serviceWorker.getRegistrations().then(function (registrations) {
                                             for (let registration of registrations) {
@@ -125,7 +127,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
                             }}
                             className="text-blue-500 hover:text-blue-600 hover:underline flex items-center gap-1"
                         >
-                            Update App
+                            Perbarui App
                         </button>
                     </div>
                 </div>
@@ -145,8 +147,8 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
                     </div>
 
                     <div className="hidden md:block">
-                        <h2 className="text-xl font-semibold text-gray-800 dark:text-white">Good Morning, {user.name?.split(' ')[0] || 'User'}! ☀️</h2>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">{new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}</p>
+                        <h2 className="text-xl font-semibold text-gray-800 dark:text-white">Selamat Pagi, {user.name?.split(' ')[0] || 'User'}! ☀️</h2>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">{new Date().toLocaleDateString('id-ID', { weekday: 'long', month: 'short', day: 'numeric' })}</p>
                     </div>
 
                     <div className="flex items-center gap-4">
@@ -161,7 +163,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
                 </header>
 
                 {/* Page Content */}
-                <div className="p-6 md:p-8 max-w-7xl mx-auto w-full flex-1">
+                <div className="p-4 md:p-8 max-w-7xl mx-auto w-full flex-1">
                     {children}
                 </div>
 

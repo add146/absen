@@ -18,6 +18,7 @@ import subscriptions from './routes/subscriptions'
 import customDomains from './routes/custom-domains'
 import superadmin from './routes/super-admin'
 import health from './routes/health'
+import visits from './routes/visits'
 import { tenantContext, rateLimiter, customDomainRouter } from './middleware/tenant'
 import { logger } from './utils/logger'
 
@@ -83,5 +84,16 @@ app.route('/notifications', notifications)
 app.route('/settings', settings)
 app.route('/custom-domains', customDomains)
 app.route('/profile', profile)
+app.route('/visits', visits)
 
-export default app
+app.route('/profile', profile)
+
+export default {
+    fetch: app.fetch,
+    scheduled: async (event: ScheduledEvent, env: Bindings, ctx: ExecutionContext) => {
+        ctx.waitUntil((async () => {
+            const { processDailyMetrics } = await import('./services/metrics-scheduler')
+            await processDailyMetrics(env)
+        })())
+    }
+}

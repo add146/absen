@@ -22,7 +22,7 @@ const PlatformAnalytics: React.FC = () => {
         }
     };
 
-    if (loading) return <div className="text-center py-8">Loading analytics...</div>;
+    if (loading) return <div className="text-center py-8">Memuat analitik...</div>;
 
     const formatCurrency = (amount: number) => {
         return new Intl.NumberFormat('id-ID', {
@@ -47,34 +47,34 @@ const PlatformAnalytics: React.FC = () => {
 
     return (
         <div>
-            <h1 className="text-3xl font-bold mb-6">Platform Analytics</h1>
+            <h1 className="text-3xl font-bold mb-6">Analitik Platform</h1>
 
             {/* Key Metrics */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 <MetricCard
                     icon={<MdBusiness className="text-3xl text-blue-600" />}
-                    label="Total Tenants"
+                    label="Total Penyewa"
                     value={tenantStatusData.reduce((sum: number, item: any) => sum + item.value, 0)}
                     trend="+12%"
                     bgColor="bg-blue-50"
                 />
                 <MetricCard
                     icon={<MdPeople className="text-3xl text-green-600" />}
-                    label="Total Users"
+                    label="Total Pengguna"
                     value={analytics?.totalUsers || 0}
                     trend="+8%"
                     bgColor="bg-green-50"
                 />
                 <MetricCard
                     icon={<MdAttachMoney className="text-3xl text-purple-600" />}
-                    label="Monthly Revenue"
+                    label="Pendapatan Bulanan"
                     value={formatCurrency(analytics?.mrr || 0)}
                     trend="+15%"
                     bgColor="bg-purple-50"
                 />
                 <MetricCard
                     icon={<MdTrendingUp className="text-3xl text-orange-600" />}
-                    label="Growth Rate"
+                    label="Tingkat Pertumbuhan"
                     value="24%"
                     trend="+5%"
                     bgColor="bg-orange-50"
@@ -84,7 +84,7 @@ const PlatformAnalytics: React.FC = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
                 {/* Tenant Growth Chart */}
                 <div className="bg-white rounded-lg shadow p-6">
-                    <h2 className="text-xl font-bold mb-4">Tenant Growth</h2>
+                    <h2 className="text-xl font-bold mb-4">Pertumbuhan Penyewa</h2>
                     <ResponsiveContainer width="100%" height={300}>
                         <LineChart data={growthData}>
                             <CartesianGrid strokeDasharray="3 3" />
@@ -92,14 +92,14 @@ const PlatformAnalytics: React.FC = () => {
                             <YAxis />
                             <Tooltip />
                             <Legend />
-                            <Line type="monotone" dataKey="tenants" stroke="#3b82f6" strokeWidth={2} name="Tenants" />
+                            <Line type="monotone" dataKey="tenants" stroke="#3b82f6" strokeWidth={2} name="Penyewa" />
                         </LineChart>
                     </ResponsiveContainer>
                 </div>
 
                 {/* User Growth Chart */}
                 <div className="bg-white rounded-lg shadow p-6">
-                    <h2 className="text-xl font-bold mb-4">User Growth</h2>
+                    <h2 className="text-xl font-bold mb-4">Pertumbuhan Pengguna</h2>
                     <ResponsiveContainer width="100%" height={300}>
                         <LineChart data={growthData}>
                             <CartesianGrid strokeDasharray="3 3" />
@@ -107,7 +107,7 @@ const PlatformAnalytics: React.FC = () => {
                             <YAxis />
                             <Tooltip />
                             <Legend />
-                            <Line type="monotone" dataKey="users" stroke="#10b981" strokeWidth={2} name="Users" />
+                            <Line type="monotone" dataKey="users" stroke="#10b981" strokeWidth={2} name="Pengguna" />
                         </LineChart>
                     </ResponsiveContainer>
                 </div>
@@ -116,7 +116,7 @@ const PlatformAnalytics: React.FC = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
                 {/* Revenue Chart */}
                 <div className="bg-white rounded-lg shadow p-6">
-                    <h2 className="text-xl font-bold mb-4">Revenue Trend</h2>
+                    <h2 className="text-xl font-bold mb-4">Tren Pendapatan</h2>
                     <ResponsiveContainer width="100%" height={300}>
                         <BarChart data={growthData}>
                             <CartesianGrid strokeDasharray="3 3" />
@@ -124,14 +124,14 @@ const PlatformAnalytics: React.FC = () => {
                             <YAxis />
                             <Tooltip formatter={(value) => formatCurrency(Number(value))} />
                             <Legend />
-                            <Bar dataKey="revenue" fill="#8b5cf6" name="Revenue (IDR)" />
+                            <Bar dataKey="revenue" fill="#8b5cf6" name="Pendapatan (IDR)" />
                         </BarChart>
                     </ResponsiveContainer>
                 </div>
 
                 {/* Tenant Status Distribution */}
                 <div className="bg-white rounded-lg shadow p-6">
-                    <h2 className="text-xl font-bold mb-4">Tenant Status Distribution</h2>
+                    <h2 className="text-xl font-bold mb-4">Distribusi Status Penyewa</h2>
                     <ResponsiveContainer width="100%" height={300}>
                         <PieChart>
                             <Pie
@@ -156,13 +156,13 @@ const PlatformAnalytics: React.FC = () => {
 
             {/* Top Tenants Table */}
             <div className="bg-white rounded-lg shadow p-6">
-                <h2 className="text-xl font-bold mb-4">Top Performing Tenants</h2>
+                <h2 className="text-xl font-bold mb-4">Penyewa Berkinerja Terbaik</h2>
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                         <tr>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tenant</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Plan</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Users</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Penyewa</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Paket</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Pengguna</th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">MRR</th>
                         </tr>

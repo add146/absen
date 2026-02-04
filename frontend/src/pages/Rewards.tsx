@@ -4,7 +4,9 @@ import {
     MdAccountBalanceWallet,
     MdRedeem,
     MdCardGiftcard,
-    MdStar
+    MdStar,
+    MdClose,
+    MdHistory
 } from 'react-icons/md';
 import DashboardLayout from '../components/DashboardLayout';
 
@@ -13,6 +15,9 @@ const Rewards: React.FC = () => {
     const [orders, setOrders] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [balance, setBalance] = useState(0);
+    const [showHistory, setShowHistory] = useState(false);
+    const [history, setHistory] = useState<any[]>([]);
+    const [historyLoading, setHistoryLoading] = useState(false);
 
     useEffect(() => {
         fetchData();
@@ -35,6 +40,23 @@ const Rewards: React.FC = () => {
             setLoading(false);
         }
     };
+
+    const fetchHistory = async () => {
+        if (history.length > 0) return;
+        setHistoryLoading(true);
+        try {
+            const res = await api.get('/shop/history');
+            setHistory(res.data.data);
+        } catch (error) {
+            console.error('Failed to fetch history', error);
+        } finally {
+            setHistoryLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        if (showHistory) fetchHistory();
+    }, [showHistory]);
 
     const handleRedeem = async (product: any) => {
         if (balance < product.price_points) {
@@ -88,7 +110,8 @@ const Rewards: React.FC = () => {
                                         <MdRedeem className="text-sm" />
                                         Redeem
                                     </button>
-                                    <button className="flex-1 bg-indigo-600 bg-opacity-40 text-white font-semibold py-2 px-4 rounded-lg hover:bg-opacity-50 transition-colors border border-indigo-400 border-opacity-30">
+                                    <button onClick={() => setShowHistory(true)} className="flex-1 bg-indigo-600 bg-opacity-40 text-white font-semibold py-2 px-4 rounded-lg hover:bg-opacity-50 transition-colors border border-indigo-400 border-opacity-30 flex items-center justify-center gap-2">
+                                        <MdHistory className="text-lg" />
                                         History
                                     </button>
                                 </div>
@@ -177,6 +200,45 @@ const Rewards: React.FC = () => {
 
                 </div>
             </div>
+            {/* History Modal */}
+            {showHistory && (
+                <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
+                    <div className="bg-white dark:bg-gray-800 rounded-2xl w-full max-w-2xl max-h-[80vh] flex flex-col relative">
+                        <div className="p-6 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center">
+                            <h3 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                                <MdHistory /> Riwayat Poin
+                            </h3>
+                            <button onClick={() => setShowHistory(false)} className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white">
+                                <MdClose className="text-2xl" />
+                            </button>
+                        </div>
+
+                        <div className="p-6 overflow-y-auto flex-1">
+                            {historyLoading ? (
+                                <div className="text-center py-8 text-gray-500">Memuat riwayat...</div>
+                            ) : history.length === 0 ? (
+                                <div className="text-center py-8 text-gray-500">Belum ada riwayat poin.</div>
+                            ) : (
+                                <div className="space-y-4">
+                                    {history.map((item, idx) => (
+                                        <div key={idx} className="flex justify-between items-center p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl border border-gray-100 dark:border-gray-700">
+                                            <div>
+                                                <p className="font-medium text-gray-900 dark:text-white">{item.description || item.transaction_type}</p>
+                                                <p className="text-xs text-gray-500 dark:text-gray-400">
+                                                    {new Date(item.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                                                </p>
+                                            </div>
+                                            <span className={`font-bold ${item.amount > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                                {item.amount > 0 ? '+' : ''}{item.amount}
+                                            </span>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
         </DashboardLayout>
     );
 };

@@ -1,6 +1,7 @@
 import { Hono } from 'hono'
 import { sign } from 'hono/jwt'
 import { compare, hash } from 'bcryptjs'
+import { authMiddleware } from '../middleware/auth'
 
 type Bindings = {
     DB: D1Database
@@ -162,5 +163,41 @@ auth.post('/join', async (c) => {
         return c.json({ error: 'Registration failed', details: e.message }, 500)
     }
 })
+
+/**
+ * GET /auth/me
+ * Get current user profile
+ */
+auth.get('/me', authMiddleware, async (c) => {
+    try {
+        const payload = c.get('user') as any;
+        const userId = payload.sub;
+
+        const user = await c.env.DB.prepare(
+            'SELECT id, name, email, role, tenant_id, points_balance, face_registered, face_photo_url FROM users WHERE id = ?'
+        ).bind(userId).first();
+
+        if (!user) {
+            return c.json({ error: 'User not found' }, 404);
+        }
+
+        return c.json({
+            user: {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+                tenant_id: user.tenant_id,
+                points_balance: user.points_balance || 0,
+                face_registered: user.face_registered,
+                face_photo_url: user.face_photo_url
+            }
+        });
+
+    } catch (e: any) {
+        console.error('Fetch /me error', e);
+        return c.json({ error: 'Failed to fetch profile' }, 500);
+    }
+});
 
 export default auth

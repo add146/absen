@@ -39,33 +39,33 @@ const GlobalSettings: React.FC = () => {
             delete newEdited[key];
             setEditedValues(newEdited);
         } catch (error: any) {
-            setMessage(error.response?.data?.error || 'Failed to update setting');
+            setMessage(error.response?.data?.error || 'Gagal menyimpan pengaturan');
         } finally {
             setSaving(false);
             setTimeout(() => setMessage(''), 3000);
         }
     };
 
-    if (loading) return <div className="text-center py-8">Loading...</div>;
+    if (loading) return <div className="text-center py-8">Memuat...</div>;
 
     const settingGroups = {
         'WhatsApp Gateway (WAHA)': settings.filter(s => s.setting_key.includes('waha')),
         'Midtrans Payment': settings.filter(s => s.setting_key.includes('midtrans')),
         'Google Maps': settings.filter(s => s.setting_key.includes('google') || s.setting_key.includes('gmaps')),
         'Platform Settings': settings.filter(s => s.setting_key.includes('platform') || s.setting_key.includes('support')),
-        'Other': settings.filter(s => !s.setting_key.includes('waha') && !s.setting_key.includes('midtrans') && !s.setting_key.includes('google') && !s.setting_key.includes('gmaps') && !s.setting_key.includes('platform') && !s.setting_key.includes('support'))
+        'Lainnya': settings.filter(s => !s.setting_key.includes('waha') && !s.setting_key.includes('midtrans') && !s.setting_key.includes('google') && !s.setting_key.includes('gmaps') && !s.setting_key.includes('platform') && !s.setting_key.includes('support'))
     };
 
     return (
         <div>
             <div className="flex items-center justify-between mb-6">
-                <h1 className="text-3xl font-bold">Global Settings</h1>
+                <h1 className="text-3xl font-bold">Pengaturan Global</h1>
                 <button
                     onClick={() => setShowSensitive(!showSensitive)}
                     className="flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
                 >
                     {showSensitive ? <MdVisibilityOff /> : <MdVisibility />}
-                    {showSensitive ? 'Hide' : 'Show'} Sensitive Values
+                    {showSensitive ? 'Sembunyikan' : 'Tampilkan'} Nilai Sensitif
                 </button>
             </div>
 
@@ -100,7 +100,7 @@ const GlobalSettings: React.FC = () => {
                                                 value={editedValues[setting.setting_key] ?? setting.setting_value}
                                                 onChange={(e) => handleEdit(setting.setting_key, e.target.value)}
                                                 className="flex-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
-                                                placeholder={`Enter ${setting.description}`}
+                                                placeholder={`Masukkan ${setting.description}`}
                                             />
                                             {editedValues[setting.setting_key] !== undefined && (
                                                 <button
@@ -109,7 +109,7 @@ const GlobalSettings: React.FC = () => {
                                                     className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 flex items-center gap-2"
                                                 >
                                                     <MdSave />
-                                                    Save
+                                                    Simpan
                                                 </button>
                                             )}
                                         </div>
@@ -123,7 +123,7 @@ const GlobalSettings: React.FC = () => {
 
             <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
                 <p className="text-sm text-yellow-800">
-                    <strong>⚠️ Warning:</strong> Changes to these settings affect the entire platform. Incorrect values may break functionality for all tenants.
+                    <strong>⚠️ Peringatan:</strong> Perubahan pada pengaturan ini mempengaruhi seluruh platform. Nilai yang salah dapat merusak fungsionalitas untuk semua penyewa.
                 </p>
             </div>
         </div>

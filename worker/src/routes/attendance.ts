@@ -2,8 +2,10 @@ import { Hono } from 'hono'
 import { authMiddleware } from '../middleware/auth'
 import { FaceVerificationService } from '../services/face-verification'
 import { PointsService } from '../services/points'
+import { PointsEngine } from '../services/points-engine'
 import { GeofenceService } from '../services/geofence'
 import { FraudDetector } from '../services/fraud-detection'
+import { LocationValidator } from '../services/location-validator'
 
 type Bindings = {
     DB: D1Database
@@ -57,68 +59,21 @@ attendance.post('/check-in', async (c) => {
         }
 
         // Resolve valid location_id
-        // Resolve valid location_id
         let validLocationId = location_id || 'default';
-        let locationValid = false;
 
         try {
-            if (location_id && location_id !== 'default') {
-                // Validate specific location
-                const loc = await c.env.DB.prepare('SELECT * FROM locations WHERE id = ?').bind(location_id).first<any>();
-                if (loc) {
-                    if (loc.polygon_coords) {
-                        // Polygon Validation
-                        let polygon: any[] = [];
-                        try {
-                            polygon = typeof loc.polygon_coords === 'string' ? JSON.parse(loc.polygon_coords) : loc.polygon_coords;
-                        } catch (e) { }
+            const locationValidator = new LocationValidator(c.env.DB);
+            const validation = await locationValidator.validate(latitude, longitude, user.tenant_id, location_id);
 
-                        if (isPointInPolygon({ lat: latitude, lng: longitude }, polygon)) {
-                            locationValid = true;
-                        }
-                    } else {
-                        // Radius Validation
-                        const distance = calculateDistance(latitude, longitude, loc.latitude, loc.longitude);
-                        // Add 50m buffer
-                        if (distance <= (loc.radius_meters || 100) + 50) {
-                            locationValid = true;
-                        }
-                    }
-                }
-            } else {
-                // Validate against ANY active location for this tenant
-                const locations = await c.env.DB.prepare('SELECT * FROM locations WHERE is_active = 1 AND tenant_id = ?').bind(user.tenant_id).all<any>();
-                for (const loc of locations.results) {
-                    if (loc.polygon_coords) {
-                        // Polygon Validation
-                        let polygon: any[] = [];
-                        try {
-                            polygon = typeof loc.polygon_coords === 'string' ? JSON.parse(loc.polygon_coords) : loc.polygon_coords;
-                        } catch (e) { }
-
-                        if (isPointInPolygon({ lat: latitude, lng: longitude }, polygon)) {
-                            locationValid = true;
-                            validLocationId = loc.id;
-                            break;
-                        }
-                    } else {
-                        const distance = calculateDistance(latitude, longitude, loc.latitude, loc.longitude);
-                        if (distance <= (loc.radius_meters || 100) + 50) {
-                            locationValid = true;
-                            validLocationId = loc.id;
-                            break;
-                        }
-                    }
-                }
+            if (!validation.isValid) {
+                return c.json({ error: validation.error, point: { latitude, longitude } }, 400);
             }
-
-            if (!locationValid) {
-                return c.json({ error: 'Location validation failed. You are outside the designated area.', point: { latitude, longitude } }, 400)
+            if (validation.validLocationId) {
+                validLocationId = validation.validLocationId;
             }
 
         } catch (e) {
             console.error('Error resolving location:', e);
-            // Fallback: If DB fails, we might technically block, but let's fail safe if critical
             return c.json({ error: 'System error during location check' }, 500);
         }
 
@@ -155,12 +110,27 @@ attendance.post('/check-in', async (c) => {
             fraudFlags, fraudScore
         ).run()
 
-        // 5. Award Points
+        // 5. Award Points (Dynamic Rules)
+        let earnedPoints = 10;
         try {
+            const pointsEngine = new PointsEngine(c.env.DB);
+            const attendanceRecord = {
+                id,
+                user_id: user.sub,
+                check_in_time: Math.floor(new Date(now).getTime() / 1000),
+                location_id: validLocationId
+            };
+
+            earnedPoints = await pointsEngine.evaluateRules('check_in', attendanceRecord, {
+                id: user.sub,
+                tenant_id: user.tenant_id,
+                points_balance: 0 // Not needed for check-in rules currently
+            });
+
             const pointsService = new PointsService(c.env.DB);
             await pointsService.awardPoints(
                 user.sub,
-                10,
+                earnedPoints,
                 'attendance',
                 'Points for daily check-in',
                 id
@@ -176,7 +146,7 @@ attendance.post('/check-in', async (c) => {
             time: now,
             face_verified: !!faceVerified,
             face_confidence: faceConfidence,
-            points_earned: 10
+            points_earned: earnedPoints
         })
     } catch (e: any) {
         console.error(e)
@@ -186,27 +156,115 @@ attendance.post('/check-in', async (c) => {
 
 attendance.post('/check-out', async (c) => {
     const user = c.get('user')
-    const { attendance_id, latitude, longitude } = await c.req.json()
+    const { attendance_id, latitude, longitude, location_id } = await c.req.json()
     const now = new Date().toISOString()
+    const checkOutTime = Math.floor(new Date(now).getTime() / 1000);
+
+    // Fetch checkout location name if location_id provided
+    // Fetch checkout location name if location_id provided
+    // Validate Location for Checkout (New Requirement)
+    let validatedCheckoutLocationId = location_id || null;
+    try {
+        const locationValidator = new LocationValidator(c.env.DB);
+        const validation = await locationValidator.validate(latitude, longitude, user.tenant_id, location_id);
+
+        if (!validation.isValid) {
+            return c.json({ error: 'Checkout failed: ' + (validation.error || 'You must be at an office location to check out.'), point: { latitude, longitude } }, 400);
+        }
+        if (validation.validLocationId) {
+            validatedCheckoutLocationId = validation.validLocationId;
+        }
+    } catch (e) {
+        console.error('Validation error check-out:', e);
+        return c.json({ error: 'Location validation error' }, 500);
+    }
+
+    let checkoutLocationName = null;
+    if (validatedCheckoutLocationId) {
+        const loc = await c.env.DB.prepare('SELECT name FROM locations WHERE id = ?').bind(validatedCheckoutLocationId).first<{ name: string }>();
+        checkoutLocationName = loc?.name || null;
+    }
 
     try {
         let result: D1Result
+        let targetAttendanceId = attendance_id;
+
         if (attendance_id) {
             result = await c.env.DB.prepare(
-                'UPDATE attendances SET check_out_time = ?, check_out_lat = ?, check_out_lng = ? WHERE id = ? AND user_id = ?'
-            ).bind(now, latitude, longitude, attendance_id, user.sub).run()
+                'UPDATE attendances SET check_out_time = ?, check_out_lat = ?, check_out_lng = ?, checkout_location_id = ?, checkout_location_name = ? WHERE id = ? AND user_id = ?'
+            ).bind(now, latitude, longitude, validatedCheckoutLocationId, checkoutLocationName, attendance_id, user.sub).run()
         } else {
             // Find latest active check-in
+            const active = await c.env.DB.prepare(
+                'SELECT id FROM attendances WHERE user_id = ? AND check_out_time IS NULL ORDER BY created_at DESC LIMIT 1'
+            ).bind(user.sub).first<{ id: string }>();
+
+            if (!active) {
+                return c.json({ error: 'No active check-in found' }, 404)
+            }
+            targetAttendanceId = active.id;
+
             result = await c.env.DB.prepare(
-                'UPDATE attendances SET check_out_time = ?, check_out_lat = ?, check_out_lng = ? WHERE user_id = ? AND check_out_time IS NULL ORDER BY created_at DESC LIMIT 1'
-            ).bind(now, latitude, longitude, user.sub).run()
+                'UPDATE attendances SET check_out_time = ?, check_out_lat = ?, check_out_lng = ?, checkout_location_id = ?, checkout_location_name = ? WHERE id = ?'
+            ).bind(now, latitude, longitude, validatedCheckoutLocationId, checkoutLocationName, targetAttendanceId).run()
         }
 
         if (result.meta.changes === 0) {
-            return c.json({ error: 'No active check-in found' }, 404)
+            return c.json({ error: 'Failed to update attendance' }, 500)
         }
 
-        return c.json({ message: 'Check-out successful', time: now })
+        // Evaluate Check-out Rules (Full Day Bonus, etc.)
+        let extraPoints = 0;
+        try {
+            // Fetch complete attendance record for evaluation
+            const att = await c.env.DB.prepare(
+                'SELECT * FROM attendances WHERE id = ?'
+            ).bind(targetAttendanceId).first<any>();
+
+            if (att) {
+                const pointsEngine = new PointsEngine(c.env.DB);
+                const attendanceRecord = {
+                    id: att.id,
+                    user_id: att.user_id,
+                    check_in_time: Math.floor(new Date(att.check_in_time).getTime() / 1000),
+                    check_out_time: checkOutTime,
+                    location_id: att.location_id
+                };
+
+                extraPoints = await pointsEngine.evaluateRules('check_out', attendanceRecord, {
+                    id: user.sub,
+                    tenant_id: user.tenant_id,
+                    points_balance: 0
+                });
+
+                if (extraPoints > 0) {
+                    const pointsService = new PointsService(c.env.DB);
+                    await pointsService.awardPoints(
+                        user.sub,
+                        extraPoints,
+                        'bonus',
+                        'Bonus points for full day work',
+                        targetAttendanceId
+                    );
+
+                    // Update valid/points flag in attendance if needed? 
+                    // Usually we track total points in attendance table too?
+                    // Currently `attendances` table has `points_earned`. We should probably update it.
+                    await c.env.DB.prepare(
+                        'UPDATE attendances SET points_earned = points_earned + ? WHERE id = ?'
+                    ).bind(extraPoints, targetAttendanceId).run();
+                }
+            }
+        } catch (e) {
+            console.error('Points evaluation failed on check-out', e);
+        }
+
+        return c.json({
+            message: 'Check-out successful',
+            time: now,
+            points_earned: extraPoints,
+            is_full_day: extraPoints > 0
+        })
 
     } catch (e: any) {
         return c.json({ error: 'Check-out failed', details: e.message }, 500)
@@ -297,33 +355,6 @@ attendance.get('/calendar', async (c) => {
     }
 })
 
-// Helper Functions
-function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
-    const R = 6371e3 // Earth radius in meters
-    const φ1 = lat1 * Math.PI / 180
-    const φ2 = lat2 * Math.PI / 180
-    const Δφ = (lat2 - lat1) * Math.PI / 180
-    const Δλ = (lon2 - lon1) * Math.PI / 180
 
-    const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
-        Math.cos(φ1) * Math.cos(φ2) *
-        Math.sin(Δλ / 2) * Math.sin(Δλ / 2)
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
-
-    return R * c
-}
-
-function isPointInPolygon(point: { lat: number, lng: number }, polygon: { lat: number, lng: number }[]) {
-    let inside = false;
-    for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
-        const xi = polygon[i].lng, yi = polygon[i].lat;
-        const xj = polygon[j].lng, yj = polygon[j].lat;
-
-        const intersect = ((yi > point.lat) !== (yj > point.lat))
-            && (point.lng < (xj - xi) * (point.lat - yi) / (yj - yi) + xi);
-        if (intersect) inside = !inside;
-    }
-    return inside;
-}
 
 export default attendance

@@ -306,7 +306,12 @@ const LocationSettings = () => {
         latitude: '',
         longitude: '',
         radius_meters: '100',
-        polygon_coords: [] as any[]
+        polygon_coords: [] as any[],
+        work_days: [1, 2, 3, 4, 5] as number[],
+        start_time: '09:00',
+        end_time: '17:00',
+        use_custom_points: false,
+        custom_points: 0
     });
 
     useEffect(() => {
@@ -356,23 +361,28 @@ const LocationSettings = () => {
             latitude: location.latitude.toString(),
             longitude: location.longitude.toString(),
             radius_meters: location.radius_meters?.toString() || '100',
-            polygon_coords: location.polygon_coords || []
+            polygon_coords: location.polygon_coords || [],
+            work_days: location.work_days ? (typeof location.work_days === 'string' ? JSON.parse(location.work_days) : location.work_days) : [1, 2, 3, 4, 5],
+            start_time: location.start_time || '09:00',
+            end_time: location.end_time || '17:00',
+            use_custom_points: location.use_custom_points === 1,
+            custom_points: location.custom_points || 0
         });
         setShowForm(true);
     };
 
     const handleDelete = async (id: string, name: string) => {
-        if (!confirm(`Are you sure you want to delete "${name}"?`)) {
+        if (!confirm(`Apakah Anda yakin ingin menghapus "${name}"?`)) {
             return;
         }
 
         try {
             await api.delete(`/admin/locations/${id}`);
             fetchLocations();
-            alert('Location deleted successfully');
+            alert('Lokasi berhasil dihapus');
         } catch (error: any) {
             console.error('Failed to delete location', error);
-            alert('Failed to delete location');
+            alert('Gagal menghapus lokasi');
         }
     };
 
@@ -384,22 +394,27 @@ const LocationSettings = () => {
                 latitude: parseFloat(formData.latitude),
                 longitude: parseFloat(formData.longitude),
                 radius_meters: parseInt(formData.radius_meters),
-                polygon_coords: geofenceType === 'polygon' ? formData.polygon_coords : null
+                polygon_coords: geofenceType === 'polygon' ? formData.polygon_coords : null,
+                work_days: formData.work_days,
+                start_time: formData.start_time,
+                end_time: formData.end_time,
+                use_custom_points: formData.use_custom_points,
+                custom_points: formData.custom_points
             };
 
             if (editingId) {
                 await api.put(`/admin/locations/${editingId}`, payload);
-                alert('Location updated successfully');
+                alert('Lokasi berhasil diperbarui');
             } else {
                 await api.post('/admin/locations', payload);
-                alert('Location added successfully');
+                alert('Lokasi berhasil ditambahkan');
             }
 
             resetForm();
             fetchLocations();
         } catch (error: any) {
             console.error('Failed to save location', error);
-            alert('Failed to save location');
+            alert('Gagal menyimpan lokasi');
         }
     };
 
@@ -407,13 +422,24 @@ const LocationSettings = () => {
         setShowForm(false);
         setEditingId(null);
         setGeofenceType('radius');
-        setFormData({ name: '', latitude: '', longitude: '', radius_meters: '100', polygon_coords: [] });
+        setFormData({
+            name: '',
+            latitude: '',
+            longitude: '',
+            radius_meters: '100',
+            polygon_coords: [],
+            work_days: [1, 2, 3, 4, 5],
+            start_time: '09:00',
+            end_time: '17:00',
+            use_custom_points: false,
+            custom_points: 0
+        });
     };
 
     return (
         <div className="space-y-6">
             <div className="flex justify-between items-center">
-                <h2 className="text-2xl font-bold text-gray-800">Location Settings & Geofencing</h2>
+                <h2 className="text-2xl font-bold text-gray-800">Pengaturan Lokasi & Geofence</h2>
                 <button
                     onClick={() => {
                         resetForm();
@@ -422,22 +448,22 @@ const LocationSettings = () => {
                     className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
                 >
                     <MdAdd size={20} />
-                    <span>Add Location</span>
+                    <span>Tambah Lokasi</span>
                 </button>
             </div>
 
             {/* Map View */}
             <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                <h3 className="text-lg font-semibold mb-4 text-gray-800">📍 Office Locations Map</h3>
+                <h3 className="text-lg font-semibold mb-4 text-gray-800">📍 Peta Lokasi Kantor</h3>
                 <p className="text-sm text-gray-500 mb-4">
                     {showForm ?
-                        (geofenceType === 'radius' ? "Click on map to set center point." : "Use drawing tools to draw polygon area.")
-                        : "View existing geofences."}
+                        (geofenceType === 'radius' ? "Klik di peta untuk mengatur titik pusat." : "Gunakan alat gambar untuk membuat area polygon.")
+                        : "Lihat geofence yang ada."}
                 </p>
 
                 {loading ? (
                     <div className="h-[400px] flex items-center justify-center bg-gray-50 rounded-lg">
-                        <p className="text-gray-500">Loading map...</p>
+                        <p className="text-gray-500">Memuat peta...</p>
                     </div>
                 ) : (
                     <OfficeMap
@@ -454,7 +480,7 @@ const LocationSettings = () => {
                     />
                 )}
                 <p className="text-xs text-gray-400 mt-2 italic text-center">
-                    * GPS accuracy varies between 5 - 20 meters depending on device and location.
+                    * Akurasi GPS bervariasi antara 5 - 20 meter tergantung perangkat dan lokasi.
                 </p>
             </div>
 
@@ -462,7 +488,7 @@ const LocationSettings = () => {
             {showForm && (
                 <div className="bg-white p-6 rounded-xl shadow-sm border border-blue-100">
                     <h3 className="text-lg font-semibold mb-4">
-                        {editingId ? 'Edit Location' : 'Add New Location'}
+                        {editingId ? 'Edit Lokasi' : 'Tambah Lokasi Baru'}
                     </h3>
 
                     {/* Type Toggle */}
@@ -476,7 +502,7 @@ const LocationSettings = () => {
                                 }`}
                         >
                             <MdRadioButtonUnchecked />
-                            <span>Simple Radius (Circle)</span>
+                            <span>Radius Simpel (Lingkaran)</span>
                         </button>
                         <button
                             type="button"
@@ -487,26 +513,26 @@ const LocationSettings = () => {
                                 }`}
                         >
                             <MdLayers />
-                            <span>Advanced Polygon</span>
+                            <span>Polygon Lanjutan</span>
                         </button>
                     </div>
 
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700">Location Name</label>
+                            <label className="block text-sm font-medium text-gray-700">Nama Lokasi</label>
                             <input
                                 type="text"
                                 required
                                 className="mt-1 w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                 value={formData.name}
                                 onChange={e => setFormData({ ...formData, name: e.target.value })}
-                                placeholder="e.g. Headquarters"
+                                placeholder="Contoh: Kantor Pusat"
                             />
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700">Center Latitude</label>
+                                <label className="block text-sm font-medium text-gray-700">Latitude Pusat</label>
                                 <input
                                     type="number" step="any" required
                                     className="mt-1 w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50"
@@ -517,7 +543,7 @@ const LocationSettings = () => {
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700">Center Longitude</label>
+                                <label className="block text-sm font-medium text-gray-700">Longitude Pusat</label>
                                 <input
                                     type="number" step="any" required
                                     className="mt-1 w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50"
@@ -531,27 +557,132 @@ const LocationSettings = () => {
 
                         {geofenceType === 'radius' && (
                             <div>
-                                <label className="block text-sm font-medium text-gray-700">Radius (Meters)</label>
+                                <label className="block text-sm font-medium text-gray-700">Radius (Meter)</label>
                                 <input
                                     type="number" required
                                     className="mt-1 w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     value={formData.radius_meters}
                                     onChange={e => setFormData({ ...formData, radius_meters: e.target.value })}
                                 />
-                                <p className="text-xs text-gray-500 mt-1">Check-in allowed within this radius.</p>
+                                <p className="text-xs text-gray-500 mt-1">Check-in diizinkan dalam radius ini.</p>
                             </div>
                         )}
 
                         {geofenceType === 'polygon' && (
                             <div className="p-3 bg-purple-50 text-purple-700 rounded-lg text-sm">
-                                <strong>Polygon Mode Active:</strong> Draw a shape on the map to define the detailed geofence area.
+                                <strong>Mode Polygon Aktif:</strong> Gambar bentuk di peta untuk menentukan area geofence secara detail.
                                 {formData.polygon_coords.length > 0 ? (
-                                    <span className="block mt-1">✅ {formData.polygon_coords.length} points defined.</span>
+                                    <span className="block mt-1">✅ {formData.polygon_coords.length} titik ditentukan.</span>
                                 ) : (
-                                    <span className="block mt-1">⚠️ No valid polygon drawn yet.</span>
+                                    <span className="block mt-1">⚠️ Belum ada polygon valid yang digambar.</span>
                                 )}
                             </div>
                         )}
+
+                        <hr className="my-6" />
+
+                        {/* Work Schedule Section */}
+                        <div className="space-y-4">
+                            <h3 className="text-lg font-semibold text-gray-800">Jadwal Kerja Lokasi</h3>
+
+                            {/* Work Days Selector */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Hari Kerja</label>
+                                <div className="flex flex-wrap gap-2">
+                                    {[
+                                        { id: 1, label: 'Sen' },
+                                        { id: 2, label: 'Sel' },
+                                        { id: 3, label: 'Rab' },
+                                        { id: 4, label: 'Kam' },
+                                        { id: 5, label: 'Jum' },
+                                        { id: 6, label: 'Sab' },
+                                        { id: 0, label: 'Min' }
+                                    ].map(day => (
+                                        <button
+                                            key={day.id}
+                                            type="button"
+                                            onClick={() => {
+                                                const currentDays = formData.work_days;
+                                                if (currentDays.includes(day.id)) {
+                                                    setFormData({ ...formData, work_days: currentDays.filter(d => d !== day.id) });
+                                                } else {
+                                                    setFormData({ ...formData, work_days: [...currentDays, day.id].sort() });
+                                                }
+                                            }}
+                                            className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${formData.work_days.includes(day.id)
+                                                ? 'bg-blue-600 text-white'
+                                                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                                }`}
+                                        >
+                                            {day.label}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Start and End Time */}
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">Jam Masuk (Batas Terlambat)</label>
+                                    <input
+                                        type="time"
+                                        value={formData.start_time}
+                                        onChange={e => setFormData({ ...formData, start_time: e.target.value })}
+                                        className="mt-1 w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    />
+                                    <p className="text-xs text-gray-500 mt-1">Check-in setelah jam ini = Terlambat</p>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">Jam Pulang</label>
+                                    <input
+                                        type="time"
+                                        value={formData.end_time}
+                                        onChange={e => setFormData({ ...formData, end_time: e.target.value })}
+                                        className="mt-1 w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr className="my-6" />
+
+                        {/* Custom Points Configuration */}
+                        <div className="space-y-4">
+                            <h3 className="text-lg font-semibold text-gray-800">⭐ Poin Kustom Per Lokasi</h3>
+                            <p className="text-sm text-gray-600">
+                                Set poin kustom untuk lokasi ini yang akan mengesampingkan aturan poin global
+                            </p>
+
+                            <div className="flex items-center space-x-3">
+                                <input
+                                    type="checkbox"
+                                    id="use_custom_points"
+                                    checked={formData.use_custom_points || false}
+                                    onChange={e => setFormData({ ...formData, use_custom_points: e.target.checked })}
+                                    className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                                />
+                                <label htmlFor="use_custom_points" className="text-sm font-medium text-gray-700">
+                                    Aktifkan poin kustom untuk lokasi ini
+                                </label>
+                            </div>
+
+                            {formData.use_custom_points && (
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">Jumlah Poin per Check-in</label>
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        value={formData.custom_points || 0}
+                                        onChange={e => setFormData({ ...formData, custom_points: parseInt(e.target.value) })}
+                                        className="mt-1 w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        placeholder="misal: 25"
+                                    />
+                                    <p className="text-xs text-gray-500 mt-1">
+                                        Poin kustom ini akan mengesampingkan aturan poin global untuk lokasi ini
+                                    </p>
+                                </div>
+                            )}
+                        </div>
 
                         <div className="flex justify-end space-x-3 pt-4">
                             <button
@@ -559,13 +690,13 @@ const LocationSettings = () => {
                                 onClick={resetForm}
                                 className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition"
                             >
-                                Cancel
+                                Batal
                             </button>
                             <button
                                 type="submit"
                                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
                             >
-                                {editingId ? 'Update Location' : 'Save Location'}
+                                {editingId ? 'Update Lokasi' : 'Simpan Lokasi'}
                             </button>
                         </div>
                     </form>
@@ -575,7 +706,7 @@ const LocationSettings = () => {
             {/* Location Cards Grid */}
             {locations.length > 0 && (
                 <div>
-                    <h3 className="text-lg font-semibold mb-4 text-gray-800">Saved Locations</h3>
+                    <h3 className="text-lg font-semibold mb-4 text-gray-800">Lokasi Tersimpan</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {locations.map(loc => (
                             <div key={loc.id} className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
@@ -593,6 +724,24 @@ const LocationSettings = () => {
                                             <div className={`mt-3 inline-block px-3 py-1 text-xs font-semibold rounded-full ${loc.polygon_coords ? 'bg-purple-100 text-purple-800' : 'bg-green-50 text-green-700'}`}>
                                                 {loc.polygon_coords ? 'Polygon Geofence' : `Radius: ${loc.radius_meters}m`}
                                             </div>
+                                            {/* Schedule Summary */}
+                                            {loc.start_time && (
+                                                <div className="mt-2 p-2 bg-gray-50 rounded-lg">
+                                                    <p className="text-xs text-gray-600 font-medium mb-1">📅 Jadwal Kerja:</p>
+                                                    <p className="text-xs text-gray-700">
+                                                        🕐 {loc.start_time} - {loc.end_time}
+                                                    </p>
+                                                    {loc.work_days && (
+                                                        <p className="text-xs text-gray-600 mt-1">
+                                                            {(() => {
+                                                                const days = typeof loc.work_days === 'string' ? JSON.parse(loc.work_days) : loc.work_days;
+                                                                const dayNames = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
+                                                                return days.map((d: number) => dayNames[d]).join(', ');
+                                                            })()}
+                                                        </p>
+                                                    )}
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                     <div className="flex space-x-2 ml-4">

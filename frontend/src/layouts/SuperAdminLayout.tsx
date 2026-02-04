@@ -26,14 +26,14 @@ const SuperAdminLayout: React.FC = () => {
     const userData = JSON.parse(localStorage.getItem('user_data') || '{}');
 
     const menuItems = [
-        { path: '/superadmin/dashboard', icon: <MdDashboard size={20} />, label: 'Dashboard' },
-        { path: '/superadmin/tenants', icon: <MdBusiness size={20} />, label: 'Tenants' },
-        { path: '/superadmin/users', icon: <MdPeople size={20} />, label: 'User Management' },
-        { path: '/superadmin/plans', icon: <MdCardGiftcard size={20} />, label: 'Subscription Plans' },
-        { path: '/superadmin/analytics', icon: <MdPieChart size={20} />, label: 'Platform Analytics' },
-        { path: '/superadmin/settings', icon: <MdSettings size={20} />, label: 'Global Settings' },
-        { path: '/superadmin/health', icon: <MdMonitorHeart size={20} />, label: 'System Health' },
-        { path: '/superadmin/profile', icon: <MdPerson size={20} />, label: 'My Profile' },
+        { path: '/superadmin/dashboard', icon: <MdDashboard size={20} />, label: 'Dasbor' },
+        { path: '/superadmin/tenants', icon: <MdBusiness size={20} />, label: 'Manajemen Penyewa' },
+        { path: '/superadmin/users', icon: <MdPeople size={20} />, label: 'Manajemen Pengguna' },
+        { path: '/superadmin/plans', icon: <MdCardGiftcard size={20} />, label: 'Paket Langganan' },
+        { path: '/superadmin/analytics', icon: <MdPieChart size={20} />, label: 'Analitik Platform' },
+        { path: '/superadmin/settings', icon: <MdSettings size={20} />, label: 'Pengaturan Global' },
+        { path: '/superadmin/health', icon: <MdMonitorHeart size={20} />, label: 'Kesehatan Sistem' },
+        { path: '/superadmin/profile', icon: <MdPerson size={20} />, label: 'Profil Saya' },
     ];
 
     return (
@@ -44,8 +44,8 @@ const SuperAdminLayout: React.FC = () => {
                     <div className="flex items-center gap-2 text-indigo-700">
                         <MdStorage size={28} />
                         <div>
-                            <h1 className="text-xl font-bold">Super Admin</h1>
-                            <p className="text-xs text-gray-400">Platform Manager</p>
+                            <h1 className="text-xl font-bold">Admin Super</h1>
+                            <p className="text-xs text-gray-400">Manajer Platform</p>
                         </div>
                     </div>
                 </div>
@@ -56,8 +56,8 @@ const SuperAdminLayout: React.FC = () => {
                             key={item.path}
                             to={item.path}
                             className={`flex items-center space-x-3 p-3 rounded-lg transition-colors ${location.pathname.includes(item.path)
-                                    ? 'bg-indigo-50 text-indigo-700'
-                                    : 'text-gray-600 hover:bg-gray-50'
+                                ? 'bg-indigo-50 text-indigo-700'
+                                : 'text-gray-600 hover:bg-gray-50'
                                 }`}
                         >
                             {item.icon}
@@ -77,7 +77,7 @@ const SuperAdminLayout: React.FC = () => {
                         className="flex items-center space-x-3 p-3 w-full text-left text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                     >
                         <MdLogout size={20} />
-                        <span className="font-medium">Logout</span>
+                        <span className="font-medium">Keluar</span>
                     </button>
                 </div>
             </aside>

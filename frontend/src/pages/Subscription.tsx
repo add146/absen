@@ -20,6 +20,7 @@ interface CurrentSubscription {
     plan_slug: string
     status: string
     current_period_end: string
+    cancel_at_period_end: number // 0 or 1
 }
 
 const SubscriptionPage: React.FC = () => {
@@ -27,6 +28,7 @@ const SubscriptionPage: React.FC = () => {
     const [currentSubscription, setCurrentSubscription] = useState<CurrentSubscription | null>(null)
     const [loading, setLoading] = useState(true)
     const [upgrading, setUpgrading] = useState<string | null>(null)
+    const [cancelling, setCancelling] = useState(false)
 
     useEffect(() => {
         fetchPlans()
@@ -67,7 +69,48 @@ const SubscriptionPage: React.FC = () => {
         }
     }
 
+    const handleCancelSubscription = async () => {
+        if (!confirm('Apakah Anda yakin ingin membatalkan langganan? Anda akan kehilangan akses ke fitur premium setelah periode saat ini berakhir.')) {
+            return
+        }
+
+        setCancelling(true)
+        try {
+            const token = localStorage.getItem('access_token')
+            const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8787'}/subscriptions/cancel`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+
+            const data = await response.json()
+
+            if (response.ok) {
+                alert('Langganan berhasil dibatalkan. Akses Anda tetap aktif hingga akhir periode penagihan.')
+                fetchCurrentSubscription()
+            } else {
+                throw new Error(data.error || 'Gagal membatalkan langganan')
+            }
+        } catch (error: any) {
+            alert(error.message || 'Terjadi kesalahan saat membatalkan langganan')
+        } finally {
+            setCancelling(false)
+        }
+    }
+
+
+
     const handleUpgrade = async (planSlug: string) => {
+        // Warning for downgrade
+        if (currentSubscription && plans.find(p => p.slug === currentSubscription.plan_slug)?.price! > plans.find(p => p.slug === planSlug)?.price!) {
+            if (!confirm('Perhatian: Anda akan beralih ke paket yang lebih murah. Beberapa fitur mungkin akan dinonaktifkan pada siklus penagihan berikutnya. Lanjutkan?')) {
+                return;
+            }
+        }
+
+
+
         setUpgrading(planSlug)
 
         try {
@@ -165,6 +208,28 @@ const SubscriptionPage: React.FC = () => {
                         <p className="font-semibold">
                             Plan Saat Ini: {currentSubscription.plan_name}
                         </p>
+                    </div>
+                )}
+
+                {currentSubscription?.cancel_at_period_end === 1 && (
+                    <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg max-w-2xl mx-auto">
+                        <div className="flex items-center justify-center gap-2 text-yellow-800">
+                            <Loader2 className="h-5 w-5" />
+                            <p className="font-medium">
+                                Langganan Anda akan berakhir pada {new Date(currentSubscription.current_period_end).toLocaleDateString()}.
+                            </p>
+                        </div>
+                    </div>
+                )}
+
+                {currentSubscription?.cancel_at_period_end === 1 && (
+                    <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg max-w-2xl mx-auto">
+                        <div className="flex items-center justify-center gap-2 text-yellow-800">
+                            <Loader2 className="h-5 w-5" />
+                            <p className="font-medium">
+                                Langganan Anda akan berakhir pada {new Date(currentSubscription.current_period_end).toLocaleDateString()}.
+                            </p>
+                        </div>
                     </div>
                 )}
             </div>
@@ -297,6 +362,24 @@ const SubscriptionPage: React.FC = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Cancel Subscription Section */}
+            {currentSubscription && currentSubscription.plan_slug !== 'free' && !currentSubscription.cancel_at_period_end && (
+                <div className="mt-12 text-center border-t border-gray-200 pt-12">
+                    <h3 className="text-xl font-bold text-gray-900 mb-4">Kelola Langganan</h3>
+                    <p className="text-gray-600 mb-6">
+                        Jika Anda ingin berhenti berlangganan, Anda dapat membatalkannya kapan saja.
+                        Akses fitur premium akan tetap aktif hingga akhir periode penagihan.
+                    </p>
+                    <button
+                        onClick={handleCancelSubscription}
+                        disabled={cancelling}
+                        className="text-red-600 font-medium hover:text-red-800 border border-red-200 hover:bg-red-50 px-6 py-2 rounded-lg transition-colors"
+                    >
+                        {cancelling ? 'Memproses...' : 'Batalkan Langganan'}
+                    </button>
+                </div>
+            )}
         </div>
     )
 }

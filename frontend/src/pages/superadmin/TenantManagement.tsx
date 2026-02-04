@@ -59,28 +59,28 @@ const TenantManagement: React.FC = () => {
         try {
             if (editingTenant) {
                 await api.put(`/super-admin/tenants/${editingTenant.id}`, formData);
-                setMessage('Tenant updated successfully');
+                setMessage('Penyewa berhasil diperbarui');
             } else {
                 await api.post('/super-admin/tenants', formData);
-                setMessage('Tenant created successfully');
+                setMessage('Penyewa berhasil dibuat');
             }
             setShowModal(false);
             fetchTenants();
         } catch (error: any) {
-            setMessage(error.response?.data?.error || 'Failed to save tenant');
+            setMessage(error.response?.data?.error || 'Gagal menyimpan penyewa');
         }
         setTimeout(() => setMessage(''), 3000);
     };
 
     const handleSuspend = async (id: string) => {
-        if (!confirm('Suspend this tenant? Users will not be able to login.')) return;
+        if (!confirm('Suspend penyewa ini? Pengguna tidak akan bisa masuk.')) return;
 
         try {
             await api.delete(`/super-admin/tenants/${id}`);
-            setMessage('Tenant suspended');
+            setMessage('Penyewa ditangguhkan');
             fetchTenants();
         } catch (error: any) {
-            setMessage(error.response?.data?.error || 'Failed to suspend tenant');
+            setMessage(error.response?.data?.error || 'Gagal menangguhkan penyewa');
         }
         setTimeout(() => setMessage(''), 3000);
     };
@@ -90,13 +90,13 @@ const TenantManagement: React.FC = () => {
     return (
         <div>
             <div className="flex items-center justify-between mb-6">
-                <h1 className="text-3xl font-bold">Tenant Management</h1>
+                <h1 className="text-3xl font-bold">Manajemen Penyewa</h1>
                 <button
                     onClick={handleCreate}
                     className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
                 >
                     <MdAdd />
-                    Create Tenant
+                    Buat Penyewa
                 </button>
             </div>
 
@@ -130,15 +130,15 @@ const TenantManagement: React.FC = () => {
 
                         <div className="space-y-2 mb-4 text-sm">
                             <div className="flex justify-between">
-                                <span className="text-gray-600">Plan:</span>
+                                <span className="text-gray-600">Paket:</span>
                                 <span className="font-semibold capitalize">{tenant.plan_type}</span>
                             </div>
                             <div className="flex justify-between">
-                                <span className="text-gray-600">Max Users:</span>
+                                <span className="text-gray-600">Maks Pengguna:</span>
                                 <span className="font-semibold">{tenant.max_users}</span>
                             </div>
                             <div className="flex justify-between">
-                                <span className="text-gray-600">Created:</span>
+                                <span className="text-gray-600">Dibuat:</span>
                                 <span className="font-semibold">{new Date(tenant.created_at).toLocaleDateString()}</span>
                             </div>
                         </div>
@@ -168,11 +168,11 @@ const TenantManagement: React.FC = () => {
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                     <div className="bg-white rounded-lg p-6 w-full max-w-md">
                         <h2 className="text-xl font-bold mb-4">
-                            {editingTenant ? 'Edit Tenant' : 'Create New Tenant'}
+                            {editingTenant ? 'Edit Penyewa' : 'Buat Penyewa Baru'}
                         </h2>
                         <div className="space-y-4">
                             <div>
-                                <label className="block text-sm font-medium mb-1">Tenant Name</label>
+                                <label className="block text-sm font-medium mb-1">Nama Penyewa</label>
                                 <input
                                     type="text"
                                     value={formData.name}
@@ -233,13 +233,13 @@ const TenantManagement: React.FC = () => {
                                 onClick={handleSave}
                                 className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
                             >
-                                Save
+                                Simpan
                             </button>
                             <button
                                 onClick={() => setShowModal(false)}
                                 className="flex-1 px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
                             >
-                                Cancel
+                                Batal
                             </button>
                         </div>
                     </div>

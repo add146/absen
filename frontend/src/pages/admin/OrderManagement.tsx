@@ -87,7 +87,7 @@ const OrderManagement: React.FC = () => {
 
     const handleExportCSV = () => {
         // Simple CSV export
-        const csvHeaders = ['Order ID', 'User', 'Email', 'Product', 'Quantity', 'Points', 'Status', 'Date'];
+        const csvHeaders = ['Order ID', 'Pengguna', 'Email', 'Produk', 'Jumlah', 'Poin', 'Status', 'Tanggal'];
         const csvRows = filteredOrders.map(order => [
             order.id,
             order.user_name,
@@ -162,7 +162,7 @@ const OrderManagement: React.FC = () => {
                     <div className="bg-white p-6 rounded-lg shadow-md">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-gray-600 text-sm">Total Orders</p>
+                                <p className="text-gray-600 text-sm">Total Order</p>
                                 <p className="text-3xl font-bold text-gray-800">{stats.total_orders}</p>
                             </div>
                             <MdShoppingCart size={40} className="text-blue-500" />
@@ -189,7 +189,7 @@ const OrderManagement: React.FC = () => {
                     <div className="bg-white p-6 rounded-lg shadow-md">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-gray-600 text-sm">Completed</p>
+                                <p className="text-gray-600 text-sm">Selesai</p>
                                 <p className="text-3xl font-bold text-green-600">{stats.completed_orders}</p>
                             </div>
                             <MdCheckCircle size={40} className="text-green-500" />
@@ -219,9 +219,9 @@ const OrderManagement: React.FC = () => {
                             className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none"
                         >
                             <option value="all">Semua Status</option>
-                            <option value="pending">Pending</option>
-                            <option value="completed">Completed</option>
-                            <option value="cancelled">Cancelled</option>
+                            <option value="pending">Tertunda (Pending)</option>
+                            <option value="completed">Selesai (Completed)</option>
+                            <option value="cancelled">Dibatalkan (Cancelled)</option>
                         </select>
                     </div>
                 </div>
@@ -303,13 +303,13 @@ const OrderManagement: React.FC = () => {
                                                         onClick={() => handleUpdateStatus(order.id, 'completed')}
                                                         className="text-xs px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 transition"
                                                     >
-                                                        Complete
+                                                        Selesaikan
                                                     </button>
                                                     <button
                                                         onClick={() => handleUpdateStatus(order.id, 'cancelled')}
                                                         className="text-xs px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 transition"
                                                     >
-                                                        Cancel
+                                                        Batalkan
                                                     </button>
                                                 </div>
                                             )}

@@ -39,23 +39,23 @@ const AdminDashboard = () => {
 
     return (
         <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-gray-800">Dashboard Overview</h2>
+            <h2 className="text-2xl font-bold text-gray-800">Ringkasan Dasbor</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <StatCard
-                    title="Total Employees"
+                    title="Total Karyawan"
                     value={stats.total_employees}
                     icon={<MdPeople size={24} />}
                     color="bg-blue-500"
                 />
                 <StatCard
-                    title="Present Today"
+                    title="Hadir Hari Ini"
                     value={stats.present_today}
                     icon={<MdTrendingUp size={24} />}
                     color="bg-green-500"
                 />
                 <StatCard
-                    title="Late Today"
+                    title="Terlambat Hari Ini"
                     value={stats.late_today}
                     icon={<MdAccessTime size={24} />}
                     color="bg-yellow-500"
@@ -63,8 +63,8 @@ const AdminDashboard = () => {
             </div>
 
             <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                <h3 className="text-lg font-bold text-gray-800 mb-4">Quick Actions</h3>
-                <p className="text-gray-500">Welcome to the Admin Panel. Use the sidebar to manage employees, attendance locations, and view reports.</p>
+                <h3 className="text-lg font-bold text-gray-800 mb-4">Aksi Cepat</h3>
+                <p className="text-gray-500">Selamat datang di Panel Admin. Gunakan sidebar untuk mengelola karyawan, lokasi absensi, dan melihat laporan.</p>
             </div>
         </div>
     );

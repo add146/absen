@@ -4,6 +4,7 @@ import api from '../services/api';
 import axios from 'axios';
 import {
     MdTouchApp,
+    MdStar,
     MdLocationOn,
     MdCheckCircle,
     MdLogin,
@@ -12,11 +13,12 @@ import {
     MdCoffee,
     MdCameraAlt,
     MdClose,
-    MdFlipCameraIos
+    MdFlipCameraIos,
 } from 'react-icons/md';
 import DashboardLayout from '../components/DashboardLayout';
 import { compressImage } from '../utils/imageCompression';
 import AttendanceHeatmap from '../components/AttendanceHeatmap';
+import { saveOfflineRequest } from '../utils/offline-storage';
 
 const Dashboard: React.FC = () => {
     const navigate = useNavigate();
@@ -31,8 +33,9 @@ const Dashboard: React.FC = () => {
         checkInTime: '--:--',
         checkOutTime: '--:--',
         workingHours: '0h 0m',
-        location: 'Not checked in'
+        location: 'Belum absen'
     });
+    const [pointsBalance, setPointsBalance] = useState(0);
 
     // Camera State
     const [showCamera, setShowCamera] = useState(false);
@@ -56,12 +59,20 @@ const Dashboard: React.FC = () => {
         fetchTodayAttendance();
         fetchLeavesData();
         fetchWeeklyData();
+        fetchUserProfile();
 
-        // Redirect owners to tenant dashboard
+        // Redirect based on role
         try {
             const userData = JSON.parse(localStorage.getItem('user_data') || '{}');
+
+            // Redirect owners/super_admin to tenant dashboard
             if (userData.role === 'owner' || userData.role === 'super_admin') {
                 navigate('/tenant/dashboard', { replace: true });
+            }
+
+            // Redirect field workers to field worker dashboard
+            if (userData.is_field_worker === 1 || userData.is_field_worker === true) {
+                navigate('/field-worker-dashboard', { replace: true });
             }
         } catch (e) {
             console.error('Error parsing user data', e);
@@ -92,7 +103,7 @@ const Dashboard: React.FC = () => {
             setFacingMode(mode);
         } catch (error) {
             console.error('Error accessing camera:', error);
-            alert('Could not access camera. Please allow permissions.');
+            alert('Tidak dapat mengakses kamera. Mohon izinkan akses.');
             setShowCamera(false);
         }
     };
@@ -155,6 +166,17 @@ const Dashboard: React.FC = () => {
         }
     }
 
+    const fetchUserProfile = async () => {
+        try {
+            const res = await api.get('/auth/me');
+            if (res.data.user) {
+                setPointsBalance(res.data.user.points_balance || 0);
+            }
+        } catch (error) {
+            console.error('Failed to fetch user profile', error);
+        }
+    }
+
     const fetchTodayAttendance = async () => {
         try {
             const res = await api.get('/attendance/today');
@@ -196,14 +218,19 @@ const Dashboard: React.FC = () => {
                     checkInTime: checkIn.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
                     checkOutTime: checkOutStr,
                     workingHours: workingHrs,
-                    location: 'Office (Verified)'
+                    location: 'Kantor (Terverifikasi)'
                 }));
+
+                // Set default checkout location to match check-in location
+                if (latest.location_id) {
+                    setSelectedLocationId(latest.location_id);
+                }
             } else {
                 // Check if locations are configured
                 const hasLocations = res.data.meta?.has_locations;
 
                 if (hasLocations === false) {
-                    setStats(prev => ({ ...prev, location: 'No Office Configured' }));
+                    setStats(prev => ({ ...prev, location: 'Tidak ada kantor dikonfigurasi' }));
                 } else {
                     // Start checking location status immediately
                     verifyLocationStatus(res.data.meta.locations || []);
@@ -218,7 +245,7 @@ const Dashboard: React.FC = () => {
     const verifyLocationStatus = (locations: any[]) => {
         if (!locations || locations.length === 0) return;
 
-        setStats(prev => ({ ...prev, location: 'Checking proximity...' }));
+        setStats(prev => ({ ...prev, location: 'Memeriksa lokasi...' }));
 
         navigator.geolocation.getCurrentPosition((position) => {
             const { latitude, longitude } = position.coords;
@@ -227,7 +254,7 @@ const Dashboard: React.FC = () => {
             let minDistance = Infinity;
             let isInside = false;
             let validId = 'default';
-            let validName = 'Office';
+            let validName = 'Kantor';
 
             for (const loc of locations) {
                 // Check if Polygon Mode
@@ -260,14 +287,14 @@ const Dashboard: React.FC = () => {
 
             if (isInside) {
                 setSelectedLocationId(validId);
-                setStats(prev => ({ ...prev, location: validName || 'Office' }));
+                setStats(prev => ({ ...prev, location: validName || 'Kantor' }));
             } else {
-                setStats(prev => ({ ...prev, location: `Too Far (${Math.round(minDistance)}m)` }));
+                setStats(prev => ({ ...prev, location: `Terlalu Jauh (${Math.round(minDistance)}m)` }));
             }
 
         }, (err) => {
             console.error('Location check failed', err);
-            setStats(prev => ({ ...prev, location: 'Location Unknown' }));
+            setStats(prev => ({ ...prev, location: 'Lokasi Tidak Diketahui' }));
         }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 });
     }
 
@@ -315,7 +342,7 @@ const Dashboard: React.FC = () => {
             } else {
                 // Clock IN - VALIDATE GEOFENCE HERE
                 if (!officeLocations || officeLocations.length === 0) {
-                    alert("No office locations configured. Please contact admin.");
+                    alert("Tidak ada lokasi kantor dikonfigurasi. Hubungi admin.");
                     return;
                 }
 
@@ -360,29 +387,68 @@ const Dashboard: React.FC = () => {
                         if (d < minDistance) minDistance = d;
                     });
 
-                    alert(`You are not within the designated area (Closest: ${Math.round(minDistance)}m). Please get closer.`);
+                    alert(`Anda tidak berada di area yang ditentukan (Terdekat: ${Math.round(minDistance)}m). Silakan mendekat.`);
                 }
             }
 
         }, (err) => {
             console.error(err);
-            alert('Location permission is required.');
+            alert('Izin lokasi diperlukan.');
             setLoading(false);
         });
     }
 
-    const handleCheckOut = async (lat: number, lng: number) => {
+
+    const saveToOfflineQueue = async (url: string, body: any, type: 'check-in' | 'check-out') => {
+        try {
+            await saveOfflineRequest(url, 'POST', body, type);
+
+            // Register Sync Tag
+            if ('serviceWorker' in navigator && 'SyncManager' in window) {
+                const reg = await navigator.serviceWorker.ready;
+                // @ts-ignore
+                await reg.sync.register('sync-attendance');
+            }
+
+            alert('Mode Offline: Data absensi tersimpan dan akan dikirim otomatis saat online.');
+            setClockedIn(type === 'check-in');
+
+            // Optimistic UI Update
+            setStats(prev => ({
+                ...prev,
+                checkInTime: type === 'check-in' ? new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : prev.checkInTime,
+                checkOutTime: type === 'check-out' ? new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : prev.checkOutTime,
+            }));
+
+        } catch (e) {
+            console.error('Failed to save offline', e);
+            alert('Gagal menyimpan data offline.');
+        }
+    }
+
+    const handleCheckOut = async (lat: number, lng: number, locationId?: string) => {
         setLoading(true);
         try {
             await api.post('/attendance/check-out', {
                 attendance_id: attendanceId,
                 latitude: lat,
-                longitude: lng
+                longitude: lng,
+                location_id: locationId || selectedLocationId !== 'default' ? selectedLocationId : null
             });
             await fetchTodayAttendance();
-        } catch (error) {
+        } catch (error: any) {
             console.error('Clock out failed', error);
-            alert('Clock out failed');
+            // Check if network error
+            if (!error.response) {
+                await saveToOfflineQueue('/attendance/check-out', {
+                    attendance_id: attendanceId,
+                    latitude: lat,
+                    longitude: lng,
+                    location_id: locationId || selectedLocationId !== 'default' ? selectedLocationId : null
+                }, 'check-out');
+            } else {
+                alert('Gagal Check Out');
+            }
         } finally {
             setLoading(false);
         }
@@ -429,9 +495,24 @@ const Dashboard: React.FC = () => {
 
         } catch (error: any) {
             console.error('Clock in failed', error);
-            const errorData = error.response?.data;
-            const errorMessage = errorData?.details || errorData?.error || error.message || 'Unknown error';
-            alert(`Clock in failed: ${errorMessage}`);
+
+            // Check if network error (no response)
+            if (!error.response) {
+                await saveToOfflineQueue('/attendance/check-in', {
+                    latitude: locationCoords?.latitude,
+                    longitude: locationCoords?.longitude,
+                    location_id: selectedLocationId,
+                    // Note: Cannot upload photo offline easily without storing blob in IDB and syncing later.
+                    // For now, we might skip photo or store base64 if small enough.
+                    // Simplified: just trigger offline save, maybe warn about photo.
+                    photo_url: 'pending_upload'
+                }, 'check-in');
+                closeCamera();
+            } else {
+                const errorData = error.response?.data;
+                const errorMessage = errorData?.details || errorData?.error || error.message || 'Unknown error';
+                alert(`Gagal Check In: ${errorMessage}`);
+            }
         } finally {
             setLoading(false);
         }
@@ -445,7 +526,7 @@ const Dashboard: React.FC = () => {
                 <div className="lg:col-span-2 space-y-6">
 
                     {/* Main Clock In Card */}
-                    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-8 text-center relative overflow-hidden">
+                    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-4 md:p-8 text-center relative overflow-hidden">
                         {/* Background Blurs */}
                         <div className="absolute -top-20 -left-20 w-64 h-64 bg-blue-400/10 rounded-full blur-3xl dark:bg-blue-600/10 pointer-events-none"></div>
                         <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-purple-400/10 rounded-full blur-3xl dark:bg-purple-600/10 pointer-events-none"></div>
@@ -453,15 +534,15 @@ const Dashboard: React.FC = () => {
                         <div className="relative z-10 flex flex-col items-center">
                             <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium mb-6 transition-colors ${clockedIn ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300' : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'}`}>
                                 <span className={`w-2 h-2 rounded-full mr-2 ${clockedIn ? 'bg-green-500' : 'bg-gray-500'}`}></span>
-                                {clockedIn ? 'Currently Clocked In' : 'Currently Checked Out'}
+                                {clockedIn ? 'Sudah Masuk' : 'Sudah Keluar'}
                             </span>
 
                             <div className="mb-8">
-                                <h1 className="text-5xl md:text-6xl font-bold text-gray-900 dark:text-white tracking-tight mb-2">
+                                <h1 className="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white tracking-tight mb-2">
                                     {currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                     <span className="text-2xl text-gray-400 font-medium ml-1"></span>
                                 </h1>
-                                <p className="text-gray-500 dark:text-gray-400">{currentTime.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' })}</p>
+                                <p className="text-gray-500 dark:text-gray-400">{currentTime.toLocaleDateString('id-ID', { weekday: 'long', month: 'long', day: 'numeric' })}</p>
                             </div>
 
                             {/* Ripple & Button */}
@@ -476,60 +557,77 @@ const Dashboard: React.FC = () => {
                                     className={`relative w-40 h-40 md:w-48 md:h-48 rounded-full shadow-lg transform transition-transform duration-300 hover:scale-105 active:scale-95 flex flex-col items-center justify-center text-white z-20 ${clockedIn ? 'bg-gradient-to-br from-red-500 to-pink-600 shadow-red-500/30' : 'bg-gradient-to-br from-indigo-600 to-purple-600 shadow-indigo-500/30'} ${loading || stats.location === 'No Office Configured' ? 'opacity-75 cursor-not-allowed grayscale' : ''}`}
                                 >
                                     {clockedIn ? <MdLogout className="text-5xl mb-1" /> : <MdTouchApp className="text-5xl mb-1" />}
-                                    <span className="font-bold text-lg tracking-wider uppercase">{loading ? '...' : (clockedIn ? 'Clock Out' : 'Clock In')}</span>
+                                    <span className="font-bold text-lg tracking-wider uppercase">{loading ? '...' : (clockedIn ? 'Check Out' : 'Check In')}</span>
                                 </button>
                             </div>
 
-                            <div className={`flex items-center justify-center px-6 py-3 rounded-xl border transition-all duration-300 ${stats.location === 'No Office Configured' || stats.location.startsWith('Too Far')
+                            {/* Checkout Location Selector */}
+                            {clockedIn && officeLocations.length > 0 && (
+                                <div className="mb-6 relative z-20">
+                                    <select
+                                        value={selectedLocationId}
+                                        onChange={(e) => setSelectedLocationId(e.target.value)}
+                                        onClick={(e) => e.stopPropagation()}
+                                        className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 text-sm rounded-full px-4 py-2 focus:ring-2 focus:ring-indigo-500 outline-none shadow-sm cursor-pointer hover:bg-white dark:hover:bg-gray-700 transition"
+                                    >
+                                        <option value="default" disabled>Pilih Lokasi...</option>
+                                        {officeLocations.map(loc => (
+                                            <option key={loc.id} value={loc.id}>📍 {loc.name}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                            )}
+
+                            <div className={`flex items-center justify-center px-6 py-3 rounded-xl border transition-all duration-300 ${stats.location === 'Tidak ada kantor dikonfigurasi' || stats.location.startsWith('Terlalu Jauh')
                                 ? 'bg-red-50 border-red-100 text-red-600 dark:bg-red-900/20 dark:border-red-800 dark:text-red-300'
-                                : stats.location === 'Checking proximity...' || stats.location === 'Location Unknown'
+                                : stats.location === 'Memeriksa lokasi...' || stats.location === 'Lokasi Tidak Diketahui'
                                     ? 'bg-yellow-50 border-yellow-100 text-yellow-600 dark:bg-yellow-900/20 dark:border-yellow-800 dark:text-yellow-300'
                                     : 'bg-green-50 border-green-200 text-green-700 dark:bg-green-900/30 dark:border-green-800 dark:text-green-300 shadow-sm'
                                 }`}>
-                                <MdLocationOn className={`${stats.location === 'No Office Configured' || stats.location.startsWith('Too Far')
+                                <MdLocationOn className={`${stats.location === 'Tidak ada kantor dikonfigurasi' || stats.location.startsWith('Terlalu Jauh')
                                     ? 'text-red-500'
-                                    : stats.location === 'Checking proximity...' || stats.location === 'Location Unknown'
+                                    : stats.location === 'Memeriksa lokasi...' || stats.location === 'Lokasi Tidak Diketahui'
                                         ? 'text-yellow-500'
                                         : 'text-green-600'
                                     } text-2xl mr-2`} />
-                                <span className={`font-medium tracking-wide ${stats.location === 'No Office Configured' || stats.location.startsWith('Too Far')
+                                <span className={`font-medium tracking-wide ${stats.location === 'Tidak ada kantor dikonfigurasi' || stats.location.startsWith('Terlalu Jauh')
                                     ? 'text-base'
-                                    : stats.location === 'Checking proximity...' || stats.location === 'Location Unknown'
+                                    : stats.location === 'Memeriksa lokasi...' || stats.location === 'Lokasi Tidak Diketahui'
                                         ? 'text-base'
                                         : 'text-lg' // Slightly smaller than xl
                                     }`}>{stats.location}</span>
-                                {!stats.location.startsWith('Too Far') && stats.location !== 'No Office Configured' && stats.location !== 'Checking proximity...' && stats.location !== 'Location Unknown' && <MdCheckCircle className="text-green-600 text-xl ml-2" />}
+                                {!stats.location.startsWith('Terlalu Jauh') && stats.location !== 'Tidak ada kantor dikonfigurasi' && stats.location !== 'Memeriksa lokasi...' && stats.location !== 'Lokasi Tidak Diketahui' && <MdCheckCircle className="text-green-600 text-xl ml-2" />}
                             </div>
                         </div>
                     </div>
 
                     {/* Stats Grid */}
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <StatCard icon={<MdLogin />} title="Clock In" value={stats.checkInTime} color="blue" />
-                        <StatCard icon={<MdLogout />} title="Clock Out" value={stats.checkOutTime} color="orange" />
-                        <StatCard icon={<MdSchedule />} title="Working Hrs" value="0h 02m" color="purple" />
-                        <StatCard icon={<MdCoffee />} title="Break Time" value="0h 00m" color="teal" />
+                        <StatCard icon={<MdLogin />} title="Masuk" value={stats.checkInTime} color="blue" />
+                        <StatCard icon={<MdLogout />} title="Keluar" value={stats.checkOutTime} color="orange" />
+                        <StatCard icon={<MdSchedule />} title="Durasi" value="0j 02m" color="purple" />
+                        <StatCard icon={<MdCoffee />} title="Istirahat" value="0j 00m" color="teal" />
                     </div>
 
                     {/* Recent Activity */}
                     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden border border-gray-100 dark:border-gray-700">
                         <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center">
-                            <h3 className="font-semibold text-gray-900 dark:text-white">Recent Activity</h3>
-                            <button onClick={() => navigate('/attendance')} className="text-sm text-primary hover:text-secondary font-medium">View All</button>
+                            <h3 className="font-semibold text-gray-900 dark:text-white">Aktivitas Terbaru</h3>
+                            <button onClick={() => navigate('/attendance')} className="text-sm text-primary hover:text-secondary font-medium">Lihat Semua</button>
                         </div>
                         <div className="divide-y divide-gray-100 dark:divide-gray-700">
                             {activities.slice(0, 3).map((act, idx) => (
                                 <ActivityItem
                                     key={idx}
                                     icon={act.check_out_time ? <MdLogout /> : <MdLogin />}
-                                    title={act.check_out_time ? 'Clock Out' : 'Clock In'}
-                                    subtitle="Office"
+                                    title={act.check_out_time ? 'Keluar' : 'Masuk'}
+                                    subtitle="Kantor"
                                     time={new Date(act.check_out_time || act.check_in_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                     type={act.check_out_time ? 'out' : 'in'}
                                     faded={!!act.check_out_time}
                                 />
                             ))}
-                            {activities.length === 0 && <div className="p-4 text-center text-gray-500 text-sm">No activity today</div>}
+                            {activities.length === 0 && <div className="p-4 text-center text-gray-500 text-sm">Tidak ada aktivitas hari ini</div>}
                         </div>
                     </div>
                 </div>
@@ -537,9 +635,31 @@ const Dashboard: React.FC = () => {
                 {/* Right Column: Cards */}
                 <div className="space-y-6">
 
+
+
+                    {/* Points Balance Card */}
+                    <div className="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl shadow-lg p-6 text-white relative overflow-hidden cursor-pointer transform transition hover:scale-[1.02]" onClick={() => navigate('/rewards')}>
+                        <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-white opacity-20 rounded-full blur-xl"></div>
+                        <div className="relative z-10 flex justify-between items-center">
+                            <div>
+                                <p className="text-indigo-100 text-sm font-medium mb-1">Poin Saya</p>
+                                <h3 className="text-3xl font-bold flex items-baseline gap-1">
+                                    {pointsBalance.toLocaleString()}
+                                    <span className="text-sm font-normal opacity-80">pts</span>
+                                </h3>
+                            </div>
+                            <div className="bg-white/20 p-3 rounded-xl backdrop-blur-sm">
+                                <MdStar className="text-2xl text-yellow-300" />
+                            </div>
+                        </div>
+                        <div className="mt-4 flex items-center text-xs font-medium text-indigo-100 bg-black/10 w-fit px-2 py-1 rounded-lg">
+                            <span>Klik untuk tukar hadiah &rarr;</span>
+                        </div>
+                    </div>
+
                     {/* Leave Balance */}
                     <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-6 border border-gray-100 dark:border-gray-700">
-                        <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Leave Balance</h3>
+                        <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Saldo Cuti</h3>
                         <div className="flex items-center justify-center relative w-48 h-48 mx-auto mb-4">
                             {/* SVG Circle Progress */}
                             <svg className="w-full h-full transform -rotate-90">
@@ -548,21 +668,21 @@ const Dashboard: React.FC = () => {
                             </svg>
                             <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
                                 <span className="text-4xl font-bold text-gray-900 dark:text-white">{leavesStats.total - leavesStats.used}</span>
-                                <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Days Left</span>
+                                <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Sisa</span>
                             </div>
                         </div>
                         <div className="grid grid-cols-2 gap-3 text-center">
                             <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
-                                <span className="block text-xs text-gray-500 dark:text-gray-400">Total Leaves</span>
+                                <span className="block text-xs text-gray-500 dark:text-gray-400">Total Cuti</span>
                                 <span className="block text-lg font-bold text-gray-900 dark:text-white">{leavesStats.total}</span>
                             </div>
                             <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
-                                <span className="block text-xs text-gray-500 dark:text-gray-400">Used</span>
+                                <span className="block text-xs text-gray-500 dark:text-gray-400">Terpakai</span>
                                 <span className="block text-lg font-bold text-gray-900 dark:text-white">{leavesStats.used}</span>
                             </div>
                         </div>
                         <button onClick={() => navigate('/leaves')} className="w-full mt-4 py-2 bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-900/30 dark:hover:bg-indigo-900/50 text-primary font-medium rounded-lg transition-colors text-sm">
-                            Apply for Leave
+                            Ajukan Cuti
                         </button>
                     </div>
 
@@ -570,8 +690,8 @@ const Dashboard: React.FC = () => {
                     {/* Weekly Hours - Simplified Bar Chart */}
                     <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-6 border border-gray-100 dark:border-gray-700">
                         <div className="flex justify-between items-center mb-4">
-                            <h3 className="font-semibold text-gray-900 dark:text-white">Weekly Hours</h3>
-                            <span className="text-xs font-medium bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 px-2 py-1 rounded">On Track</span>
+                            <h3 className="font-semibold text-gray-900 dark:text-white">Jam Kerja Mingguan</h3>
+                            <span className="text-xs font-medium bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 px-2 py-1 rounded">Sesuai Target</span>
                         </div>
                         <div className="flex items-end justify-between h-32 gap-2 mb-2">
                             {weeklyHours.map((h, i) => (
@@ -587,7 +707,7 @@ const Dashboard: React.FC = () => {
                             ))}
                         </div>
                         <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 px-1">
-                            <span>Mon</span><span>Tue</span><span className="font-bold text-primary">Wed</span><span>Thu</span><span>Fri</span>
+                            <span>Sen</span><span>Sel</span><span className="font-bold text-primary">Rab</span><span>Kam</span><span>Jum</span>
                         </div>
                     </div>
 
@@ -610,7 +730,7 @@ const Dashboard: React.FC = () => {
                         </button>
 
                         <h3 className="text-xl font-bold mb-4 text-center dark:text-white">
-                            {capturedImage ? 'Confirm Photo' : 'Take Selfie'}
+                            {capturedImage ? 'Konfirmasi Foto' : 'Ambil Selfie'}
                         </h3>
 
                         <div className="relative bg-black rounded-xl overflow-hidden aspect-[4/3] mb-4">
@@ -644,7 +764,7 @@ const Dashboard: React.FC = () => {
                                     onClick={capturePhoto}
                                     className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl flex items-center justify-center"
                                 >
-                                    <MdCameraAlt className="mr-2 text-xl" /> Capture
+                                    <MdCameraAlt className="mr-2 text-xl" /> Ambil Foto
                                 </button>
                             ) : (
                                 <>
@@ -655,20 +775,20 @@ const Dashboard: React.FC = () => {
                                         }}
                                         className="flex-1 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-white font-bold py-3 rounded-xl"
                                     >
-                                        Retake
+                                        Ulangi
                                     </button>
                                     <button
                                         onClick={handleCheckInWithPhoto}
                                         disabled={loading}
                                         className="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-xl flex items-center justify-center"
                                     >
-                                        {loading ? 'Processing...' : 'Confirm Check In'}
+                                        {loading ? 'Memproses...' : 'Konfirmasi Check In'}
                                     </button>
                                 </>
                             )}
                         </div>
                         <p className="text-center text-xs text-gray-500 mt-4">
-                            Photo is required for face verification
+                            Foto diperlukan untuk verifikasi wajah
                         </p>
                     </div>
                 </div>

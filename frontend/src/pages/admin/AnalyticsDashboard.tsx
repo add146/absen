@@ -42,7 +42,7 @@ const AnalyticsDashboard: React.FC = () => {
             <div className="flex items-center justify-center h-screen">
                 <div className="text-center">
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-                    <p className="mt-4 text-gray-600">Loading analytics...</p>
+                    <p className="mt-4 text-gray-600">Memuat analisis...</p>
                 </div>
             </div>
         );
@@ -51,8 +51,8 @@ const AnalyticsDashboard: React.FC = () => {
     return (
         <div className="p-6 max-w-7xl mx-auto">
             <div className="mb-6">
-                <h1 className="text-3xl font-bold text-gray-900">Analytics Dashboard</h1>
-                <p className="text-gray-600 mt-2">Comprehensive insights and trends</p>
+                <h1 className="text-3xl font-bold text-gray-900">Dasbor Analitik</h1>
+                <p className="text-gray-600 mt-2">Wawasan dan tren yang komprehensif</p>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -74,7 +74,7 @@ const AnalyticsDashboard: React.FC = () => {
                     </div>
                     <div className="ml-3">
                         <p className="text-sm text-blue-700">
-                            Analytics are updated in real-time. Use the date filters to view historical data.
+                            Analitik diperbarui secara real-time. Gunakan filter tanggal untuk melihat data historis.
                         </p>
                     </div>
                 </div>

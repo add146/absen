@@ -69,26 +69,26 @@ const SystemHealth = () => {
     return (
         <div className="space-y-6">
             <div className="flex justify-between items-center">
-                <h2 className="text-2xl font-bold text-gray-800">System Health</h2>
+                <h2 className="text-2xl font-bold text-gray-800">Kesehatan Sistem</h2>
                 <button
                     onClick={checkHealth}
                     className="flex items-center space-x-2 bg-blue-50 text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-100 transition"
                     disabled={loading}
                 >
                     <MdRefresh className={loading ? 'animate-spin' : ''} size={20} />
-                    <span>{loading ? 'Checking...' : 'Refresh Status'}</span>
+                    <span>{loading ? 'Memeriksa...' : 'Segarkan Status'}</span>
                 </button>
             </div>
 
             <div className={`p-6 rounded-xl text-white shadow-md transition-colors ${status === 'healthy' ? 'bg-gradient-to-r from-green-500 to-emerald-600' :
-                    status === 'degraded' ? 'bg-gradient-to-r from-yellow-500 to-orange-600' :
-                        'bg-gradient-to-r from-red-500 to-pink-600'
+                status === 'degraded' ? 'bg-gradient-to-r from-yellow-500 to-orange-600' :
+                    'bg-gradient-to-r from-red-500 to-pink-600'
                 }`}>
                 <div className="flex items-center gap-4">
                     {status === 'healthy' ? <MdCheckCircle size={48} /> : <MdError size={48} />}
                     <div>
-                        <h1 className="text-2xl font-bold">System is {status.toUpperCase()}</h1>
-                        <p className="opacity-90">All systems operational following last check at {lastChecked?.toLocaleTimeString()}</p>
+                        <h1 className="text-2xl font-bold">Sistem {status === 'healthy' ? 'SEHAT' : (status === 'degraded' ? 'TERDEGRADASI' : 'OFFLINE')}</h1>
+                        <p className="opacity-90">Semua sistem beroperasi normal sejak pemeriksaan terakhir pada {lastChecked?.toLocaleTimeString()}</p>
                     </div>
                 </div>
             </div>
@@ -98,7 +98,7 @@ const SystemHealth = () => {
                     title="API Gateway"
                     status={details.api}
                     icon={<MdCloudQueue size={24} />}
-                    message={latency ? `Latency: ${latency}ms` : 'Connecting...'}
+                    message={latency ? `Latensi: ${latency}ms` : 'Menghubungkan...'}
                 />
                 <StatusCard
                     title="Database (D1)"
@@ -108,10 +108,10 @@ const SystemHealth = () => {
                 />
                 {/* Placeholder for future R2 check */}
                 <StatusCard
-                    title="Storage (R2)"
+                    title="Penyimpanan (R2)"
                     status={details.api === 'operational' ? 'operational' : 'unknown'}
                     icon={<MdStorage size={24} />}
-                    message="Active"
+                    message="Aktif"
                 />
             </div>
         </div>
