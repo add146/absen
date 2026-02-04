@@ -185,9 +185,10 @@ const Login: React.FC = () => {
             <div className="absolute bottom-6 right-6 z-20">
                 <button
                     onClick={toggleTheme}
+                    aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"}
                     className="p-3 rounded-full bg-white dark:bg-gray-800 shadow-lg text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-primary focus:outline-none transition-colors"
                 >
-                    {darkMode ? <MdLightMode /> : <MdDarkMode />}
+                    {darkMode ? <MdLightMode aria-hidden="true" /> : <MdDarkMode aria-hidden="true" />}
                 </button>
             </div>
         </div>

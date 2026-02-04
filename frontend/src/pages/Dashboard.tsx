@@ -11,10 +11,12 @@ import {
     MdSchedule,
     MdCoffee,
     MdCameraAlt,
-    MdClose
+    MdClose,
+    MdFlipCameraIos
 } from 'react-icons/md';
 import DashboardLayout from '../components/DashboardLayout';
 import { compressImage } from '../utils/imageCompression';
+import AttendanceHeatmap from '../components/AttendanceHeatmap';
 
 const Dashboard: React.FC = () => {
     const navigate = useNavigate();
@@ -38,7 +40,10 @@ const Dashboard: React.FC = () => {
     const [capturedImage, setCapturedImage] = useState<string | null>(null);
     const videoRef = useRef<HTMLVideoElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
+    const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user');
     const [locationCoords, setLocationCoords] = useState<{ latitude: number, longitude: number } | null>(null);
+    const [officeLocations, setOfficeLocations] = useState<any[]>([]);
+    const [selectedLocationId, setSelectedLocationId] = useState<string>('default');
 
     const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8787';
 
@@ -72,18 +77,29 @@ const Dashboard: React.FC = () => {
         }
     }, [showCamera, stream]);
 
-    const startCamera = async () => {
+    const startCamera = async (mode: 'user' | 'environment' = 'user') => {
+        // Stop existing stream if any
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+        }
+
         try {
             const mediaStream = await navigator.mediaDevices.getUserMedia({
-                video: { facingMode: 'user' },
+                video: { facingMode: mode },
                 audio: false
             });
             setStream(mediaStream);
+            setFacingMode(mode);
         } catch (error) {
             console.error('Error accessing camera:', error);
             alert('Could not access camera. Please allow permissions.');
             setShowCamera(false);
         }
+    };
+
+    const switchCamera = () => {
+        const newMode = facingMode === 'user' ? 'environment' : 'user';
+        startCamera(newMode);
     };
 
     const stopCamera = () => {
@@ -145,6 +161,11 @@ const Dashboard: React.FC = () => {
             const data = res.data.data;
             setActivities(data);
 
+            // Set office locations if available
+            if (res.data.meta?.locations) {
+                setOfficeLocations(res.data.meta.locations);
+            }
+
             if (data && data.length > 0) {
                 const latest = data[0];
                 const checkIn = new Date(latest.check_in_time);
@@ -178,12 +199,106 @@ const Dashboard: React.FC = () => {
                     location: 'Office (Verified)'
                 }));
             } else {
-                setStats(prev => ({ ...prev, location: 'Ready to check-in' }));
+                // Check if locations are configured
+                const hasLocations = res.data.meta?.has_locations;
+
+                if (hasLocations === false) {
+                    setStats(prev => ({ ...prev, location: 'No Office Configured' }));
+                } else {
+                    // Start checking location status immediately
+                    verifyLocationStatus(res.data.meta.locations || []);
+                }
             }
         } catch (error: any) {
             console.error('Failed to fetch attendance', error);
             if (error.response?.status === 401) navigate('/login');
         }
+    };
+
+    const verifyLocationStatus = (locations: any[]) => {
+        if (!locations || locations.length === 0) return;
+
+        setStats(prev => ({ ...prev, location: 'Checking proximity...' }));
+
+        navigator.geolocation.getCurrentPosition((position) => {
+            const { latitude, longitude } = position.coords;
+            setLocationCoords({ latitude, longitude });
+
+            let minDistance = Infinity;
+            let isInside = false;
+            let validId = 'default';
+            let validName = 'Office';
+
+            for (const loc of locations) {
+                // Check if Polygon Mode
+                if (loc.polygon_coords && loc.polygon_coords.length > 0) {
+                    let polygon = loc.polygon_coords;
+                    if (typeof polygon === 'string') {
+                        try { polygon = JSON.parse(polygon); } catch (e) { }
+                    }
+
+                    if (isPointInPolygon({ lat: latitude, lng: longitude }, polygon)) {
+                        isInside = true;
+                        validId = loc.id;
+                        validName = loc.name;
+                        // For polygon, distance is 0 (inside) for sorting purposes, or calculate distance to centroid if needed
+                        minDistance = 0;
+                        break;
+                    }
+                } else {
+                    // Radius Mode
+                    const distance = calculateDistance(latitude, longitude, loc.latitude, loc.longitude);
+                    if (distance <= (loc.radius_meters || 100) + 50) {
+                        isInside = true;
+                        validId = loc.id;
+                        validName = loc.name;
+                        break;
+                    }
+                    if (distance < minDistance) minDistance = distance;
+                }
+            }
+
+            if (isInside) {
+                setSelectedLocationId(validId);
+                setStats(prev => ({ ...prev, location: validName || 'Office' }));
+            } else {
+                setStats(prev => ({ ...prev, location: `Too Far (${Math.round(minDistance)}m)` }));
+            }
+
+        }, (err) => {
+            console.error('Location check failed', err);
+            setStats(prev => ({ ...prev, location: 'Location Unknown' }));
+        }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 });
+    }
+
+    // Ray-Casting Algorithm for Point in Polygon
+    const isPointInPolygon = (point: { lat: number, lng: number }, polygon: { lat: number, lng: number }[]) => {
+        let inside = false;
+        for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+            const xi = polygon[i].lng, yi = polygon[i].lat;
+            const xj = polygon[j].lng, yj = polygon[j].lat;
+
+            const intersect = ((yi > point.lat) !== (yj > point.lat))
+                && (point.lng < (xj - xi) * (point.lat - yi) / (yj - yi) + xi);
+            if (intersect) inside = !inside;
+        }
+        return inside;
+    };
+
+    // Haversine formula to calculate distance in meters
+    const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
+        const R = 6371e3; // Earth radius in meters
+        const φ1 = lat1 * Math.PI / 180;
+        const φ2 = lat2 * Math.PI / 180;
+        const Δφ = (lat2 - lat1) * Math.PI / 180;
+        const Δλ = (lon2 - lon1) * Math.PI / 180;
+
+        const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+            Math.cos(φ1) * Math.cos(φ2) *
+            Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+        return R * c;
     };
 
     const initiateClockAction = () => {
@@ -198,9 +313,55 @@ const Dashboard: React.FC = () => {
                 // For now, proceed to checkout
                 handleCheckOut(latitude, longitude);
             } else {
-                // If clocking IN, open Camera
-                setShowCamera(true);
-                startCamera();
+                // Clock IN - VALIDATE GEOFENCE HERE
+                if (!officeLocations || officeLocations.length === 0) {
+                    alert("No office locations configured. Please contact admin.");
+                    return;
+                }
+
+                // Check if user is inside ANY valid location
+                let isInside = false;
+                let validId = 'default';
+
+                for (const loc of officeLocations) {
+                    // Polygon Mode
+                    if (loc.polygon_coords && loc.polygon_coords.length > 0) {
+                        let polygon = loc.polygon_coords;
+                        if (typeof polygon === 'string') {
+                            try { polygon = JSON.parse(polygon); } catch (e) { }
+                        }
+
+                        if (isPointInPolygon({ lat: latitude, lng: longitude }, polygon)) {
+                            isInside = true;
+                            validId = loc.id;
+                            break;
+                        }
+                    } else {
+                        // Radius Mode
+                        const distance = calculateDistance(latitude, longitude, loc.latitude, loc.longitude);
+                        // Add a small buffer (e.g. 50m) for GPS drift
+                        if (distance <= (loc.radius_meters || 100) + 50) {
+                            isInside = true;
+                            validId = loc.id;
+                            break;
+                        }
+                    }
+                }
+
+                if (isInside) {
+                    setSelectedLocationId(validId);
+                    setShowCamera(true);
+                    startCamera();
+                } else {
+                    // Find closest office to show nice error
+                    let minDistance = Infinity;
+                    officeLocations.forEach(loc => {
+                        const d = calculateDistance(latitude, longitude, loc.latitude, loc.longitude);
+                        if (d < minDistance) minDistance = d;
+                    });
+
+                    alert(`You are not within the designated area (Closest: ${Math.round(minDistance)}m). Please get closer.`);
+                }
             }
 
         }, (err) => {
@@ -259,7 +420,7 @@ const Dashboard: React.FC = () => {
             await api.post('/attendance/check-in', {
                 latitude: locationCoords.latitude,
                 longitude: locationCoords.longitude,
-                location_id: 'default',
+                location_id: selectedLocationId,
                 photo_url: photoUrl
             });
 
@@ -311,18 +472,33 @@ const Dashboard: React.FC = () => {
 
                                 <button
                                     onClick={initiateClockAction}
-                                    disabled={loading}
-                                    className={`relative w-40 h-40 md:w-48 md:h-48 rounded-full shadow-lg transform transition-transform duration-300 hover:scale-105 active:scale-95 flex flex-col items-center justify-center text-white z-20 ${clockedIn ? 'bg-gradient-to-br from-red-500 to-pink-600 shadow-red-500/30' : 'bg-gradient-to-br from-indigo-600 to-purple-600 shadow-indigo-500/30'} ${loading ? 'opacity-75 cursor-not-allowed' : ''}`}
+                                    disabled={loading || stats.location === 'No Office Configured'}
+                                    className={`relative w-40 h-40 md:w-48 md:h-48 rounded-full shadow-lg transform transition-transform duration-300 hover:scale-105 active:scale-95 flex flex-col items-center justify-center text-white z-20 ${clockedIn ? 'bg-gradient-to-br from-red-500 to-pink-600 shadow-red-500/30' : 'bg-gradient-to-br from-indigo-600 to-purple-600 shadow-indigo-500/30'} ${loading || stats.location === 'No Office Configured' ? 'opacity-75 cursor-not-allowed grayscale' : ''}`}
                                 >
                                     {clockedIn ? <MdLogout className="text-5xl mb-1" /> : <MdTouchApp className="text-5xl mb-1" />}
                                     <span className="font-bold text-lg tracking-wider uppercase">{loading ? '...' : (clockedIn ? 'Clock Out' : 'Clock In')}</span>
                                 </button>
                             </div>
 
-                            <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-700/50 px-4 py-2 rounded-lg border border-gray-100 dark:border-gray-600">
-                                <MdLocationOn className="text-green-500 text-base mr-2" />
-                                Location: <span className="font-medium text-gray-700 dark:text-gray-300 ml-1">{stats.location}</span>
-                                <MdCheckCircle className="text-green-500 text-base ml-2" />
+                            <div className={`flex items-center justify-center px-6 py-3 rounded-xl border transition-all duration-300 ${stats.location === 'No Office Configured' || stats.location.startsWith('Too Far')
+                                ? 'bg-red-50 border-red-100 text-red-600 dark:bg-red-900/20 dark:border-red-800 dark:text-red-300'
+                                : stats.location === 'Checking proximity...' || stats.location === 'Location Unknown'
+                                    ? 'bg-yellow-50 border-yellow-100 text-yellow-600 dark:bg-yellow-900/20 dark:border-yellow-800 dark:text-yellow-300'
+                                    : 'bg-green-50 border-green-200 text-green-700 dark:bg-green-900/30 dark:border-green-800 dark:text-green-300 shadow-sm'
+                                }`}>
+                                <MdLocationOn className={`${stats.location === 'No Office Configured' || stats.location.startsWith('Too Far')
+                                    ? 'text-red-500'
+                                    : stats.location === 'Checking proximity...' || stats.location === 'Location Unknown'
+                                        ? 'text-yellow-500'
+                                        : 'text-green-600'
+                                    } text-2xl mr-2`} />
+                                <span className={`font-medium tracking-wide ${stats.location === 'No Office Configured' || stats.location.startsWith('Too Far')
+                                    ? 'text-base'
+                                    : stats.location === 'Checking proximity...' || stats.location === 'Location Unknown'
+                                        ? 'text-base'
+                                        : 'text-lg' // Slightly smaller than xl
+                                    }`}>{stats.location}</span>
+                                {!stats.location.startsWith('Too Far') && stats.location !== 'No Office Configured' && stats.location !== 'Checking proximity...' && stats.location !== 'Location Unknown' && <MdCheckCircle className="text-green-600 text-xl ml-2" />}
                             </div>
                         </div>
                     </div>
@@ -390,6 +566,7 @@ const Dashboard: React.FC = () => {
                         </button>
                     </div>
 
+
                     {/* Weekly Hours - Simplified Bar Chart */}
                     <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-6 border border-gray-100 dark:border-gray-700">
                         <div className="flex justify-between items-center mb-4">
@@ -413,6 +590,9 @@ const Dashboard: React.FC = () => {
                             <span>Mon</span><span>Tue</span><span className="font-bold text-primary">Wed</span><span>Thu</span><span>Fri</span>
                         </div>
                     </div>
+
+                    {/* Monthly Attendance Heatmap */}
+                    <AttendanceHeatmap />
 
                 </div>
 
@@ -446,6 +626,16 @@ const Dashboard: React.FC = () => {
                                 <img src={capturedImage} className="w-full h-full object-cover" alt="Captured" />
                             )}
                             <canvas ref={canvasRef} className="hidden" />
+
+                            {/* Switch Camera Button - Only show if not captured yet */}
+                            {!capturedImage && (
+                                <button
+                                    onClick={switchCamera}
+                                    className="absolute bottom-4 right-4 p-3 bg-black/50 hover:bg-black/70 text-white rounded-full transition-colors backdrop-blur-sm z-20"
+                                >
+                                    <MdFlipCameraIos className="text-xl" />
+                                </button>
+                            )}
                         </div>
 
                         <div className="flex space-x-3">

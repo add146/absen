@@ -722,3 +722,25 @@ Sistem **Super Admin** telah diimplementasikan sepenuhnya dengan fitur:
 ### 7.3 Perbaikan Global Settings
 - UI Disederhanakan: Menghapus technical keys (underscore), hanya menampilkan label deskriptif.
 - **WAHA Integration**: Penambahan kolom `waha_session_name` untuk multi-device support.
+
+### 7.4 Update Implementasi (04 Februari 2026)
+
+#### Advanced Geofencing
+- **Polygon Mode**: Admin dapat menggambar area poligonal kompleks untuk validasi lokasi yang lebih akurat (ray-casting algorithm).
+- **Radius Visualization**:
+  - Marker Pin kini dapat didrag & drop untuk menentukan titik tengah.
+  - Lingkaran biru (Radius Circle) visual mempresentasikan area cakupan sesuai dengan setting meter.
+  - Lingkaran tetap terlihat pada lokasi yang tersimpan untuk kemudahan monitoring.
+- **GPS Accuracy Note**: Penambahan disclaimer "GPS accuracy varies 5-20m" di bawah peta.
+
+#### User Experience Improvements
+- **Attendance Heatmap Calendar**: Visualisasi kehadiran bulanan dengan indikator warna (Hadir, Terlambat, Absen).
+- **Mobile Optimization**:
+  - Penambahan indikator versi aplikasi (v1.0.1).
+  - Tombol **"Update App"** untuk force clear cache tanpa reload manual.
+  - Perbaikan font pada status lokasi (Medium Weight, Size LG) agar lebih bersih.
+  - Penghapusan teks "Ready to Check-in" yang redundan.
+
+#### Camera Features
+- **Switch Camera**: Dukungan tombol flip kamera untuk berganti antara kamera depan dan belakang.
+- **Face Verification**: Integrasi foto selfie wajib saat check-in.

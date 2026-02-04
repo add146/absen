@@ -4,7 +4,7 @@
  */
 
 import { Hono } from 'hono';
-import { authMiddleware, adminAuthMiddleware } from '../middleware/auth';
+import { authMiddleware, superAdminMiddleware } from '../middleware/auth';
 import { Bindings } from '../index';
 
 type Variables = {
@@ -17,9 +17,9 @@ type Variables = {
 
 const app = new Hono<{ Bindings: Bindings, Variables: Variables }>();
 
-// All routes require admin authentication
+// All routes require Super Admin authentication
 app.use('/*', authMiddleware);
-app.use('/*', adminAuthMiddleware);
+app.use('/*', superAdminMiddleware);
 
 /**
  * GET /settings

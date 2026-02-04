@@ -5,7 +5,8 @@ const CACHE_NAME = 'absen-v1';
 const STATIC_ASSETS = [
     '/',
     '/index.html',
-    '/manifest.json'
+    '/manifest.json',
+    '/offline.html'
 ];
 
 // Install event - cache static assets

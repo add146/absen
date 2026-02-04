@@ -8,10 +8,15 @@ const SuperAdminDashboard: React.FC = () => {
 
     useEffect(() => {
         fetchAnalytics();
+        // Real-time updates: Poll every 30 seconds
+        const interval = setInterval(fetchAnalytics, 30000);
+        return () => clearInterval(interval);
     }, []);
 
     const fetchAnalytics = async () => {
         try {
+            // Don't set loading on background updates
+            if (!analytics) setLoading(true);
             const res = await api.get('/super-admin/analytics');
             setAnalytics(res.data);
         } catch (error) {
@@ -21,7 +26,7 @@ const SuperAdminDashboard: React.FC = () => {
         }
     };
 
-    if (loading) return <div className="text-center py-8">Loading...</div>;
+    if (loading) return <div className="text-center py-8" role="status" aria-live="polite">Loading platform analytics...</div>;
 
     const formatCurrency = (amount: number) => {
         return new Intl.NumberFormat('id-ID', {
@@ -38,25 +43,25 @@ const SuperAdminDashboard: React.FC = () => {
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 <StatCard
-                    icon={<MdBusiness className="text-3xl text-blue-600" />}
+                    icon={<MdBusiness className="text-3xl text-blue-600" aria-hidden="true" />}
                     label="Total Tenants"
                     value={analytics?.tenantStats?.reduce((sum: number, s: any) => sum + (s.count || 0), 0) || 0}
                     bgColor="bg-blue-50"
                 />
                 <StatCard
-                    icon={<MdPeople className="text-3xl text-green-600" />}
+                    icon={<MdPeople className="text-3xl text-green-600" aria-hidden="true" />}
                     label="Total Users"
                     value={analytics?.totalUsers || 0}
                     bgColor="bg-green-50"
                 />
                 <StatCard
-                    icon={<MdAttachMoney className="text-3xl text-purple-600" />}
+                    icon={<MdAttachMoney className="text-3xl text-purple-600" aria-hidden="true" />}
                     label="MRR"
                     value={formatCurrency(analytics?.mrr || 0)}
                     bgColor="bg-purple-50"
                 />
                 <StatCard
-                    icon={<MdTrendingUp className="text-3xl text-orange-600" />}
+                    icon={<MdTrendingUp className="text-3xl text-orange-600" aria-hidden="true" />}
                     label="New Signups (30d)"
                     value={analytics?.recentSignups || 0}
                     bgColor="bg-orange-50"

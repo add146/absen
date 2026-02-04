@@ -20,8 +20,8 @@ export const authMiddleware = async (c: Context, next: Next) => {
 
 export const adminAuthMiddleware = async (c: Context, next: Next) => {
     const user = c.get('user')
-    if (!user || user.role !== 'admin') {
-        // Strict check: Must be authenticated AND have 'admin' role
+    if (!user || (user.role !== 'admin' && user.role !== 'owner')) {
+        // Strict check: Must be authenticated AND have 'admin' or 'owner' role
         return c.json({ error: 'Forbidden: Admin access required' }, 403)
     }
     await next()

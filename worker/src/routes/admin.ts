@@ -20,6 +20,13 @@ const admin = new Hono<{ Bindings: Bindings, Variables: Variables }>()
 // Apply middleware to all admin routes
 admin.use('/*', authMiddleware, adminAuthMiddleware)
 
+// GET /maps-config - Get Google Maps API Key
+admin.get('/maps-config', async (c) => {
+    // Fetch from Global Settings
+    const key = await c.env.DB.prepare("SELECT setting_value FROM global_settings WHERE setting_key = 'google_maps_api_key'").first<{ setting_value: string }>();
+    return c.json({ apiKey: key?.setting_value || '' });
+})
+
 // GET /users - List all users (with pagination and role filter)
 admin.get('/users', async (c) => {
     const { page = '1', limit = '10', role } = c.req.query()
@@ -148,7 +155,7 @@ admin.get('/locations', async (c) => {
 
 // POST /locations - Create or Update Location
 admin.post('/locations', async (c) => {
-    const { name, latitude, longitude, radius_meters = 100 } = await c.req.json()
+    const { name, latitude, longitude, radius_meters = 100, polygon_coords } = await c.req.json()
     const user = c.get('user')
     const tenant_id = user.tenant_id // Provide tenant_id from admin user
 
@@ -157,9 +164,11 @@ admin.post('/locations', async (c) => {
     }
 
     const id = crypto.randomUUID()
+    const polygonJson = polygon_coords ? JSON.stringify(polygon_coords) : null;
+
     await c.env.DB.prepare(
-        'INSERT INTO locations (id, tenant_id, name, latitude, longitude, radius_meters) VALUES (?, ?, ?, ?, ?, ?)'
-    ).bind(id, tenant_id, name, latitude, longitude, radius_meters).run()
+        'INSERT INTO locations (id, tenant_id, name, latitude, longitude, radius_meters, polygon_coords) VALUES (?, ?, ?, ?, ?, ?, ?)'
+    ).bind(id, tenant_id, name, latitude, longitude, radius_meters, polygonJson).run()
 
     return c.json({ message: 'Location created', id })
 })
@@ -167,15 +176,17 @@ admin.post('/locations', async (c) => {
 // PUT /locations/:id - Update location
 admin.put('/locations/:id', async (c) => {
     const id = c.req.param('id')
-    const { name, latitude, longitude, radius_meters = 100 } = await c.req.json()
+    const { name, latitude, longitude, radius_meters = 100, polygon_coords } = await c.req.json()
 
     if (!name || !latitude || !longitude) {
         return c.json({ error: 'Missing required fields' }, 400)
     }
 
+    const polygonJson = polygon_coords ? JSON.stringify(polygon_coords) : null;
+
     await c.env.DB.prepare(
-        'UPDATE locations SET name = ?, latitude = ?, longitude = ?, radius_meters = ? WHERE id = ?'
-    ).bind(name, latitude, longitude, radius_meters, id).run()
+        'UPDATE locations SET name = ?, latitude = ?, longitude = ?, radius_meters = ?, polygon_coords = ? WHERE id = ?'
+    ).bind(name, latitude, longitude, radius_meters, polygonJson, id).run()
 
     return c.json({ message: 'Location updated' })
 })

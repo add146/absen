@@ -6,6 +6,7 @@
 
 import { WAHAService } from './waha-service';
 import { notificationTemplates, getNotificationTitle, type NotificationData } from '../templates/notification-templates';
+import { GlobalSettingsService } from './global-settings-service';
 
 export interface Env {
     DB: D1Database;
@@ -26,29 +27,21 @@ export class NotificationService {
     }
 
     /**
-     * Get WAHA configuration from system_settings
+     * Get WAHA configuration from global_settings
      */
     private async getWAHAConfig(): Promise<{ enabled: boolean; baseUrl?: string; apiKey?: string; session?: string }> {
-        try {
-            const { results } = await this.db
-                .prepare(`SELECT key, value FROM system_settings WHERE key LIKE 'waha_%'`)
-                .all();
+        const settingsService = new GlobalSettingsService(this.db);
+        const settings = await settingsService.getSettings();
 
-            const config: Record<string, string> = {};
-            results.forEach((row: any) => {
-                config[row.key] = row.value;
-            });
+        // Check if WAHA is configured (at least URL is present)
+        const enabled = !!settings.waha_api_url;
 
-            return {
-                enabled: config.waha_enabled === 'true',
-                baseUrl: config.waha_base_url,
-                apiKey: config.waha_api_key,
-                session: config.waha_session || 'default'
-            };
-        } catch (error) {
-            console.error('Failed to load WAHA config:', error);
-            return { enabled: false };
-        }
+        return {
+            enabled,
+            baseUrl: settings.waha_api_url,
+            apiKey: settings.waha_api_key,
+            session: settings.waha_session_name || 'default'
+        };
     }
 
     /**

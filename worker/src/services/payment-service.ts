@@ -26,24 +26,39 @@ export interface PaymentTransaction {
     }[]
 }
 
+import { GlobalSettingsService } from './global-settings-service';
+
+/**
+ * Get Midtrans config from Global Settings
+ */
+async function getMidtransConfig(db: D1Database) {
+    const settingsService = new GlobalSettingsService(db);
+    const settings = await settingsService.getSettings();
+    return {
+        serverKey: settings.midtrans_server_key,
+        clientKey: settings.midtrans_client_key,
+        isProduction: settings.midtrans_mode === 'production'
+    };
+}
+
 /**
  * Get Midtrans API URL based on environment
  */
-function getMidtransUrl(env: Bindings): string {
-    const isProduction = env.MIDTRANS_IS_PRODUCTION === 'true'
-    return isProduction
+async function getMidtransUrl(db: D1Database): Promise<string> {
+    const config = await getMidtransConfig(db);
+    return config.isProduction
         ? 'https://api.midtrans.com/v2'
-        : 'https://api.sandbox.midtrans.com/v2'
+        : 'https://api.sandbox.midtrans.com/v2';
 }
 
 /**
  * Get Midtrans Snap URL
  */
-function getSnapUrl(env: Bindings): string {
-    const isProduction = env.MIDTRANS_IS_PRODUCTION === 'true'
-    return isProduction
+async function getSnapUrl(db: D1Database): Promise<string> {
+    const config = await getMidtransConfig(db);
+    return config.isProduction
         ? 'https://app.midtrans.com/snap/v1/transactions'
-        : 'https://app.sandbox.midtrans.com/snap/v1/transactions'
+        : 'https://app.sandbox.midtrans.com/snap/v1/transactions';
 }
 
 /**
@@ -53,8 +68,12 @@ export async function createPaymentTransaction(
     transaction: PaymentTransaction,
     env: Bindings
 ): Promise<{ token: string, redirectUrl: string }> {
-    const serverKey = env.MIDTRANS_SERVER_KEY || ''
+    const config = await getMidtransConfig(env.DB);
+    const serverKey = config.serverKey || env.MIDTRANS_SERVER_KEY || ''; // Fallback to env if DB empty
     const authHeader = `Basic ${btoa(serverKey + ':')}`
+
+    // Update app URL logic
+    const appUrl = config.isProduction ? 'https://absen.khibroh.com' : 'http://localhost:5173';
 
     const payload = {
         transaction_details: {
@@ -73,13 +92,14 @@ export async function createPaymentTransaction(
             quantity: item.quantity
         })),
         callbacks: {
-            finish: `${getAppUrl(env)}/subscription/success`,
-            error: `${getAppUrl(env)}/subscription/failed`,
-            pending: `${getAppUrl(env)}/subscription/pending`
+            finish: `${appUrl}/subscription/success`,
+            error: `${appUrl}/subscription/failed`,
+            pending: `${appUrl}/subscription/pending`
         }
     }
 
-    const response = await fetch(getSnapUrl(env), {
+    const snapUrl = await getSnapUrl(env.DB);
+    const response = await fetch(snapUrl, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

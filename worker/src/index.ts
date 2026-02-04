@@ -17,7 +17,9 @@ import tenants from './routes/tenants'
 import subscriptions from './routes/subscriptions'
 import customDomains from './routes/custom-domains'
 import superadmin from './routes/super-admin'
+import health from './routes/health'
 import { tenantContext, rateLimiter, customDomainRouter } from './middleware/tenant'
+import { logger } from './utils/logger'
 
 export type Bindings = {
     DB: D1Database
@@ -33,9 +35,12 @@ export type Bindings = {
     MIDTRANS_IS_PRODUCTION?: string
 }
 
+import { securityHeaders, ipRateLimiter } from './middleware/security'
+
 const app = new Hono<{ Bindings: Bindings }>()
 
 app.use('/*', cors())
+app.use('/*', securityHeaders)
 
 // Custom domain routing (before auth)
 app.use('/*', customDomainRouter)
@@ -48,7 +53,10 @@ app.get('/', (c) => {
     })
 })
 
+app.route('/health', health)
+
 // Public routes (no auth required)
+app.use('/auth/*', ipRateLimiter) // Apply IP rate limiting to auth routes
 app.route('/auth', auth)
 // Webhook endpoints (public but should verify signature)
 app.route('/subscriptions', subscriptions) // Some endpoints are public (webhook)

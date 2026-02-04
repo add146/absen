@@ -90,9 +90,9 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
                 </nav>
 
                 <div className="p-4 border-t border-gray-200 dark:border-gray-700">
-                    <div className="flex items-center gap-3 px-2">
-                        <div className="h-10 w-10 rounded-full bg-gray-300 dark:bg-gray-600 overflow-hidden">
-                            {/* Replace with actual image */}
+                    <div className="flex items-center gap-3 px-2 mb-4">
+                        <div className="h-10 w-10 rounded-full bg-gray-300 dark:bg-gray-600 overflow-hidden flex items-center justify-center text-lg font-bold text-gray-500">
+                            {user.name ? user.name.charAt(0) : 'U'}
                         </div>
                         <div className="flex-1 min-w-0">
                             <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{user.name || 'User'}</p>
@@ -104,6 +104,28 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
                             title="Logout"
                         >
                             <MdLogout className="text-xl" />
+                        </button>
+                    </div>
+
+                    {/* App Version & Refresh */}
+                    <div className="flex items-center justify-between px-2 text-xs text-gray-400 dark:text-gray-500 border-t border-gray-100 dark:border-gray-700 pt-3 mt-2">
+                        <span>v1.0.1</span>
+                        <button
+                            onClick={() => {
+                                if (window.confirm('Reload app to get latest updates?')) {
+                                    if ('serviceWorker' in navigator) {
+                                        navigator.serviceWorker.getRegistrations().then(function (registrations) {
+                                            for (let registration of registrations) {
+                                                registration.unregister();
+                                            }
+                                        });
+                                    }
+                                    window.location.reload();
+                                }
+                            }}
+                            className="text-blue-500 hover:text-blue-600 hover:underline flex items-center gap-1"
+                        >
+                            Update App
                         </button>
                     </div>
                 </div>

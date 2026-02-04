@@ -2,6 +2,8 @@ import { Hono } from 'hono'
 import { authMiddleware } from '../middleware/auth'
 import { FaceVerificationService } from '../services/face-verification'
 import { PointsService } from '../services/points'
+import { GeofenceService } from '../services/geofence'
+import { FraudDetector } from '../services/fraud-detection'
 
 type Bindings = {
     DB: D1Database
@@ -19,7 +21,7 @@ attendance.use('*', authMiddleware)
 
 attendance.post('/check-in', async (c) => {
     const user = c.get('user')
-    const { latitude, longitude, location_id, photo, photo_url } = await c.req.json()
+    const { latitude, longitude, location_id, photo, photo_url, is_mock } = await c.req.json()
 
     if (!latitude || !longitude) return c.json({ error: 'Location required' }, 400)
 
@@ -55,49 +57,105 @@ attendance.post('/check-in', async (c) => {
         }
 
         // Resolve valid location_id
+        // Resolve valid location_id
         let validLocationId = location_id || 'default';
+        let locationValid = false;
 
         try {
-            // Check if the provided (or default) location exists
-            const locationExists = await c.env.DB.prepare('SELECT id FROM locations WHERE id = ?').bind(validLocationId).first();
+            if (location_id && location_id !== 'default') {
+                // Validate specific location
+                const loc = await c.env.DB.prepare('SELECT * FROM locations WHERE id = ?').bind(location_id).first<any>();
+                if (loc) {
+                    if (loc.polygon_coords) {
+                        // Polygon Validation
+                        let polygon: any[] = [];
+                        try {
+                            polygon = typeof loc.polygon_coords === 'string' ? JSON.parse(loc.polygon_coords) : loc.polygon_coords;
+                        } catch (e) { }
 
-            if (!locationExists) {
-                // If specific ID not found, try to find ANY active location
-                const anyLocation = await c.env.DB.prepare('SELECT id FROM locations WHERE is_active = 1 LIMIT 1').first<{ id: string }>();
+                        if (isPointInPolygon({ lat: latitude, lng: longitude }, polygon)) {
+                            locationValid = true;
+                        }
+                    } else {
+                        // Radius Validation
+                        const distance = calculateDistance(latitude, longitude, loc.latitude, loc.longitude);
+                        // Add 50m buffer
+                        if (distance <= (loc.radius_meters || 100) + 50) {
+                            locationValid = true;
+                        }
+                    }
+                }
+            } else {
+                // Validate against ANY active location for this tenant
+                const locations = await c.env.DB.prepare('SELECT * FROM locations WHERE is_active = 1 AND tenant_id = ?').bind(user.tenant_id).all<any>();
+                for (const loc of locations.results) {
+                    if (loc.polygon_coords) {
+                        // Polygon Validation
+                        let polygon: any[] = [];
+                        try {
+                            polygon = typeof loc.polygon_coords === 'string' ? JSON.parse(loc.polygon_coords) : loc.polygon_coords;
+                        } catch (e) { }
 
-                if (anyLocation) {
-                    validLocationId = anyLocation.id;
-                } else {
-                    // If NO locations exist at all, create a default one to satisfy FK
-                    validLocationId = 'default';
-                    await c.env.DB.prepare(
-                        `INSERT INTO locations (id, tenant_id, name, latitude, longitude, radius_meters, is_active)
-                     VALUES (?, ?, ?, ?, ?, ?, ?)`
-                    ).bind('default', 'default', 'Default Office', latitude, longitude, 100, 1).run();
-                    console.log('Created default location for check-in');
+                        if (isPointInPolygon({ lat: latitude, lng: longitude }, polygon)) {
+                            locationValid = true;
+                            validLocationId = loc.id;
+                            break;
+                        }
+                    } else {
+                        const distance = calculateDistance(latitude, longitude, loc.latitude, loc.longitude);
+                        if (distance <= (loc.radius_meters || 100) + 50) {
+                            locationValid = true;
+                            validLocationId = loc.id;
+                            break;
+                        }
+                    }
                 }
             }
+
+            if (!locationValid) {
+                return c.json({ error: 'Location validation failed. You are outside the designated area.', point: { latitude, longitude } }, 400)
+            }
+
         } catch (e) {
             console.error('Error resolving location:', e);
-            // Continue and hope for the best (or fail at INSERT)
+            // Fallback: If DB fails, we might technically block, but let's fail safe if critical
+            return c.json({ error: 'System error during location check' }, 500);
         }
 
-        // 3. Record attendance
+        // 3. Fraud Detection
+        const fraudDetector = new FraudDetector(c.env.DB);
+        const fraudAnalysis = await fraudDetector.analyzeCheckIn({
+            id,
+            user_id: user.sub,
+            check_in_lat: latitude,
+            check_in_lng: longitude,
+            check_in_time: Math.floor(new Date(now).getTime() / 1000)
+        }, is_mock);
+
+        const fraudFlags = fraudDetector.serializeIndicators(fraudAnalysis);
+        const fraudScore = fraudAnalysis.fraudScore;
+
+        if (fraudScore > 50) {
+            console.warn(`[FRAUD] High risk check-in detected for ${user.sub}: Score ${fraudScore}`);
+        }
+
+        // 4. Record attendance
         await c.env.DB.prepare(
             `INSERT INTO attendances (
                 id, user_id, location_id, check_in_time, 
                 check_in_lat, check_in_lng, 
                 face_verified, face_confidence, face_photo_url,
-                points_earned
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+                points_earned, fraud_flags, fraud_score
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
         ).bind(
             id, user.sub, validLocationId, now,
             latitude, longitude,
             faceVerified, faceConfidence, facePhotoUrl,
-            10 // 10 points for check-in
+            10, // 10 points for check-in
+            fraudFlags, fraudScore
         ).run()
 
-        // 4. Award Points
+        // 5. Award Points
         try {
             const pointsService = new PointsService(c.env.DB);
             await pointsService.awardPoints(
@@ -163,7 +221,19 @@ attendance.get('/today', async (c) => {
         'SELECT * FROM attendances WHERE user_id = ? AND check_in_time LIKE ? ORDER BY created_at DESC'
     ).bind(user.sub, `${today}%`).all()
 
-    return c.json({ data: result.results })
+    // Check if any active locations exist
+    // Get active locations for this tenant for client-side validation
+    const locations = await c.env.DB.prepare(
+        'SELECT * FROM locations WHERE is_active = 1 AND tenant_id = ?'
+    ).bind(user.tenant_id).all();
+
+    return c.json({
+        data: result.results,
+        meta: {
+            has_locations: locations.results.length > 0,
+            locations: locations.results // Send locations to frontend
+        }
+    })
 })
 
 attendance.get('/history', async (c) => {
@@ -191,5 +261,69 @@ attendance.get('/history', async (c) => {
         return c.json({ success: false, error: 'Failed to fetch history' }, 500)
     }
 })
+
+attendance.get('/calendar', async (c) => {
+    const user = c.get('user')
+    const { month, year } = c.req.query()
+
+    const now = new Date()
+    const targetYear = year ? parseInt(year) : now.getFullYear()
+    const targetMonth = month ? parseInt(month) : now.getMonth() + 1 // 1-12
+
+    // Get all attendance for this month
+    const startDate = `${targetYear}-${targetMonth.toString().padStart(2, '0')}-01`
+    // Calculate end date (last day of month)
+    const lastDay = new Date(targetYear, targetMonth, 0).getDate()
+    const endDate = `${targetYear}-${targetMonth.toString().padStart(2, '0')}-${lastDay}`
+
+    try {
+        const result = await c.env.DB.prepare(
+            `SELECT * FROM attendances 
+             WHERE user_id = ? 
+             AND check_in_time >= ? 
+             AND check_in_time <= ?
+             ORDER BY check_in_time ASC`
+        ).bind(user.sub, startDate + ' 00:00:00', endDate + ' 23:59:59').all()
+
+        return c.json({
+            data: result.results,
+            meta: {
+                month: targetMonth,
+                year: targetYear
+            }
+        })
+    } catch (e: any) {
+        return c.json({ success: false, error: 'Failed to fetch calendar' }, 500)
+    }
+})
+
+// Helper Functions
+function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
+    const R = 6371e3 // Earth radius in meters
+    const φ1 = lat1 * Math.PI / 180
+    const φ2 = lat2 * Math.PI / 180
+    const Δφ = (lat2 - lat1) * Math.PI / 180
+    const Δλ = (lon2 - lon1) * Math.PI / 180
+
+    const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+        Math.cos(φ1) * Math.cos(φ2) *
+        Math.sin(Δλ / 2) * Math.sin(Δλ / 2)
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+
+    return R * c
+}
+
+function isPointInPolygon(point: { lat: number, lng: number }, polygon: { lat: number, lng: number }[]) {
+    let inside = false;
+    for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+        const xi = polygon[i].lng, yi = polygon[i].lat;
+        const xj = polygon[j].lng, yj = polygon[j].lat;
+
+        const intersect = ((yi > point.lat) !== (yj > point.lat))
+            && (point.lng < (xj - xi) * (point.lat - yi) / (yj - yi) + xi);
+        if (intersect) inside = !inside;
+    }
+    return inside;
+}
 
 export default attendance
