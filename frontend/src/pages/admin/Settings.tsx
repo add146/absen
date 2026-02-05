@@ -53,11 +53,7 @@ const Settings: React.FC = () => {
                 detail = error.message || 'Unknown Error';
             }
 
-
-            // Debug info
-            // Ensure api.defaults.baseURL is visible
-            const target = api.defaults.baseURL || 'undefined_base_url';
-            setMessage({ type: 'error', text: `${detail} (Target: ${target})` });
+            setMessage({ type: 'error', text: detail });
         } finally {
             setLoading(false);
         }
@@ -66,7 +62,7 @@ const Settings: React.FC = () => {
     return (
         <div className="max-w-4xl mx-auto">
             <div className="mb-6">
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Pengaturan Akun (v2)</h1>
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Pengaturan Akun</h1>
                 <p className="text-gray-500 dark:text-gray-400">Kelola keamanan dan preferensi tampilan Anda</p>
             </div>
 
