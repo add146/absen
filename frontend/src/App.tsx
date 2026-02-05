@@ -35,6 +35,9 @@ import PlanManagement from './pages/superadmin/PlanManagement';
 import PlatformAnalytics from './pages/superadmin/PlatformAnalytics';
 
 
+import Team from './pages/Team';
+import Settings from './pages/Settings';
+
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const token = localStorage.getItem('access_token');
   if (!token) {
@@ -57,6 +60,8 @@ function App() {
         <Route path="/attendance" element={<ProtectedRoute><AttendanceHistory /></ProtectedRoute>} />
         <Route path="/rewards" element={<ProtectedRoute><Rewards /></ProtectedRoute>} />
         <Route path="/leaves" element={<ProtectedRoute><LeaveRequest /></ProtectedRoute>} />
+        <Route path="/team" element={<ProtectedRoute><Team /></ProtectedRoute>} />
+        <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
         <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
         <Route path="/subscription" element={<ProtectedRoute><Subscription /></ProtectedRoute>} />
         <Route path="/tenant/dashboard" element={<Navigate to="/admin/dashboard" replace />} />

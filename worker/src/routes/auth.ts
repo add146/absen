@@ -274,4 +274,71 @@ auth.get('/force-reset-all', async (c) => {
     }
 });
 
+/**
+ * GET /auth/team
+ * Get list of team members (colleagues) in the same tenant
+ */
+auth.get('/team', authMiddleware, async (c) => {
+    try {
+        const user = c.get('user') as any;
+        const tenant_id = user.tenant_id;
+
+        const { results } = await c.env.DB.prepare(
+            'SELECT id, name, email, role, face_photo_url, created_at FROM users WHERE tenant_id = ? AND status = ? ORDER BY name ASC'
+        ).bind(tenant_id, 'active').all<any>();
+
+        return c.json({
+            data: results
+        });
+    } catch (e: any) {
+        console.error('Fetch team error', e);
+        return c.json({ error: 'Failed to fetch team members' }, 500);
+    }
+});
+
+/**
+ * PUT /auth/change-password
+ * Change current user password
+ */
+auth.put('/change-password', authMiddleware, async (c) => {
+    try {
+        const userPayload = c.get('user') as any;
+        const { current_password, new_password } = await c.req.json();
+
+        if (!current_password || !new_password) {
+            return c.json({ error: 'Current and new password are required' }, 400);
+        }
+
+        if (new_password.length < 6) {
+            return c.json({ error: 'New password must be at least 6 characters' }, 400);
+        }
+
+        // Verify current password
+        const user = await c.env.DB.prepare(
+            'SELECT password_hash FROM users WHERE id = ?'
+        ).bind(userPayload.sub).first<any>();
+
+        if (!user) return c.json({ error: 'User not found' }, 404);
+
+        const isValid = await compare(current_password, user.password_hash);
+        if (!isValid) {
+            return c.json({ error: 'Password saat ini salah' }, 401);
+        }
+
+        // Hash new password
+        const newHash = await hash(new_password, 10);
+
+        // Update
+        await c.env.DB.prepare(
+            'UPDATE users SET password_hash = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?'
+        ).bind(newHash, userPayload.sub).run();
+
+        return c.json({ message: 'Password berhasil diubah' });
+
+    } catch (e: any) {
+        console.error('Change password error', e);
+        return c.json({ error: 'Failed to change password' }, 500);
+    }
+});
+
 export default auth
