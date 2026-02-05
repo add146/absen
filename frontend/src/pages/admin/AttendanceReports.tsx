@@ -27,6 +27,10 @@ const AttendanceReports = () => {
     };
 
     return (
+    // Photo Modal
+    const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
+
+    return (
         <div className="space-y-6">
             <div className="flex justify-between items-center">
                 <h2 className="text-2xl font-bold text-gray-800">Laporan Kehadiran</h2>
@@ -86,13 +90,14 @@ const AttendanceReports = () => {
                             <th className="p-4 font-semibold text-gray-600">Masuk</th>
                             <th className="p-4 font-semibold text-gray-600">Keluar</th>
                             <th className="p-4 font-semibold text-gray-600">Status</th>
+                            <th className="p-4 font-semibold text-gray-600">Foto</th>
                         </tr>
                     </thead>
                     <tbody>
                         {loading ? (
-                            <tr><td colSpan={5} className="p-8 text-center text-gray-500">Memuat...</td></tr>
+                            <tr><td colSpan={6} className="p-8 text-center text-gray-500">Memuat...</td></tr>
                         ) : logs.length === 0 ? (
-                            <tr><td colSpan={5} className="p-8 text-center text-gray-500">Tidak ada catatan kehadiran untuk tanggal ini.</td></tr>
+                            <tr><td colSpan={6} className="p-8 text-center text-gray-500">Tidak ada catatan kehadiran untuk tanggal ini.</td></tr>
                         ) : (
                             logs.map((log) => (
                                 <tr key={log.id} className="border-b last:border-0 hover:bg-gray-50">
@@ -120,12 +125,43 @@ const AttendanceReports = () => {
                                             {log.is_valid ? 'Sah' : 'Ditandai'}
                                         </span>
                                     </td>
+                                    <td className="p-4">
+                                        {log.face_photo_url ? (
+                                            <button
+                                                onClick={() => setSelectedPhoto(log.face_photo_url)}
+                                                className="text-xs bg-indigo-100 text-indigo-700 px-3 py-1.5 rounded hover:bg-indigo-200 transition font-medium"
+                                            >
+                                                Lihat Foto
+                                            </button>
+                                        ) : (
+                                            <span className="text-xs text-gray-400">-</span>
+                                        )}
+                                    </td>
                                 </tr>
                             ))
                         )}
                     </tbody>
                 </table>
             </div>
+
+            {/* Photo Modal */}
+            {selectedPhoto && (
+                <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4" onClick={() => setSelectedPhoto(null)}>
+                    <div className="relative max-w-2xl w-full">
+                        <button
+                            className="absolute -top-10 right-0 text-white hover:text-gray-300"
+                            onClick={() => setSelectedPhoto(null)}
+                        >
+                            Tutup [Esc]
+                        </button>
+                        <img
+                            src={selectedPhoto}
+                            alt="Verification"
+                            className="w-full h-auto rounded-lg shadow-2xl border-4 border-white"
+                        />
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

@@ -77,6 +77,9 @@ const FieldWorkerVisits: React.FC = () => {
         });
     };
 
+    // Photo Modal
+    const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
+
     return (
         <div className="space-y-6">
             <div className="flex justify-between items-center">
@@ -180,7 +183,12 @@ const FieldWorkerVisits: React.FC = () => {
                                         </td>
                                         <td className="p-4">
                                             {visit.photo_url ? (
-                                                <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">✓ Ada</span>
+                                                <button
+                                                    onClick={() => setSelectedPhoto(visit.photo_url)}
+                                                    className="text-xs bg-blue-100 text-blue-700 px-3 py-1.5 rounded hover:bg-blue-200 transition font-medium"
+                                                >
+                                                    Lihat Foto
+                                                </button>
                                             ) : (
                                                 <span className="text-xs text-gray-400">-</span>
                                             )}
@@ -192,8 +200,29 @@ const FieldWorkerVisits: React.FC = () => {
                     </div>
                 )}
             </div>
+
+            {/* Photo Modal */}
+            {selectedPhoto && (
+                <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4" onClick={() => setSelectedPhoto(null)}>
+                    <div className="relative max-w-2xl w-full">
+                        <button
+                            className="absolute -top-10 right-0 text-white hover:text-gray-300"
+                            onClick={() => setSelectedPhoto(null)}
+                        >
+                            Tutup [Esc]
+                        </button>
+                        <img
+                            src={selectedPhoto}
+                            alt="Visit Validation"
+                            className="w-full h-auto rounded-lg shadow-2xl border-4 border-white"
+                        />
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
+
+export default FieldWorkerVisits;
 
 export default FieldWorkerVisits;

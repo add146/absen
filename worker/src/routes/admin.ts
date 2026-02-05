@@ -236,58 +236,7 @@ admin.delete('/locations/:id', async (c) => {
     return c.json({ message: 'Location deleted' })
 })
 
-// GET /attendance - Get attendance history for a user (admin view) - FIXED ROUTE
-admin.get('/attendance', async (c) => {
-    console.log('[VERSION_CHECK] v2026-02-04-FIX-ROUTE')
-    const { user_id, limit = '20' } = c.req.query()
-
-    console.log('[ATTENDANCE_HISTORY] Request received:', { user_id, limit })
-
-    if (!user_id) {
-        console.log('[ATTENDANCE_HISTORY] Missing user_id')
-        return c.json({ error: 'user_id query parameter is required' }, 400)
-    }
-
-    try {
-        console.log('[ATTENDANCE_HISTORY] Preparing query...')
-
-        // Fetch attendance records only
-        const query = `
-            SELECT
-                a.id,
-                a.check_in_time,
-                a.check_out_time,
-                a.is_valid,
-                l.name as location_name,
-                'presence' as type
-            FROM attendances a
-            LEFT JOIN locations l ON a.location_id = l.id
-            WHERE a.user_id = ?
-            ORDER BY a.check_in_time DESC
-            LIMIT ?
-        `
-
-        console.log('[ATTENDANCE_HISTORY] Executing query with params:', { user_id, limit: parseInt(limit) })
-
-        const { results } = await c.env.DB.prepare(query)
-            .bind(user_id, parseInt(limit))
-            .all<any>()
-
-        console.log('[ATTENDANCE_HISTORY] Query executed successfully. Results count:', results?.length || 0)
-
-        return c.json({ data: results || [] })
-    } catch (error: any) {
-        console.error('[ATTENDANCE_HISTORY] ERROR:', error)
-        console.error('[ATTENDANCE_HISTORY] Error message:', error.message)
-        console.error('[ATTENDANCE_HISTORY] Error stack:', error.stack)
-
-        return c.json({
-            error: 'Failed to fetch attendance history',
-            details: error.message,
-            stack: error.stack
-        }, 500)
-    }
-})
+// Route removed (consolidated with the main attendance handler below)
 
 
 
@@ -376,6 +325,7 @@ admin.get('/attendance', async (c) => {
             is_valid, 
             points_earned, 
             checkout_location_name,
+            face_photo_url,
             'presence' as type,
             NULL as leave_type
         FROM attendances
@@ -390,6 +340,8 @@ admin.get('/attendance', async (c) => {
             end_date || 'T23:59:59Z' as check_out_time, 
             1 as is_valid, 
             0 as points_earned, 
+            NULL as checkout_location_name,
+            NULL as face_photo_url,
             'leave' as type,
             type as leave_type
         FROM leaves
@@ -435,11 +387,12 @@ admin.get('/attendance', async (c) => {
         ) combined_results
         LEFT JOIN users u ON combined_results.user_id = u.id
         LEFT JOIN locations l ON combined_results.location_id = l.id
+        WHERE u.tenant_id = ?
         ORDER BY check_in_time DESC
     `
 
-    // Combined params: normal params + leave params
-    const allParams = [...params, ...leaveParams]
+    // Combined params: normal params + leave params + tenant_id
+    const allParams = [...params, ...leaveParams, user.tenant_id]
 
     if (!isCsv) {
         const offset = (parseInt(page) - 1) * parseInt(limit)
