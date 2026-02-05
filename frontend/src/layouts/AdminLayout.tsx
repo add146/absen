@@ -1,6 +1,6 @@
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
-import { MdDashboard, MdPeople, MdLocationOn, MdAssessment, MdLogout, MdCheckCircle, MdShoppingCart, MdInventory, MdShowChart, MdStars, MdSecurity, MdDarkMode, MdLightMode, MdSettings } from 'react-icons/md';
+import { MdDashboard, MdPeople, MdLocationOn, MdAssessment, MdLogout, MdCheckCircle, MdShoppingCart, MdInventory, MdShowChart, MdStars, MdSecurity, MdDarkMode, MdLightMode, MdSettings, MdDomain } from 'react-icons/md';
 
 const AdminLayout = () => {
     const navigate = useNavigate();
@@ -26,6 +26,12 @@ const AdminLayout = () => {
         { path: '/admin/fraud-detection', icon: <MdSecurity size={20} />, label: 'Fraud Detection' },
         { path: '/admin/settings', icon: <MdSettings size={20} />, label: 'Settings' },
     ];
+
+    // Check if user is owner to show Custom Domains
+    const userData = localStorage.getItem('user_data');
+    if (userData && JSON.parse(userData).role === 'owner') {
+        menuItems.splice(10, 0, { path: '/admin/domains', icon: <MdDomain size={20} />, label: 'Domains' });
+    }
 
     return (
         <div className={`flex h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-200 ${darkMode ? 'dark' : ''}`}>

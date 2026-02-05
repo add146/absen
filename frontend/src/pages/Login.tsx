@@ -20,6 +20,24 @@ const Login: React.FC = () => {
     const [formData, setFormData] = useState({ email: '', password: '' });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const [customTenant, setCustomTenant] = useState<{ name: string, logo_url?: string } | null>(null);
+
+    useEffect(() => {
+        // Check if we are on a custom domain
+        const checkDomain = async () => {
+            try {
+                // Determine if we should check based on hostname (optional optimization, but API handles it)
+                // Just call API, if 404 it means not a custom domain
+                const res = await api.get('/auth/tenant-info');
+                if (res.data.tenant) {
+                    setCustomTenant(res.data.tenant);
+                }
+            } catch (e) {
+                // Ignore errors (likely 404 if not custom domain)
+            }
+        };
+        checkDomain();
+    }, []);
 
     const toggleTheme = () => {
         setDarkMode(!darkMode);
@@ -71,10 +89,18 @@ const Login: React.FC = () => {
                 <div className="bg-white dark:bg-gray-800 p-8 md:p-12 rounded-2xl shadow-xl w-full max-w-md mx-auto transform transition-all hover:shadow-2xl">
                     <div className="mb-10 text-center">
                         <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 text-primary mb-4">
-                            <MdFingerprint className="text-3xl" />
+                            {customTenant?.logo_url ? (
+                                <img src={customTenant.logo_url} alt="Logo" className="w-8 h-8 object-contain" />
+                            ) : (
+                                <MdFingerprint className="text-3xl" />
+                            )}
                         </div>
-                        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Welcome Back</h1>
-                        <p className="text-gray-500 dark:text-gray-400 text-sm">Please sign in to your employee dashboard</p>
+                        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+                            {customTenant ? customTenant.name : 'Welcome Back'}
+                        </h1>
+                        <p className="text-gray-500 dark:text-gray-400 text-sm">
+                            {customTenant ? 'Please sign in to your account' : 'Please sign in to your employee dashboard'}
+                        </p>
                     </div>
 
                     {error && (

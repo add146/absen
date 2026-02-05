@@ -1,6 +1,5 @@
 import { Hono } from 'hono'
 import { sign } from 'hono/jwt'
-import { compare, hash } from 'bcryptjs'
 import { authMiddleware } from '../middleware/auth'
 
 type Bindings = {
@@ -9,6 +8,37 @@ type Bindings = {
 }
 
 const auth = new Hono<{ Bindings: Bindings }>()
+
+auth.get('/tenant-info', async (c) => {
+    try {
+        // 1. Check if we are running under a custom domain (set by middleware)
+        const customDomainTenantId = c.get('customDomainTenantId') as string;
+
+        if (!customDomainTenantId) {
+            return c.json({ error: 'Not a custom domain' }, 404);
+        }
+
+        // 2. Fetch tenant details
+        const tenant = await c.env.DB.prepare(
+            'SELECT id, name, logo_url, custom_branding FROM tenants WHERE id = ?'
+        ).bind(customDomainTenantId).first();
+
+        if (!tenant) {
+            return c.json({ error: 'Tenant context invalid' }, 404);
+        }
+
+        return c.json({
+            tenant: {
+                id: tenant.id,
+                name: tenant.name,
+                logo_url: tenant.logo_url,
+                branding: typeof tenant.custom_branding === 'string' ? JSON.parse(tenant.custom_branding) : tenant.custom_branding
+            }
+        });
+    } catch (e: any) {
+        return c.json({ error: 'Failed to resolve tenant info' }, 500);
+    }
+});
 
 auth.post('/register', async (c) => {
     try {
@@ -54,7 +84,8 @@ auth.post('/login', async (c) => {
     }
 
     // 2. Verify Password
-    const isValid = await compare(password, user.password_hash as string)
+    const bcrypt = await import('bcryptjs')
+    const isValid = await bcrypt.compare(password, user.password_hash as string)
     if (!isValid) {
         console.log(`Login failed: Password mismatch for ${email}. Hash length: ${user.password_hash?.length}`);
         return c.json({ error: 'Invalid credentials' }, 401)
@@ -217,7 +248,8 @@ auth.get('/debug-check', async (c) => {
         let isValid = false;
         let compareError = null;
         try {
-            isValid = await compare(password, hash);
+            const bcrypt = await import('bcryptjs');
+            isValid = await bcrypt.compare(password, hash);
         } catch (e: any) {
             compareError = e.message;
         }
@@ -320,13 +352,16 @@ auth.put('/change-password', authMiddleware, async (c) => {
 
         if (!user) return c.json({ error: 'User not found' }, 404);
 
-        const isValid = await compare(current_password, user.password_hash);
+        // Usage dynamic import for consistency with login
+        const bcrypt = await import('bcryptjs');
+        const isValid = await bcrypt.compare(current_password, user.password_hash);
+
         if (!isValid) {
             return c.json({ error: 'Password saat ini salah' }, 401);
         }
 
         // Hash new password
-        const newHash = await hash(new_password, 10);
+        const newHash = await bcrypt.hash(new_password, 10);
 
         // Update
         await c.env.DB.prepare(
@@ -337,7 +372,7 @@ auth.put('/change-password', authMiddleware, async (c) => {
 
     } catch (e: any) {
         console.error('Change password error', e);
-        return c.json({ error: 'Failed to change password' }, 500);
+        return c.json({ error: 'Failed to change password', details: e.message }, 500);
     }
 });
 
