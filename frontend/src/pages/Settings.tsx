@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import DashboardLayout from '../components/DashboardLayout';
 import api from '../services/api';
+import { useTheme } from '../context/ThemeContext';
 import { MdSecurity, MdDarkMode, MdLightMode, MdLock, MdCheckCircle, MdError } from 'react-icons/md';
 
 const Settings: React.FC = () => {
@@ -11,19 +12,7 @@ const Settings: React.FC = () => {
     });
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
-    const [darkMode, setDarkMode] = useState(document.documentElement.classList.contains('dark'));
-
-    const toggleTheme = () => {
-        const isDark = !darkMode;
-        setDarkMode(isDark);
-        if (isDark) {
-            document.documentElement.classList.add('dark');
-            localStorage.setItem('theme', 'dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-            localStorage.setItem('theme', 'light');
-        }
-    };
+    const { darkMode, toggleTheme } = useTheme();
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });

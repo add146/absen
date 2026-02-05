@@ -21,9 +21,11 @@ interface DashboardLayoutProps {
     children: React.ReactNode;
 }
 
+import { useTheme } from '../context/ThemeContext';
+
 const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
-    const [darkMode, setDarkMode] = useState(false);
+    const { darkMode, toggleTheme } = useTheme();
     const location = useLocation();
     const navigate = useNavigate();
 
@@ -31,11 +33,6 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
         localStorage.removeItem('access_token');
         localStorage.removeItem('user_data');
         navigate('/login');
-    };
-
-    const toggleTheme = () => {
-        setDarkMode(!darkMode);
-        document.documentElement.classList.toggle('dark');
     };
 
     const user = JSON.parse(localStorage.getItem('user_data') || '{}');

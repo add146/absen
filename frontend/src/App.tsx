@@ -20,6 +20,7 @@ import FraudDetection from './pages/admin/FraudDetection';
 import FieldWorkerVisits from './pages/admin/FieldWorkerVisits';
 import SystemHealth from './pages/admin/SystemHealth';
 import InvoiceHistory from './pages/admin/InvoiceHistory';
+import AdminSettings from './pages/admin/Settings';
 import AdminRoute from './components/AdminRoute';
 import AdminLayout from './layouts/AdminLayout';
 import TenantOnboarding from './pages/TenantOnboarding';
@@ -46,62 +47,67 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
+import { ThemeProvider } from './context/ThemeContext';
+
 function App() {
   // Main Router Configuration
   return (
-    <Router>
-      <Routes>
-        {/* Public Routes */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/onboarding" element={<TenantOnboarding />} />
-        <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-        <Route path="/field-worker-dashboard" element={<ProtectedRoute><FieldWorkerDashboard /></ProtectedRoute>} />
-        <Route path="/attendance" element={<ProtectedRoute><AttendanceHistory /></ProtectedRoute>} />
-        <Route path="/rewards" element={<ProtectedRoute><Rewards /></ProtectedRoute>} />
-        <Route path="/leaves" element={<ProtectedRoute><LeaveRequest /></ProtectedRoute>} />
-        <Route path="/team" element={<ProtectedRoute><Team /></ProtectedRoute>} />
-        <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
-        <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-        <Route path="/subscription" element={<ProtectedRoute><Subscription /></ProtectedRoute>} />
-        <Route path="/tenant/dashboard" element={<Navigate to="/admin/dashboard" replace />} />
+    <ThemeProvider>
+      <Router>
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/onboarding" element={<TenantOnboarding />} />
+          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+          <Route path="/field-worker-dashboard" element={<ProtectedRoute><FieldWorkerDashboard /></ProtectedRoute>} />
+          <Route path="/attendance" element={<ProtectedRoute><AttendanceHistory /></ProtectedRoute>} />
+          <Route path="/rewards" element={<ProtectedRoute><Rewards /></ProtectedRoute>} />
+          <Route path="/leaves" element={<ProtectedRoute><LeaveRequest /></ProtectedRoute>} />
+          <Route path="/team" element={<ProtectedRoute><Team /></ProtectedRoute>} />
+          <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+          <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+          <Route path="/subscription" element={<ProtectedRoute><Subscription /></ProtectedRoute>} />
+          <Route path="/tenant/dashboard" element={<Navigate to="/admin/dashboard" replace />} />
 
-        {/* Admin Routes */}
-        <Route path="/admin" element={<AdminRoute />}>
-          <Route element={<AdminLayout />}>
-            <Route path="dashboard" element={<AdminDashboard />} />
-            <Route path="employees" element={<EmployeeManagement />} />
-            <Route path="locations" element={<LocationSettings />} />
-            <Route path="approvals" element={<LeaveApproval />} />
-            <Route path="reports" element={<AttendanceReports />} />
-            <Route path="products" element={<ProductManagement />} />
-            <Route path="orders" element={<OrderManagement />} />
-            <Route path="analytics" element={<AnalyticsDashboard />} />
-            <Route path="point-rules" element={<PointRulesManagement />} />
-            <Route path="fraud-detection" element={<FraudDetection />} />
-            <Route path="field-worker-visits" element={<FieldWorkerVisits />} />
-            <Route path="invoices" element={<InvoiceHistory />} />
-            <Route index element={<Navigate to="/admin/dashboard" replace />} />
+          {/* Admin Routes */}
+          <Route path="/admin" element={<AdminRoute />}>
+            <Route element={<AdminLayout />}>
+              <Route path="dashboard" element={<AdminDashboard />} />
+              <Route path="employees" element={<EmployeeManagement />} />
+              <Route path="locations" element={<LocationSettings />} />
+              <Route path="approvals" element={<LeaveApproval />} />
+              <Route path="reports" element={<AttendanceReports />} />
+              <Route path="products" element={<ProductManagement />} />
+              <Route path="orders" element={<OrderManagement />} />
+              <Route path="analytics" element={<AnalyticsDashboard />} />
+              <Route path="point-rules" element={<PointRulesManagement />} />
+              <Route path="fraud-detection" element={<FraudDetection />} />
+              <Route path="field-worker-visits" element={<FieldWorkerVisits />} />
+              <Route path="invoices" element={<InvoiceHistory />} />
+              <Route path="settings" element={<AdminSettings />} />
+              <Route index element={<Navigate to="/admin/dashboard" replace />} />
+            </Route>
           </Route>
-        </Route>
 
-        {/* Super Admin Routes */}
-        <Route path="/superadmin" element={<ProtectedRoute><SuperAdminLayout /></ProtectedRoute>}>
-          <Route path="dashboard" element={<SuperAdminDashboard />} />
-          <Route path="tenants" element={<TenantManagement />} />
-          <Route path="users" element={<UserManagement />} />
-          <Route path="plans" element={<PlanManagement />} />
-          <Route path="analytics" element={<PlatformAnalytics />} />
-          <Route path="settings" element={<GlobalSettings />} />
-          <Route path="profile" element={<SuperAdminProfile />} />
-          <Route path="health" element={<SystemHealth />} />
-          <Route index element={<Navigate to="/superadmin/dashboard" replace />} />
-        </Route>
+          {/* Super Admin Routes */}
+          <Route path="/superadmin" element={<ProtectedRoute><SuperAdminLayout /></ProtectedRoute>}>
+            <Route path="dashboard" element={<SuperAdminDashboard />} />
+            <Route path="tenants" element={<TenantManagement />} />
+            <Route path="users" element={<UserManagement />} />
+            <Route path="plans" element={<PlanManagement />} />
+            <Route path="analytics" element={<PlatformAnalytics />} />
+            <Route path="settings" element={<GlobalSettings />} />
+            <Route path="profile" element={<SuperAdminProfile />} />
+            <Route path="health" element={<SystemHealth />} />
+            <Route index element={<Navigate to="/superadmin/dashboard" replace />} />
+          </Route>
 
-        <Route path="/" element={<Navigate to="/login" replace />} />
-        <Route path="*" element={<Navigate to="/login" replace />} />
-      </Routes>
-    </Router>
+          <Route path="/" element={<Navigate to="/login" replace />} />
+          <Route path="*" element={<Navigate to="/login" replace />} />
+        </Routes>
+      </Router>
+    </ThemeProvider>
   );
 }
 
