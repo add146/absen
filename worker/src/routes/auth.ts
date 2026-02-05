@@ -332,7 +332,7 @@ auth.get('/team', authMiddleware, async (c) => {
  * PUT /auth/change-password
  * Change current user password
  */
-auth.put('/change-password', authMiddleware, async (c) => {
+auth.post('/change-password', authMiddleware, async (c) => {
     try {
         const userPayload = c.get('user') as any;
         const { current_password, new_password } = await c.req.json();

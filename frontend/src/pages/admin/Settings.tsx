@@ -33,7 +33,7 @@ const Settings: React.FC = () => {
 
         setLoading(true);
         try {
-            await api.put('/auth/change-password', {
+            await api.post('/auth/change-password', {
                 current_password: formData.current_password,
                 new_password: formData.new_password
             });
