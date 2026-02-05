@@ -26,7 +26,6 @@ const AttendanceReports = () => {
         }
     };
 
-    return (
     // Photo Modal
     const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
 

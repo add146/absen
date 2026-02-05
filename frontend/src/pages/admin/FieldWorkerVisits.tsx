@@ -223,6 +223,4 @@ const FieldWorkerVisits: React.FC = () => {
     );
 };
 
-export default FieldWorkerVisits;
-
-export default FieldWorkerVisits;
+// End of file
