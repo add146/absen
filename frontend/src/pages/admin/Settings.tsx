@@ -53,7 +53,11 @@ const Settings: React.FC = () => {
                 detail = error.message || 'Unknown Error';
             }
 
-            setMessage({ type: 'error', text: detail });
+
+            // Debug info
+            // Ensure api.defaults.baseURL is visible
+            const target = api.defaults.baseURL || 'undefined_base_url';
+            setMessage({ type: 'error', text: `${detail} (Target: ${target})` });
         } finally {
             setLoading(false);
         }
