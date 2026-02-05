@@ -49,7 +49,8 @@ app.use('/*', customDomainRouter)
 app.get('/', (c) => {
     return c.json({
         message: 'Absen SAAS API is running',
-        version: '2.0.0',
+        version: '2.1.0',
+        deployment_check: new Date().toISOString(),
         features: ['multi-tenant', 'subscription', 'custom-domain']
     })
 })
