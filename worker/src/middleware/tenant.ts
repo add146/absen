@@ -14,7 +14,7 @@ type Bindings = {
  */
 export const tenantContext = async (c: Context<{ Bindings: Bindings }>, next: Next) => {
     // Skip tenant check for public endpoints
-    const publicPaths = ['/auth/login', '/auth/register', '/tenants/create']
+    const publicPaths = ['/auth/login', '/auth/register', '/tenants/create', '/upload/file']
     if (publicPaths.some(path => c.req.path.startsWith(path))) {
         return next()
     }

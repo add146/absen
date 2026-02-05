@@ -15,6 +15,40 @@ type Variables = {
 
 const app = new Hono<{ Bindings: Bindings, Variables: Variables }>();
 
+// GET file from R2 (Public Access)
+app.get('/file/:key{.*}', async (c) => {
+    try {
+        const key = c.req.param('key');
+        if (!c.env.STORAGE) return c.json({ error: 'Storage not configured' }, 500);
+
+        const object = await c.env.STORAGE.get(key);
+        if (!object) return c.json({ error: 'File not found' }, 404);
+
+        const headers = new Headers();
+        object.writeHttpMetadata(headers);
+        headers.set('etag', object.httpEtag);
+
+        // Ensure content-type is set
+        if (!headers.get('content-type')) {
+            const ext = key.split('.').pop()?.toLowerCase();
+            const types: Record<string, string> = {
+                'jpg': 'image/jpeg',
+                'jpeg': 'image/jpeg',
+                'png': 'image/png',
+                'gif': 'image/gif',
+                'webp': 'image/webp'
+            };
+            if (ext && types[ext]) headers.set('content-type', types[ext]);
+        }
+
+        return new Response(object.body, {
+            headers,
+        });
+    } catch (e) {
+        return c.json({ error: 'Failed to fetch file' }, 500);
+    }
+})
+
 // Upload file to R2
 app.post('/', authMiddleware, async (c) => {
     try {
@@ -51,8 +85,9 @@ app.post('/', authMiddleware, async (c) => {
 
         await c.env.STORAGE.put(key, file);
 
-        // Generate public URL (adjust based on your R2 public domain)
-        const publicUrl = `https://pub-YOUR_R2_PUBLIC_ID.r2.dev/${key}`;
+        // Generate public URL (Worker Proxy)
+        const origin = new URL(c.req.url).origin;
+        const publicUrl = `${origin}/upload/file/${key}`;
 
         // For now, return the key (you'll need to configure R2 public access)
         return c.json({
@@ -97,7 +132,8 @@ app.post('/product', authMiddleware, adminAuthMiddleware, async (c) => {
 
         await c.env.STORAGE!.put(key, file);
 
-        const publicUrl = `https://pub-YOUR_R2_PUBLIC_ID.r2.dev/${key}`;
+        const origin = new URL(c.req.url).origin;
+        const publicUrl = `${origin}/upload/file/${key}`;
 
         return c.json({
             success: true,
@@ -134,7 +170,8 @@ app.post('/avatar', authMiddleware, async (c) => {
 
         await c.env.STORAGE!.put(key, file);
 
-        const avatarUrl = `https://pub-YOUR_R2_PUBLIC_ID.r2.dev/${key}`;
+        const origin = new URL(c.req.url).origin;
+        const avatarUrl = `${origin}/upload/file/${key}`;
 
         // Update user avatar in database
         await c.env.DB.prepare(
