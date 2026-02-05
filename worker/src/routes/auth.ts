@@ -329,8 +329,8 @@ auth.get('/team', authMiddleware, async (c) => {
 });
 
 /**
- * PUT /auth/change-password
- * Change current user password
+ * POST /auth/change-password
+ * Change current user password (Changed from PUT to POST to fix 404)
  */
 auth.post('/change-password', authMiddleware, async (c) => {
     try {
