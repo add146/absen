@@ -7,7 +7,6 @@ import { createPaymentTransaction, mapMidtransStatus } from './payment-service'
 
 type Bindings = {
     DB: D1Database
-    CACHE?: KVNamespace
     MIDTRANS_SERVER_KEY?: string
     MIDTRANS_CLIENT_KEY?: string
     MIDTRANS_IS_PRODUCTION?: string
@@ -307,11 +306,6 @@ async function activateSubscription(tenantId: string, invoiceId: string, env: Bi
         features.maxUsers || -1,
         tenantId
     ).run()
-
-    // Invalidate tenant cache
-    if (env.CACHE) {
-        await env.CACHE.delete(`tenant:${tenantId}`)
-    }
 }
 
 /**

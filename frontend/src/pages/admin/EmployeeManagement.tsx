@@ -1,7 +1,8 @@
 
 import { useEffect, useState } from 'react';
 import api from '../../services/api';
-import { MdAdd, MdSearch, MdEdit, MdDelete, MdHistory, MdClose } from 'react-icons/md';
+import { MdAdd, MdSearch, MdEdit, MdDelete, MdHistory } from 'react-icons/md';
+import AttendanceCalendarView from '../../components/AttendanceCalendarView';
 
 const EmployeeManagement = () => {
     const [employees, setEmployees] = useState<any[]>([]);
@@ -18,10 +19,10 @@ const EmployeeManagement = () => {
     });
 
     // History Modal State
+    // History Modal State
     const [showHistory, setShowHistory] = useState(false);
-    const [historyData, setHistoryData] = useState<any[]>([]);
-    const [historyLoading, setHistoryLoading] = useState(false);
     const [selectedEmployeeName, setSelectedEmployeeName] = useState('');
+    const [selectedEmployeeId, setSelectedEmployeeId] = useState<string | null>(null);
 
     useEffect(() => {
         fetchEmployees();
@@ -89,21 +90,8 @@ const EmployeeManagement = () => {
 
     const handleViewHistory = async (employee: any) => {
         setSelectedEmployeeName(employee.name);
+        setSelectedEmployeeId(employee.id);
         setShowHistory(true);
-        setHistoryLoading(true);
-        try {
-            console.log('Fetching attendance for user:', employee.id);
-            const res = await api.get(`/admin/attendance?user_id=${employee.id}&limit=20`);
-            console.log('Attendance data received:', res.data);
-            setHistoryData(res.data.data);
-        } catch (error: any) {
-            console.error('Failed to fetch history:', error);
-            console.error('Error response:', error.response?.data);
-            console.error('Error status:', error.response?.status);
-            alert(`Gagal mengambil riwayat absensi: ${error.response?.data?.error || error.message}`);
-        } finally {
-            setHistoryLoading(false);
-        }
     }
 
     const filteredEmployees = employees.filter(emp =>
@@ -267,9 +255,9 @@ const EmployeeManagement = () => {
                                     </td>
                                     <td className="p-4 text-gray-500">{new Date(emp.created_at).toLocaleDateString()}</td>
                                     <td className="p-4 flex space-x-2">
-                                        <button onClick={() => handleViewHistory(emp)} className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg" title="Riwayat Absensi"><MdHistory /></button>
-                                        <button onClick={() => handleEdit(emp)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg" title="Edit"><MdEdit /></button>
-                                        <button onClick={() => handleDelete(emp.id, emp.name)} className="p-2 text-red-600 hover:bg-red-50 rounded-lg" title="Hapus"><MdDelete /></button>
+                                        <button onClick={() => handleViewHistory(emp)} className="p-2 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 rounded-lg transition-colors border border-indigo-200" title="Riwayat Absensi"><MdHistory size={20} /></button>
+                                        <button onClick={() => handleEdit(emp)} className="p-2 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors border border-blue-200" title="Edit"><MdEdit size={20} /></button>
+                                        <button onClick={() => handleDelete(emp.id, emp.name)} className="p-2 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg transition-colors border border-red-200" title="Hapus"><MdDelete size={20} /></button>
                                     </td>
                                 </tr>
                             ))
@@ -279,65 +267,18 @@ const EmployeeManagement = () => {
             </div>
 
             {/* Attendance History Modal */}
+            {/* Attendance History Modal */}
             {
-                showHistory && (
+                showHistory && selectedEmployeeId && (
                     <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-                        <div className="bg-white rounded-xl shadow-lg w-full max-w-3xl max-h-[80vh] flex flex-col">
-                            <div className="p-6 border-b flex justify-between items-center">
-                                <h3 className="text-xl font-bold">Riwayat Absensi: {selectedEmployeeName}</h3>
-                                <button onClick={() => setShowHistory(false)} className="text-gray-500 hover:text-gray-700">
-                                    <MdClose size={24} />
-                                </button>
-                            </div>
-                            <div className="p-6 overflow-y-auto flex-1">
-                                {historyLoading ? (
-                                    <div className="text-center py-8">Memuat riwayat...</div>
-                                ) : historyData.length === 0 ? (
-                                    <div className="text-center py-8 text-gray-500">Belum ada data absensi untuk karyawan ini.</div>
-                                ) : (
-                                    <table className="w-full text-left">
-                                        <thead className="bg-gray-50">
-                                            <tr>
-                                                <th className="p-3 text-sm font-semibold">Tanggal</th>
-                                                <th className="p-3 text-sm font-semibold">Masuk</th>
-                                                <th className="p-3 text-sm font-semibold">Keluar</th>
-                                                <th className="p-3 text-sm font-semibold">Lokasi</th>
-                                                <th className="p-3 text-sm font-semibold">Status</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody className="divide-y">
-                                            {historyData.map((log: any) => (
-                                                <tr key={log.id}>
-                                                    <td className="p-3 text-sm">{new Date(log.check_in_time).toLocaleDateString()}</td>
-                                                    <td className="p-3 text-sm font-mono text-green-600">
-                                                        {log.type === 'presence' ? new Date(log.check_in_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '-'}
-                                                    </td>
-                                                    <td className="p-3 text-sm font-mono text-red-600">
-                                                        {log.type === 'presence' && log.check_out_time ? new Date(log.check_out_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '-'}
-                                                    </td>
-                                                    <td className="p-3 text-sm">
-                                                        {log.type === 'presence' ? (log.location_name || 'Kantor') : `Cuti: ${log.leave_type}`}
-                                                    </td>
-                                                    <td className="p-3">
-                                                        {log.type === 'leave' ? (
-                                                            <span className="px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-700 font-semibold">
-                                                                Cuti
-                                                            </span>
-                                                        ) : !log.is_valid ? (
-                                                            <span className="px-2 py-1 rounded-full text-xs bg-red-100 text-red-700 font-semibold">
-                                                                Invalid
-                                                            </span>
-                                                        ) : (
-                                                            <span className="px-2 py-1 rounded-full text-xs bg-green-100 text-green-700 font-semibold">
-                                                                Hadir
-                                                            </span>
-                                                        )}
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                )}
+                        <div className="bg-white rounded-xl shadow-lg w-full max-w-6xl max-h-[90vh] flex flex-col p-6 overflow-hidden relative">
+                            {/* Close button handled inside component or here if we want absolute positioning */}
+                            <div className="overflow-y-auto h-full pr-2">
+                                <AttendanceCalendarView
+                                    userId={selectedEmployeeId}
+                                    userName={selectedEmployeeName}
+                                    onClose={() => setShowHistory(false)}
+                                />
                             </div>
                         </div>
                     </div>

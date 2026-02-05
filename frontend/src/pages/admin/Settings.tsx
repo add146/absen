@@ -13,6 +13,48 @@ const Settings: React.FC = () => {
     const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
     const { darkMode, toggleTheme } = useTheme();
 
+    // Tenant Settings State
+    const [tenantSettings, setTenantSettings] = useState<{ require_camera?: boolean }>({});
+    const [settingsLoading, setSettingsLoading] = useState(false);
+    const [userRole, setUserRole] = useState<string>('');
+
+    React.useEffect(() => {
+        const userData = localStorage.getItem('user_data');
+        if (userData) {
+            const user = JSON.parse(userData);
+            setUserRole(user.role);
+            if (user.role === 'admin' || user.role === 'owner') {
+                fetchTenantSettings();
+            }
+        }
+    }, []);
+
+    const fetchTenantSettings = async () => {
+        try {
+            const res = await api.get('/admin/tenant-settings');
+            setTenantSettings(res.data.data || {});
+        } catch (error) {
+            console.error('Failed to fetch tenant settings', error);
+        }
+    };
+
+    const handleSettingChange = async (key: string, value: any) => {
+        const newSettings = { ...tenantSettings, [key]: value };
+        setTenantSettings(newSettings);
+        setSettingsLoading(true);
+        try {
+            await api.put('/admin/tenant-settings', { [key]: value });
+            setMessage({ type: 'success', text: 'Pengaturan berhasil disimpan!' });
+        } catch (error) {
+            console.error('Failed to update settings', error);
+            setMessage({ type: 'error', text: 'Gagal menyimpan pengaturan.' });
+            // Revert on error
+            fetchTenantSettings();
+        } finally {
+            setSettingsLoading(false);
+        }
+    };
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
@@ -171,6 +213,40 @@ const Settings: React.FC = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Attendance Settings (Admin Only) */}
+            {(userRole === 'admin' || userRole === 'owner') && (
+                <div className="mt-8 bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
+                    <div className="flex items-center mb-6">
+                        <div className="p-2 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-lg mr-3">
+                            <MdCheckCircle className="text-2xl" />
+                        </div>
+                        <div>
+                            <h2 className="text-lg font-bold text-gray-800 dark:text-white">Pengaturan Absensi</h2>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">Konfigurasi aturan kemanan dan validasi absen.</p>
+                        </div>
+                    </div>
+
+                    <div className="space-y-6">
+                        <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-700">
+                            <div>
+                                <h3 className="font-medium text-gray-900 dark:text-white">Wajib Foto Selfie</h3>
+                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Karyawan wajib mengambil foto saat melakukan Check In</p>
+                            </div>
+                            <label className="relative inline-flex items-center cursor-pointer">
+                                <input
+                                    type="checkbox"
+                                    className="sr-only peer"
+                                    checked={tenantSettings.require_camera !== false} // Default true if undefined
+                                    onChange={(e) => handleSettingChange('require_camera', e.target.checked)}
+                                    disabled={settingsLoading}
+                                />
+                                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

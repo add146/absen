@@ -285,11 +285,19 @@ attendance.get('/today', async (c) => {
         'SELECT * FROM locations WHERE is_active = 1 AND tenant_id = ?'
     ).bind(user.tenant_id).all();
 
+    // Fetch tenant settings for frontend validation (e.g. camera requirement)
+    const tenant = await c.env.DB.prepare('SELECT settings FROM tenants WHERE id = ?').bind(user.tenant_id).first<{ settings: string }>();
+    let settings: any = {};
+    if (tenant?.settings) {
+        try { settings = JSON.parse(tenant.settings); } catch (e) { }
+    }
+
     return c.json({
         data: result.results,
         meta: {
             has_locations: locations.results.length > 0,
-            locations: locations.results // Send locations to frontend
+            locations: locations.results, // Send locations to frontend
+            settings: settings // Send tenant settings
         }
     })
 })

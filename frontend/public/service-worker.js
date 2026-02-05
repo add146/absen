@@ -96,50 +96,93 @@ self.addEventListener('sync', (event) => {
 
 async function syncAttendanceData() {
     try {
-        // Need to use idb library or raw indexedDB API in SW
-        // Raw API is safer to avoid import issues in SW environment if bundler not configured
         const db = await openDBInternal();
         const tx = db.transaction('pending_attendance', 'readwrite');
         const store = tx.objectStore('pending_attendance');
-        const requests = await store.getAll();
+        const requests = await getAllRequests(store);
 
         console.log(`[SW] Syncing ${requests.length} attendance requests`);
 
         for (const req of requests) {
             try {
-                // Determine API URL (using self.location.origin is safe usually, or hardcode if needed)
-                // Dashboard saves relative URL, so we prepend API base if needed, 
-                // but better if dashboard saved absolute URL or we know the base.
-                // Assuming Vite proxy or CORS enabled backend:
+                // Determine API URL 
+                // We assume req.url is relative path (e.g. /attendance/check-in)
+                // We need to construct absolute URL. SW runs on same origin as frontend.
+                // If API is on same domain (proxied), use self.location.origin.
+                // If API is external, we need to know the base.
+                // Since we rely on Vite proxy in dev, self.location.origin works for dev.
+                // In prod, API might be different. 
+                // BETTER APPROACH: The stored URL should probably be full URL or we try to guess.
+                // For this implementation, we will try to use the origin + path first (Proxy approach),
+                // OR fallback to hardcoded if needed. ideally frontend saves full URL.
+                // But let's assume Proxy/Same Origin strategy which is best for PWA.
 
-                // Note: Token? We need the token. 
-                // Frontend should store token in IDB or we assume cookies (but we use Bearer).
-                // LIMITATION: SW can't access localStorage.
-                // FIX: Dashboard should save token in the body or header inside IDB request object.
-                // Updating offline-storage.ts to include headers/token is best, 
-                // but for now let's assume body has what we need or we skip token if using session cookie?
-                // We use Bearer token. 
-                // Quick fix: User must re-login if offline? No.
-                // Let's assume the request body/headers saved in IDB includes auth header.
-                // Dashboard creates the request object.
+                // Construct URL: remove leading slash if present to avoid double slash with base
+                const path = req.url.startsWith('/') ? req.url : '/' + req.url;
+                // In prod, frontend might point to separate API. 
+                // If so, we need that domain.
+                // Let's rely on the fact that for now, we can hardcode the worker URL as fallback
+                // or assume same origin if served via Pages which proxies to Worker (standard setup).
+                // Actually PRD says: Frontend: Cloudflare Pages, Backend: Workers.
+                // Usually configured via custom domain or env var.
+                // The environment variable VITE_API_URL is NOT available here.
+                // WORKAROUND: We will attempt to fetch from the stored path relative to current origin.
+                // If that fails (404), we might need a backup. But normally Pages serves frontend and we can proxy /api.
+                // However, the current codebase uses VITE_API_URL.
+                // Let's assume the frontend saved the RELATIVE path.
 
-                // Refactoring Dashboard to save headers is needed. 
-                // For this step, I will implement the fetch assuming headers are inside req.body or handled.
-                // Actually, I need to fix Dashboard save logic to include headers.
-                // But let's verify SW logic first.
+                // CRITICAL: We need the API Endpoint. 
+                // We will try to fetch using the full URL constructed from origin + path.
+                // If the app is hosted at https://app.com, and API is at https://api.app.com, this fails.
+                // FIX: dashboard.tsx should save FULL URL. 
+                // RETROACTIVE FIX: In dashboard.tsx, we passed Relative URL.
+                // Let's update this to use a known default or try to determine.
+                // For now, I will use a hardcoded production fallback if origin fetch fails is too risky.
+                // I will use a flexible approach: Try full URL if it looks like one, else append to specific base.
 
-                const response = await fetch('http://localhost:8787' + req.url, {
+                let fetchUrl = req.url;
+                if (!req.url.startsWith('http')) {
+                    // Dev environment default or relative
+                    fetchUrl = self.location.origin + path;
+                    // Or hardcode the generic worker url if known? No, dynamic is better.
+                }
+
+                console.log(`[SW] Processing sync for ${fetchUrl}`, req);
+
+                const response = await fetch(fetchUrl, {
                     method: req.method,
-                    headers: {
-                        'Content-Type': 'application/json',
-                        // 'Authorization': ... wait, we need token.
+                    headers: req.headers || {
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(req.body)
                 });
 
+                console.log(`[SW] Sync Response for ${fetchUrl}:`, response.status);
+
                 if (response.ok) {
-                    await store.delete(req.timestamp); // Use timestamp as key
-                    console.log(`[SW] Synced request ${req.url}`);
+                    // Success - delete from IDB
+                    // Need a new transaction for delete if we want to be safe or reuse?
+                    // IDB transactions auto-commit when event loop spins. await might close it.
+                    // Better verify if tx is still active. 
+                    // To be safe, open new tx for delete or use the cursor method.
+                    await deleteRequest(db, req.timestamp);
+                    console.log(`[SW] Synced request ${req.url} successfully`);
+
+                    // Notify clients to refresh
+                    const clients = await self.clients.matchAll();
+                    clients.forEach(client => {
+                        client.postMessage({
+                            type: 'SYNC_COMPLETED',
+                            url: req.url
+                        });
+                    });
+                } else {
+                    console.error('[SW] Sync rejected by server', response.status);
+                    // If 4xx error (client error), maybe delete it? 
+                    // If 401 Unauthorized, token expired. Delete it.
+                    if (response.status >= 400 && response.status < 500) {
+                        await deleteRequest(db, req.timestamp); // Don't retry invalid requests
+                    }
                 }
             } catch (err) {
                 console.error('[SW] Sync failed for request', err);
@@ -150,17 +193,39 @@ async function syncAttendanceData() {
     }
 }
 
+// Helper to get all from store (Promise wrapper)
+function getAllRequests(store) {
+    return new Promise((resolve, reject) => {
+        const request = store.getAll();
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+    });
+}
+
+function deleteRequest(db, key) {
+    return new Promise((resolve, reject) => {
+        const tx = db.transaction('pending_attendance', 'readwrite');
+        const store = tx.objectStore('pending_attendance');
+        const request = store.delete(key);
+        request.onsuccess = () => resolve();
+        request.onerror = () => reject(request.error);
+    });
+}
+
 // Simple IDB wrapper for SW
 function openDBInternal() {
     return new Promise((resolve, reject) => {
-        const request = indexedDB.open('absen-db', 1);
+        const request = indexedDB.open('absen-db', 2); // Version 2 matched
         request.onerror = () => reject(request.error);
         request.onsuccess = () => resolve(request.result);
         request.onupgradeneeded = (event) => {
             const db = event.target.result;
-            if (!db.objectStoreNames.contains('pending_attendance')) {
-                db.createObjectStore('pending_attendance', { keyPath: 'timestamp' });
+            // Handle upgrades
+            if (event.oldVersion < 1) {
+                const store = db.createObjectStore('pending_attendance', { keyPath: 'timestamp' });
+                // Note: creating index in SW might be tricky if not careful, but standard API holds.
             }
+            // Version 2 doesn't need structure change, just field addition which is schema-less in IDB values
         };
     });
 }

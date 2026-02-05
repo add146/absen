@@ -1,10 +1,10 @@
 import { Context, Next } from 'hono'
 import { verify } from 'hono/jwt'
+import { globalCache } from '../utils/cache'
 
 type Bindings = {
     DB: D1Database
     JWT_SECRET: string
-    CACHE?: KVNamespace
 }
 
 /**
@@ -54,42 +54,27 @@ export const tenantContext = async (c: Context<{ Bindings: Bindings }>, next: Ne
             payload.tenant_id = user.tenant_id
         }
 
-        // Check cache first for tenant info
-        let tenant: any = null
-        if (c.env.CACHE) {
-            const cached = await c.env.CACHE.get(`tenant:${payload.tenant_id}`, 'json')
-            if (cached) {
-                tenant = cached
-            }
-        }
+        // Check in-memory cache first
+        let tenant: any = globalCache.get(`tenant:${payload.tenant_id}`)
 
         // If not in cache, query database
         if (!tenant) {
             tenant = await c.env.DB
-                .prepare('SELECT id, name FROM tenants WHERE id = ?')
+                .prepare('SELECT id, name, status, plan_type, max_users FROM tenants WHERE id = ?')
                 .bind(payload.tenant_id)
                 .first()
-
-            if (tenant) {
-                // Default values for missing columns to prevent errors
-                tenant.status = tenant.status || 'active'
-                tenant.plan_type = tenant.plan_type || 'free'
-                tenant.max_users = tenant.max_users || 5
-            }
 
             if (!tenant) {
                 return c.json({ error: 'Tenant not found' }, 404)
             }
 
-            // Cache tenant info for 1 hour
-            if (c.env.CACHE) {
-                // TEMPORARY: Disabled due to KV quota exhausted
-                // await c.env.CACHE.put(
-                //    `tenant:${payload.tenant_id}`,
-                //    JSON.stringify(tenant),
-                //    { expirationTtl: 3600 }
-                // )
-            }
+            // Default values for missing columns
+            tenant.status = tenant.status || 'active'
+            tenant.plan_type = tenant.plan_type || 'free'
+            tenant.max_users = tenant.max_users || 5
+
+            // Cache tenant info for 1 hour in-memory
+            globalCache.set(`tenant:${payload.tenant_id}`, tenant, 3600)
         }
 
         // Check if tenant is active
@@ -114,63 +99,13 @@ export const tenantContext = async (c: Context<{ Bindings: Bindings }>, next: Ne
 }
 
 /**
- * Rate Limiting Middleware
- * Enforces rate limits based on tenant plan
+ * Rate Limiting Middleware (REMOVED)
+ * Replaced by D1-based IP rate limiting in security middleware
+ * This middleware is kept for backward compatibility but does nothing
  */
 export const rateLimiter = async (c: Context<{ Bindings: Bindings }>, next: Next) => {
-    // TEMPORARY: Fully disabled
+    // NO-OP: Rate limiting moved to D1-based IP rate limiting
     return next()
-
-    /* 
-    if (!c.env.CACHE) {
-        // No KV namespace, skip rate limiting
-        return next()
-    }
-
-    const tenantId = c.get('tenantId')
-    if (!tenantId) {
-        // No tenant context, skip
-        return next()
-    }
-
-    const tenant = c.get('tenant')
-    const minuteKey = Math.floor(Date.now() / 60000) // Current minute
-    const rateLimitKey = `ratelimit:${tenantId}:${minuteKey}`
-
-    // Get current count
-    const current = await c.env.CACHE.get(rateLimitKey)
-    const count = current ? parseInt(current) : 0
-
-    // Define limits per plan
-    const limits: Record<string, number> = {
-        free: 100,      // 100 requests per minute
-        basic: 500,     // 500 requests per minute
-        premium: 1000,  // 1000 requests per minute
-        enterprise: 5000 // 5000 requests per minute
-    }
-
-    const limit = limits[tenant.plan_type] || limits.free
-
-    if (count >= limit) {
-        return c.json({
-            error: 'Rate limit exceeded',
-            limit,
-            retryAfter: 60 - (Date.now() % 60000) / 1000 // Seconds until next minute
-        }, 429)
-    }
-
-    // Increment counter
-    await c.env.CACHE.put(rateLimitKey, (count + 1).toString(), {
-        expirationTtl: 60 // Expire after 1 minute
-    })
-
-    // Add rate limit headers
-    c.header('X-RateLimit-Limit', limit.toString())
-    c.header('X-RateLimit-Remaining', (limit - count - 1).toString())
-    c.header('X-RateLimit-Reset', (Math.floor(Date.now() / 60000) + 1).toString())
-
-    await next()
-    */
 }
 
 /**
@@ -219,15 +154,13 @@ export const customDomainRouter = async (c: Context<{ Bindings: Bindings }>, nex
         return next()
     }
 
-    // Check cache for domain → tenant mapping
-    if (c.env.CACHE) {
-        const cachedTenantId = await c.env.CACHE.get(`domain:${host}`)
+    // Check in-memory cache for domain → tenant mapping
+    const cachedTenantId = globalCache.get<string>(`domain:${host}`)
 
-        if (cachedTenantId) {
-            c.set('customDomain', host)
-            c.set('customDomainTenantId', cachedTenantId)
-            return next()
-        }
+    if (cachedTenantId) {
+        c.set('customDomain', host)
+        c.set('customDomainTenantId', cachedTenantId)
+        return next()
     }
 
     // Query database for custom domain
@@ -237,15 +170,8 @@ export const customDomainRouter = async (c: Context<{ Bindings: Bindings }>, nex
         .first()
 
     if (domain) {
-        // Cache the mapping for 24 hours
-        if (c.env.CACHE) {
-            // TEMPORARY: Disabled due to KV quota exhausted
-            /*
-            await c.env.CACHE.put(`domain:${host}`, domain.tenant_id as string, {
-                expirationTtl: 86400 // 24 hours
-            })
-            */
-        }
+        // Cache the mapping for 24 hours in-memory
+        globalCache.set(`domain:${host}`, domain.tenant_id as string, 86400)
 
         c.set('customDomain', host)
         c.set('customDomainTenantId', domain.tenant_id)

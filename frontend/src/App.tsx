@@ -35,6 +35,7 @@ import GlobalSettings from './pages/superadmin/GlobalSettings';
 import TenantManagement from './pages/superadmin/TenantManagement';
 import PlanManagement from './pages/superadmin/PlanManagement';
 import PlatformAnalytics from './pages/superadmin/PlatformAnalytics';
+import StorageAnalytics from './pages/superadmin/StorageAnalytics';
 
 
 import Team from './pages/Team';
@@ -99,6 +100,7 @@ function App() {
             <Route path="users" element={<UserManagement />} />
             <Route path="plans" element={<PlanManagement />} />
             <Route path="analytics" element={<PlatformAnalytics />} />
+            <Route path="storage" element={<StorageAnalytics />} />
             <Route path="settings" element={<GlobalSettings />} />
             <Route path="profile" element={<SuperAdminProfile />} />
             <Route path="health" element={<SystemHealth />} />

@@ -6,6 +6,7 @@ interface AbsenDB extends DBSchema {
         value: {
             url: string;
             method: string;
+            headers: any;
             body: any;
             timestamp: number;
             type: 'check-in' | 'check-out';
@@ -18,24 +19,28 @@ let dbPromise: Promise<IDBPDatabase<AbsenDB>>;
 
 export const initDB = () => {
     if (!dbPromise) {
-        dbPromise = openDB<AbsenDB>('absen-db', 1, {
-            upgrade(db) {
-                const store = db.createObjectStore('pending_attendance', {
-                    keyPath: 'timestamp',
-                    autoIncrement: true,
-                });
-                store.createIndex('by-timestamp', 'timestamp');
+        dbPromise = openDB<AbsenDB>('absen-db', 2, { // Bump version
+            upgrade(db, oldVersion) {
+                if (oldVersion < 1) {
+                    const store = db.createObjectStore('pending_attendance', {
+                        keyPath: 'timestamp',
+                        autoIncrement: true,
+                    });
+                    store.createIndex('by-timestamp', 'timestamp');
+                }
+                // Migration for version 2 if needed (auto handled if we just add field to new records, but schema def changed)
             },
         });
     }
     return dbPromise;
 };
 
-export const saveOfflineRequest = async (url: string, method: string, body: any, type: 'check-in' | 'check-out') => {
+export const saveOfflineRequest = async (url: string, method: string, body: any, headers: any, type: 'check-in' | 'check-out') => {
     const db = await initDB();
     await db.add('pending_attendance', {
         url,
         method,
+        headers,
         body,
         timestamp: Date.now(),
         type

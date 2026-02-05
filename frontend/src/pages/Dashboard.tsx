@@ -33,7 +33,8 @@ const Dashboard: React.FC = () => {
         checkInTime: '--:--',
         checkOutTime: '--:--',
         workingHours: '0h 0m',
-        location: 'Belum absen'
+        location: 'Belum absen',
+        settings: {} as any // Add settings to state
     });
     const [pointsBalance, setPointsBalance] = useState(0);
 
@@ -60,6 +61,18 @@ const Dashboard: React.FC = () => {
         fetchLeavesData();
         fetchWeeklyData();
         fetchUserProfile();
+
+        // Listen for SW Sync Messages
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.addEventListener('message', (event) => {
+                if (event.data && event.data.type === 'SYNC_COMPLETED') {
+                    console.log('SW Sync Completed, refreshing data...');
+                    fetchTodayAttendance();
+                    fetchUserProfile();
+                    // Alert user if needed or just snackbar
+                }
+            });
+        }
 
         // Redirect based on role
         try {
@@ -218,7 +231,8 @@ const Dashboard: React.FC = () => {
                     checkInTime: checkIn.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
                     checkOutTime: checkOutStr,
                     workingHours: workingHrs,
-                    location: 'Kantor (Terverifikasi)'
+                    location: 'Kantor (Terverifikasi)',
+                    settings: res.data.meta?.settings || {} // Store settings
                 }));
 
                 // Set default checkout location to match check-in location
@@ -380,8 +394,7 @@ const Dashboard: React.FC = () => {
             setLoading(false);
 
             if (clockedIn) {
-                // If clocking out, verify location directly (or add camera if required later)
-                // For now, proceed to checkout
+                // For now, proceed to checkout directly (Backend doesn't support checkout photos yet)
                 handleCheckOut(latitude, longitude);
             } else {
                 // Clock IN - VALIDATE GEOFENCE HERE
@@ -421,8 +434,18 @@ const Dashboard: React.FC = () => {
 
                 if (isInside) {
                     setSelectedLocationId(validId);
-                    setShowCamera(true);
-                    startCamera();
+
+                    // CHECK CAMERA REQUIREMENT
+                    const requireCamera = stats.settings?.require_camera !== false; // Default true if undefined
+
+                    if (requireCamera) {
+                        setShowCamera(true);
+                        startCamera();
+                    } else {
+                        // Bypass camera, direct check-in
+                        handleCheckInWithoutPhoto(latitude, longitude, validId);
+                    }
+
                 } else {
                     // Find closest office to show nice error
                     let minDistance = Infinity;
@@ -442,26 +465,70 @@ const Dashboard: React.FC = () => {
         });
     }
 
+    const handleCheckInWithoutPhoto = async (lat: number, lng: number, locId: string) => {
+        setLoading(true);
+        try {
+            await api.post('/attendance/check-in', {
+                latitude: lat,
+                longitude: lng,
+                location_id: locId,
+                photo_url: null // Explicitly null
+            });
+            await fetchTodayAttendance();
+        } catch (error: any) {
+            console.error('Clock in failed (no photo)', error);
+            if (!error.response) {
+                await saveToOfflineQueue('/attendance/check-in', {
+                    latitude: lat,
+                    longitude: lng,
+                    location_id: locId,
+                    photo_url: null
+                }, 'check-in');
+            } else {
+                alert(`Gagal Check In: ${error.response?.data?.details || error.message}`);
+            }
+        } finally {
+            setLoading(false);
+        }
+    }
+
 
     const saveToOfflineQueue = async (url: string, body: any, type: 'check-in' | 'check-out') => {
         try {
-            await saveOfflineRequest(url, 'POST', body, type);
+            const token = localStorage.getItem('access_token');
+            const headers: any = {
+                'Content-Type': 'application/json'
+            };
+            if (token) {
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+
+            await saveOfflineRequest(url, 'POST', body, headers, type);
 
             // Register Sync Tag
             if ('serviceWorker' in navigator && 'SyncManager' in window) {
-                const reg = await navigator.serviceWorker.ready;
-                // @ts-ignore
-                await reg.sync.register('sync-attendance');
+                try {
+                    const reg = await navigator.serviceWorker.ready;
+                    // @ts-ignore
+                    await reg.sync.register('sync-attendance');
+                } catch (err) {
+                    console.log('Background Sync not supported or failed', err);
+                }
             }
 
+            // Fallback: Listen for online event to trigger manual sync if SW sync fails or not supported
+            // This is handled by a global listener usually, but we can try immediate check
+
             alert('Mode Offline: Data absensi tersimpan dan akan dikirim otomatis saat online.');
-            setClockedIn(type === 'check-in');
+            if (type === 'check-in') setClockedIn(true);
+            else setClockedIn(false);
 
             // Optimistic UI Update
             setStats(prev => ({
                 ...prev,
                 checkInTime: type === 'check-in' ? new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : prev.checkInTime,
                 checkOutTime: type === 'check-out' ? new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : prev.checkOutTime,
+                location: prev.location.includes('(Offline)') ? prev.location : `${prev.location} (Offline Stored)`
             }));
 
         } catch (e) {

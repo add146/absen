@@ -35,6 +35,7 @@ const SuperAdminLayout: React.FC = () => {
         { path: '/superadmin/users', icon: <MdPeople size={20} />, label: 'Manajemen Pengguna' },
         { path: '/superadmin/plans', icon: <MdCardGiftcard size={20} />, label: 'Paket Langganan' },
         { path: '/superadmin/analytics', icon: <MdPieChart size={20} />, label: 'Analitik Platform' },
+        { path: '/superadmin/storage', icon: <MdStorage size={20} />, label: 'Storage Analytics' },
         { path: '/superadmin/settings', icon: <MdSettings size={20} />, label: 'Pengaturan Global' },
         { path: '/superadmin/health', icon: <MdMonitorHeart size={20} />, label: 'Kesehatan Sistem' },
         { path: '/superadmin/profile', icon: <MdPerson size={20} />, label: 'Profil Saya' },

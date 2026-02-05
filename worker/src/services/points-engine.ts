@@ -116,7 +116,7 @@ export class PointsEngine {
             FROM attendances
             WHERE user_id = ? 
             AND id != ?
-            AND date(check_in_time, 'unixepoch', '+7 hours') = date(?, 'unixepoch', '+7 hours')
+            AND date(check_in_time, '+7 hours') = date(?, 'unixepoch', '+7 hours')
             AND points_earned > 0
         `).bind(userId, currentAttendanceId, checkInTime).first<{ count: number }>();
 

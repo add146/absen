@@ -11,21 +11,22 @@ export const securityHeaders = async (c: Context, next: Next) => {
 };
 
 // IP-based Rate Limit for public endpoints (Login/Register)
-// Uses KV if available, falls back to in-memory (per isolate)
+// Uses D1 database for persistent rate limiting
 export const ipRateLimiter = async (c: Context, next: Next) => {
     const ip = c.req.header('CF-Connecting-IP') || 'unknown';
-    const path = c.req.path;
     const now = Math.floor(Date.now() / 1000); // seconds
     const windowSize = 60; // 1 minute window
     const limit = 20; // 20 requests per minute per IP for auth endpoints
+    const currentWindow = Math.floor(now / windowSize);
 
-    // Simple in-memory fallback map for dev/testing without KV
-    // Note: specific to this worker instance
-    const cacheKey = `ratelimit:ip:${ip}:${Math.floor(now / windowSize)}`;
+    try {
+        // Get current count from D1
+        const result = await c.env.DB
+            .prepare('SELECT request_count FROM rate_limits WHERE ip = ? AND endpoint = ? AND window_start = ?')
+            .bind(ip, c.req.path, currentWindow)
+            .first<{ request_count: number }>();
 
-    if (c.env?.CACHE) {
-        const current = await c.env.CACHE.get(cacheKey);
-        const count = current ? parseInt(current) : 0;
+        const count = result?.request_count || 0;
 
         if (count >= limit) {
             return c.json({
@@ -34,11 +35,21 @@ export const ipRateLimiter = async (c: Context, next: Next) => {
             }, 429);
         }
 
-        // Increment (not atomic, but sufficient for soft limit)
-        await c.env.CACHE.put(cacheKey, (count + 1).toString(), { expirationTtl: windowSize });
-    } else {
-        // In-memory fallback logic could go here, but omitted to keep it stateless mostly
-        // console.warn("KV CACHE not available for rate limiting");
+        // Increment or insert
+        if (result) {
+            await c.env.DB
+                .prepare('UPDATE rate_limits SET request_count = request_count + 1 WHERE ip = ? AND endpoint = ? AND window_start = ?')
+                .bind(ip, c.req.path, currentWindow)
+                .run();
+        } else {
+            await c.env.DB
+                .prepare('INSERT INTO rate_limits (ip, endpoint, window_start, request_count) VALUES (?, ?, ?, 1)')
+                .bind(ip, c.req.path, currentWindow)
+                .run();
+        }
+    } catch (error) {
+        // Don't block requests if rate limiting fails
+        console.error('Rate limiting error:', error);
     }
 
     await next();

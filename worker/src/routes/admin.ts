@@ -299,10 +299,14 @@ admin.get('/stats', async (c) => {
         "SELECT COUNT(DISTINCT user_id) as count FROM attendances WHERE date(check_in_time) = ? AND strftime('%H:%M', check_in_time) > '09:00'"
     ).bind(today).first()
 
+    // 4. Tenant Info (For Company Code display)
+    const tenant = await c.env.DB.prepare('SELECT name, slug FROM tenants WHERE id = ?').bind(c.get('user').tenant_id).first();
+
     return c.json({
         total_employees: totalUsers?.count || 0,
         present_today: presentToday?.count || 0,
-        late_today: lateToday?.count || 0
+        late_today: lateToday?.count || 0,
+        tenant: tenant // Return tenant info
     })
 })
 

@@ -5,7 +5,6 @@
 
 type Bindings = {
     DB: D1Database
-    CACHE?: KVNamespace
 }
 
 export interface Tenant {
@@ -140,27 +139,10 @@ export async function createTenant(input: CreateTenantInput, env: Bindings): Pro
  * Get tenant by ID
  */
 export async function getTenantById(tenantId: string, env: Bindings): Promise<Tenant | null> {
-    // Check cache first
-    if (env.CACHE) {
-        const cached = await env.CACHE.get(`tenant:${tenantId}`, 'json')
-        if (cached) {
-            return cached as Tenant
-        }
-    }
-
     const tenant = await env.DB
         .prepare('SELECT * FROM tenants WHERE id = ?')
         .bind(tenantId)
         .first()
-
-    if (tenant) {
-        // Cache for 1 hour
-        if (env.CACHE) {
-            await env.CACHE.put(`tenant:${tenantId}`, JSON.stringify(tenant), {
-                expirationTtl: 3600
-            })
-        }
-    }
 
     return tenant as Tenant | null
 }
@@ -208,11 +190,6 @@ export async function updateTenant(
     const query = `UPDATE tenants SET ${fields.join(', ')} WHERE id = ?`
     await env.DB.prepare(query).bind(...values).run()
 
-    // Invalidate cache
-    if (env.CACHE) {
-        await env.CACHE.delete(`tenant:${tenantId}`)
-    }
-
     return getTenantById(tenantId, env)
 }
 
@@ -223,11 +200,6 @@ export async function suspendTenant(tenantId: string, env: Bindings): Promise<vo
     await env.DB.prepare('UPDATE tenants SET status = ?, updated_at = datetime("now") WHERE id = ?')
         .bind('suspended', tenantId)
         .run()
-
-    // Invalidate cache
-    if (env.CACHE) {
-        await env.CACHE.delete(`tenant:${tenantId}`)
-    }
 }
 
 /**
@@ -237,11 +209,6 @@ export async function activateTenant(tenantId: string, env: Bindings): Promise<v
     await env.DB.prepare('UPDATE tenants SET status = ?, updated_at = datetime("now") WHERE id = ?')
         .bind('active', tenantId)
         .run()
-
-    // Invalidate cache
-    if (env.CACHE) {
-        await env.CACHE.delete(`tenant:${tenantId}`)
-    }
 }
 
 /**

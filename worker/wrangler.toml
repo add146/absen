@@ -16,9 +16,10 @@ binding = "AI"
 binding = "STORAGE"
 bucket_name = "absen-storage"
 
-[[kv_namespaces]]
-binding = "CACHE"
-id = "b9f7c774a5bf4b649abaeee07169f563"
+# KV Namespace removed - migrated to D1 + in-memory caching
+# [[kv_namespaces]]
+# binding = "CACHE"
+# id = "b9f7c774a5bf4b649abaeee07169f563"
 
 [vars]
 ENVIRONMENT = "production"

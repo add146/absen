@@ -142,6 +142,7 @@ app.route('/subscriptions', subscriptions) // Some endpoints are public (webhook
 
 // Super Admin routes (auth required but NO tenant context)
 app.route('/super-admin', superadmin)
+app.route('/super-admin/storage', await import('./routes/storage-analytics').then(m => m.default))
 
 // Protected routes (require authentication + tenant context)
 app.use('/*', tenantContext) // Apply tenant middleware to all routes below
@@ -171,8 +172,25 @@ export default {
     fetch: app.fetch,
     scheduled: async (event: ScheduledEvent, env: Bindings, ctx: ExecutionContext) => {
         ctx.waitUntil((async () => {
-            const { processDailyMetrics } = await import('./services/metrics-scheduler')
-            await processDailyMetrics(env)
+            try {
+                // Daily metrics processing
+                const { processDailyMetrics } = await import('./services/metrics-scheduler')
+                await processDailyMetrics(env)
+
+                // Storage lifecycle cleanup
+                const { cleanupOldFiles, cleanupRateLimits, archiveOldPhotos } = await import('./services/storage-lifecycle')
+
+                const fileCleanup = await cleanupOldFiles(env)
+                console.log(`Storage cleanup: ${fileCleanup.deleted} files, ${(fileCleanup.spaceFreed / 1024 / 1024).toFixed(2)} MB freed`)
+
+                const rateLimitCleanup = await cleanupRateLimits(env)
+                console.log(`Rate limits cleaned: ${rateLimitCleanup} records`)
+
+                const archived = await archiveOldPhotos(env)
+                console.log(`Photos archived: ${archived} files`)
+            } catch (error) {
+                console.error('Scheduled job error:', error)
+            }
         })())
     }
 }

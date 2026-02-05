@@ -37,7 +37,8 @@ const AdminLayout = () => {
         <div className={`flex h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-200 ${darkMode ? 'dark' : ''}`}>
             {/* Sidebar */}
             <aside className="w-64 bg-white dark:bg-gray-800 shadow-md flex flex-col border-r border-gray-200 dark:border-gray-700">
-                <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+                <div className="p-6 border-b border-gray-200 dark:border-gray-700 flex items-center gap-3">
+                    <MdSecurity className="text-3xl text-blue-600 dark:text-blue-400" />
                     <h1 className="text-2xl font-bold text-blue-600 dark:text-blue-400">Absen Admin</h1>
                 </div>
 

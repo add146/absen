@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import api from '../services/api';
 import {
     MdToken,
     MdDashboard,
@@ -25,6 +26,7 @@ import { useTheme } from '../context/ThemeContext';
 
 const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [points, setPoints] = useState<number>(0);
     const { darkMode, toggleTheme } = useTheme();
     const location = useLocation();
     const navigate = useNavigate();
@@ -37,12 +39,30 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
 
     const user = JSON.parse(localStorage.getItem('user_data') || '{}');
 
+    // Fetch latest user data (points)
+    React.useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const res = await api.get('/auth/me');
+                if (res.data.user) {
+                    setPoints(res.data.user.points_balance || 0);
+                    // Update local storage if needed, but state is enough for now
+                }
+            } catch (error) {
+                console.error('Failed to update user points', error);
+                // Fallback to local storage if available
+                if (user.points_balance) setPoints(user.points_balance);
+            }
+        };
+        fetchUser();
+    }, []);
+
     const navItems: { name: string; icon: React.ReactNode; path: string; badge?: string }[] = [
         { name: 'Dasbor', icon: <MdDashboard />, path: '/dashboard' },
         { name: 'Kehadiran', icon: <MdSchedule />, path: '/attendance' },
         { name: 'Cuti', icon: <MdFlightTakeoff />, path: '/leaves' },
         { name: 'Tim', icon: <MdGroup />, path: '/team' },
-        { name: 'Hadiah', icon: <MdLeaderboard />, path: '/rewards' },
+        { name: 'Hadiah', icon: <MdLeaderboard />, path: '/rewards', badge: `${points} pts` },
         { name: 'Profil', icon: <MdPerson />, path: '/profile' },
         { name: 'Pengaturan', icon: <MdSettings />, path: '/settings' },
     ];
@@ -134,7 +154,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
             <main className="flex-1 md:ml-64 flex flex-col h-full relative overflow-y-auto scroll-smooth">
 
                 {/* Header */}
-                <header className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-md sticky top-0 z-10 px-6 py-4 flex justify-between items-center border-b border-gray-200 dark:border-gray-700">
+                <header className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-md sticky top-0 z-30 px-6 py-4 flex justify-between items-center border-b border-gray-200 dark:border-gray-700">
                     <div className="flex items-center md:hidden">
                         <button onClick={() => setSidebarOpen(!sidebarOpen)} className="mr-3 text-gray-600 dark:text-gray-300">
                             <MdMenu className="text-2xl" />

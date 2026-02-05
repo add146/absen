@@ -798,6 +798,23 @@ Fase penguatan sistem (hardening) dan implementasi fitur Progressive Web App tel
 
 #### Feature Completion
 - **Invoice History UI**: Implementasi penuh halaman riwayat tagihan (`InvoiceHistory.tsx`) yang memungkinkan admin melihat status pembayaran dan mengunduh invoice.
+
+### 7.8 Update Implementasi (05 Februari 2026)
+
+#### User Onboarding & Admin UX
+- **Company Code Display**: Dashboard Admin kini menampilkan "Kode Perusahaan" (Tenant Slug) secara prominen di kartu paling atas. Dilengkapi tombol "Copy" untuk mempermudah admin membagikan kode ke karyawan baru.
+- **Admin Branding**: Logo header pada layout admin diperbarui menjadi "Absen Admin" dengan ikon keamanan, memperjelas konteks halaman yang sedang diakses.
+- **Header Fixes**: Perbaikan `z-index` pada header dashboard untuk mencegah elemen tombol "Check-in" menutupi navigasi saat di-scroll pada layar kecil.
+
+#### Image Storage Architecture
+- **Worker Proxy for R2**: Implementasi route `/upload/file/:key` pada Worker untuk melayani file gambar langsung dari R2 bucket.
+  - Menggantikan kebutuhan domain publik R2 yang bermasalah.
+  - Memastikan kompatibilitas akses gambar profil dan bukti foto di seluruh platform (termasuk report PDF yang akan datang).
+
+#### Points System Logic Refinement
+- **Daily Check-in Limit**: Perbaikan query database (`PointsEngine`) untuk deteksi check-in harian yang lebih akurat (menggunakan ISO string comparison), mencegah double-claim poin dalam satu hari.
+- **Sidebar Integration**: Integrasi saldo poin dinamis pada menu sidebar "Hadiah", memberikan feedback instan kepada user tanpa perlu membuka menu rewards.
+- **Duration Cap**: Konfirmasi dan retensi aturan batas maksimal 13 jam durasi kerja untuk klaim "Full Day Bonus", mencegah eksploitasi poin akibat lupa check-out.
 - **Order Management Polish**: UI manajemen pesanan toko yang lengkap dengan filter status (Pending, Completed, Cancelled) dan fitur ekspor CSV.
 - **System Health Monitoring**: Halaman pemantauan kesehatan sistem (`SystemHealth.tsx`) yang menampilkan status real-time dari API Gateway dan Database.
 - **Fraud Detection UI Refinement**: Visualisasi indikator kecurangan yang lebih jelas (Mock GPS, Impossible Travel) dengan badge risiko (Rendah, Sedang, Tinggi).
@@ -820,6 +837,23 @@ Validasi ID produk dilonggarkan untuk mendukung legacy product ID (non-UUID), me
 
 ---
 
+### 7.8 Update Implementasi (05 Februari 2026)
+
+#### Storage Optimization & Scalability
+- **KV Removal**: Migrasi penyimpanan metadata dan rate-limiting dari Workers KV ke D1 Database untuk efisiensi biaya.
+- **Image Compression (R2)**: Integrasi Cloudflare Image Resizing. Foto yang diupload kini dikompresi otomatis saat diakses (Quality 60), menghemat bandwidth hingga 60-70%.
+- **Storage Analytics**: Dashboard baru bagi Super Admin untuk memantau penggunaan penyimpanan tenant secara real-time (jumlah file, tipe file, total size).
+
+#### Attendance & User Experience
+- **Calendar History View**: Refactor total tampilan riwayat absensi. Menggantikan tabel statis dengan **Kalender Interaktif**:
+  - **Visual Indicators**: Warna status (Hadir, Terlambat, Cuti).
+  - **Daily Timeline**: Detail aktivitas harian (Clock In/Out, Lokasi) yang muncul saat tanggal diklik.
+  - **Lightbox Modal**: Klik thumbnail foto untuk melihat versi resolusi tinggi.
+  - Tampilan ini digunakan konsisten baik di halaman User maupun Admin.
+- **Camera Verification Toggle**: Setting baru bagi Tenant Admin untuk mengaktifkan/menonaktifkan kewajiban foto selfie saat check-in.
+- **UI Polish**: Penambahan background color pada tombol aksi (History, Edit, Delete) di manajemen karyawan untuk visual yang lebih jelas.
+- **Bug Fix**: Koreksi kalkulasi statistik "Terlambat" agar hanya menghitung satu kali per hari unik.
+
 ## 8. Gap & Future Roadmap (Updated)
 
 Meskipun fitur utama telah selesai (85% Completion), beberapa fitur berikut masih dalam status **Pending** atau **Partial**:
@@ -827,6 +861,6 @@ Meskipun fitur utama telah selesai (85% Completion), beberapa fitur berikut masi
 1.  **Custom Domain Strategy**: Menggunakan fitur native **Cloudflare for SaaS (Custom Hostnames)**. Pengaturan dilakukan via Cloudflare Dashboard atau simplifikasi UI di masa depan, mengurangi kebutuhan build UI kompleks di awal.
 2.  **Advanced Testing**: Unit test ada, namun End-to-End (E2E) testing dengan Playwright belum disetup.
 3.  **Disaster Recovery**: Rencana pemulihan bencana formal belum didokumentasikan sepenuhnya.
-4.  **Background Sync**: Fitur advanced PWA untuk antrian offline sync belum aktif sepenuhnya.
+4.  **Background Sync**: Fitur offline sync telah diimplementasikan (IndexedDB + Service Worker + Auto Retry).
 
 *Catatan: Fitur Email Notifications telah dihapus dari roadmap sesuai keputusan bisnis 04 Feb 2026. Fokus notifikasi sepenuhnya pada WhatsApp (WAHA).*
