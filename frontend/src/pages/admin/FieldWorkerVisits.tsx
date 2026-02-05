@@ -223,4 +223,4 @@ const FieldWorkerVisits: React.FC = () => {
     );
 };
 
-// End of file
+export default FieldWorkerVisits;
