@@ -40,8 +40,20 @@ const Settings: React.FC = () => {
             setMessage({ type: 'success', text: 'Password berhasil diperbarui!' });
             setFormData({ current_password: '', new_password: '', confirm_password: '' });
         } catch (error: any) {
-            const msg = error.response?.data?.error || 'Gagal mengubah password.';
-            setMessage({ type: 'error', text: msg });
+            console.error('Change password error:', error);
+            const status = error.response?.status;
+            const data = error.response?.data;
+            let detail = 'Gagal mengubah password.';
+
+            if (data && data.error) {
+                detail = `${data.error} ${data.details ? `(${data.details})` : ''}`;
+            } else if (status) {
+                detail = `Error Status: ${status} - ${error.message}`;
+            } else {
+                detail = error.message || 'Unknown Error';
+            }
+
+            setMessage({ type: 'error', text: detail });
         } finally {
             setLoading(false);
         }
